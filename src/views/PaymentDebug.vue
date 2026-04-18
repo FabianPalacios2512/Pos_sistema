@@ -50,6 +50,9 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useToast } from '../composables/useToast.js'
+
+const { showSuccess } = useToast()
 
 const route = useRoute()
 const router = useRouter()
@@ -73,7 +76,7 @@ const params = computed(() => ({
 const copyToClipboard = () => {
   const text = JSON.stringify(params.value, null, 2)
   navigator.clipboard.writeText(text).then(() => {
-    alert('Copiado al portapapeles')
+    showSuccess('Copiado al portapapeles')
   })
 }
 

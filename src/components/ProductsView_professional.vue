@@ -27,8 +27,8 @@
         </div>
         
         <div class="flex items-center space-x-3">
-          <!-- Botón Importar Excel (NUEVO) -->
-          <button id="tour-import-excel" @click="showExcelImportModal = true"
+          <!-- Botón Importar Excel (solo admin) -->
+          <button v-if="!isVendedor" id="tour-import-excel" @click="showExcelImportModal = true"
                   class="px-4 py-2 bg-white dark:bg-zinc-900/60 hover:bg-gray-50 dark:hover:bg-zinc-800/60 text-gray-600 dark:text-zinc-300 text-[15px] font-medium rounded-lg border border-gray-200 dark:border-zinc-700/60 transition-all duration-200 flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
@@ -36,8 +36,8 @@
             <span>Importar Excel</span>
           </button>
           
-          <!-- Botón Neutro (Exportar) -->
-          <button id="tour-export-products" @click="exportProducts"
+          <!-- Botón Neutro (Exportar - solo admin) -->
+          <button v-if="!isVendedor" id="tour-export-products" @click="exportProducts"
                   class="px-4 py-2 bg-white dark:bg-zinc-900/60 hover:bg-gray-50 dark:hover:bg-zinc-800/60 text-gray-600 dark:text-zinc-300 text-[15px] font-medium rounded-lg border border-gray-200 dark:border-zinc-700/60 transition-all duration-200 flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -57,7 +57,7 @@
           </button>
           
           <!-- Bot�n Principal (Nuevo Producto) -->
-          <button id="tour-new-product"
+          <button v-if="!isVendedor" id="tour-new-product"
                   @click="openCreateModal"
                   class="px-5 py-2 bg-gray-900 dark:bg-white/10 hover:bg-black dark:hover:bg-white/15 text-white text-[15px] font-semibold rounded-lg shadow-sm transition-all duration-200 flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -87,7 +87,7 @@
         </div>
         <div class="w-px h-8 bg-gray-200 dark:bg-zinc-800 hidden md:block"></div>
         <div>
-          <p class="text-sm font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-0.5">Valor Inventario</p>
+          <p class="text-sm font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-0.5">Valor Potencial</p>
           <p class="text-2xl font-light text-gray-900 dark:text-white">${{ formatCurrency(totalValue) }}</p>
         </div>
       </div>
@@ -147,7 +147,7 @@
             </svg>
           </div>
           <div>
-            <p class="text-[13px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider leading-none">Valor Total</p>
+            <p class="text-[13px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider leading-none">Valor Potencial</p>
             <p class="text-base font-semibold text-[#374151] dark:text-zinc-300 leading-tight">${{ formatCurrency(totalValue) }}</p>
           </div>
         </div>
@@ -300,6 +300,7 @@
             v-for="product in paginatedProducts"
             :key="product.id"
             :product="product"
+            :readOnly="isVendedor"
             @view="viewProduct"
             @edit="editProduct"
           />
@@ -310,7 +311,8 @@
           <div v-for="product in paginatedProducts" 
                :key="product.id" 
                @click="viewProduct(product)"
-               class="bg-white dark:bg-[#1e1f20] rounded-2xl hover:bg-gray-50 dark:hover:bg-[#282a2c] transition-all duration-200 overflow-hidden group cursor-pointer">
+               class="bg-white dark:bg-[#1e1f20] rounded-2xl hover:bg-gray-50 dark:hover:bg-[#282a2c] transition-all duration-200 overflow-hidden group"
+               :class="!isVendedor ? 'cursor-pointer' : ''">
           
             <!-- Imagen del producto con overlay en hover -->
             <div class="relative aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-50 dark:from-[#1e1f20] dark:to-[#282a2c] overflow-hidden">
@@ -332,8 +334,8 @@
                 </div>
               </div>
               
-              <!-- Overlay con acciones en hover -->
-              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+              <!-- Overlay con acciones en hover (oculto para vendedores) -->
+              <div v-if="!isVendedor" class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
                 <button @click.stop="viewProduct(product)" 
                         class="w-9 h-9 rounded-full bg-white/95 hover:bg-white text-gray-700 hover:text-gray-900 flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-all duration-200"
                         title="Ver">
@@ -578,8 +580,9 @@
             <!-- Columnas de Stock Dinámicas -->
             <template v-if="showMultipleStockColumns">
               <td v-for="warehouse in availableWarehouses" :key="warehouse.id"
-                  class="px-4 py-[16px] text-center cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-150"
-                  @click.stop="viewProduct(product, warehouse.id)">
+                  class="px-4 py-[16px] text-center transition-colors duration-150"
+                  :class="!isVendedor ? 'cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20' : ''"
+                  @click.stop="!isVendedor && viewProduct(product, warehouse.id)">
                 <div v-if="getWarehouseTotalStock(product, warehouse.id) !== null" class="flex flex-col items-center relative group/stock-wh" :title="hasVariants(product) ? getVariantWarehouseStockAnalysis(product, warehouse.id)?.tooltipText : null">
                   <span class="text-[17px] font-mono font-bold tabular-nums text-gray-900 dark:text-gray-200">
                     {{ getWarehouseTotalStock(product, warehouse.id) }}
@@ -605,10 +608,14 @@
               </td>
             </template>
             <template v-else>
-              <td class="px-6 py-[16px] text-center cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-150" @click.stop="viewProduct(product)">
+              <td class="px-6 py-[16px] text-center transition-colors duration-150"
+                  :class="!isVendedor ? 'cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20' : ''"
+                  @click.stop="!isVendedor && viewProduct(product)">
                 <div class="flex flex-col items-center relative group/stock" :title="hasVariants(product) ? getVariantStockAnalysis(product)?.tooltipText : null"> 
                   <span class="text-[17px] font-mono font-bold tabular-nums text-gray-900 dark:text-gray-200">
-                    {{ hasVariants(product) ? getStockSummary(product).total : getTotalStock(product) }}
+                    {{ isVendedor && authUser?.warehouse_id
+                      ? (getWarehouseTotalStock(product, authUser.warehouse_id) ?? 0)
+                      : (hasVariants(product) ? getStockSummary(product).total : getTotalStock(product)) }}
                   </span>
                   <template v-if="hasVariants(product)">
                     <div v-if="getVariantStockAnalysis(product)?.status === 'critical'" class="mt-1 flex items-center gap-1 text-[10px] font-bold text-rose-600 dark:text-rose-400">
@@ -624,8 +631,8 @@
                      <span v-if="getTotalStock(product) === 0" class="text-[10px] font-bold text-rose-600 dark:text-rose-400 mt-1">✖ Sin stock</span>
                      <span v-else-if="getTotalStock(product) <= (product.min_stock || 0)" class="text-[10px] font-bold text-amber-600 dark:text-amber-400 mt-1">⚠ Bajo mínimo</span>
                   </template>
-                  <!-- Tooltip desglose por sede -->
-                  <div v-if="product.warehouses && product.warehouses.length > 0" 
+                  <!-- Tooltip desglose por sede (oculto para vendedores) -->
+                  <div v-if="!isVendedor && product.warehouses && product.warehouses.length > 0" 
                        class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover/stock:opacity-100 transition-all duration-200 pointer-events-none z-10 w-48 bg-white dark:bg-zinc-900/95 backdrop-blur-md shadow-xl dark:shadow-black/50 border border-gray-200 dark:border-white/10 rounded-xl p-3">
                     <p class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wide mb-2 text-left">Stock por Sede</p>
                     <ul class="space-y-1.5 text-sm text-left">
@@ -656,7 +663,7 @@
             <td class="px-4 py-[16px] sticky right-0 z-10"
                 :class="[index % 2 === 1 ? 'bg-[#FAFAFA] dark:bg-zinc-900' : 'bg-white dark:bg-zinc-900']">
               <div class="flex items-center justify-center gap-1">
-                <button @click.stop="viewProduct(product)" 
+                <button v-if="!isVendedor" @click.stop="viewProduct(product)" 
                   class="p-1.5 text-gray-900 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-zinc-700/40 rounded-md transition-all"
                   title="Ver detalles">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -664,14 +671,14 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                   </svg>
                 </button>
-                <button @click.stop="editProduct(product)" 
+                <button v-if="!isVendedor" @click.stop="editProduct(product)" 
                   class="p-1.5 text-gray-900 dark:text-zinc-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-slate-100 dark:hover:bg-zinc-700/40 rounded-md transition-all"
                   title="Editar producto">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                   </svg>
                 </button>
-                <button @click.stop="toggleProductStatus(product)" 
+                <button v-if="!isVendedor" @click.stop="toggleProductStatus(product)" 
                   class="p-1.5 rounded-md transition-all"
                   :class="getProductStatus(product) !== false 
                     ? 'text-gray-900 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-zinc-700/40' 
@@ -686,7 +693,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
                 </button>
-                <button @click.stop="deleteProduct(product)" 
+                <button v-if="!isVendedor" @click.stop="deleteProduct(product)" 
                   class="p-1.5 text-slate-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-md transition-all"
                   title="Eliminar producto">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1309,19 +1316,35 @@
                 <!-- Grid de Sedes -->
                 <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
                   <div v-for="warehouse in availableWarehouses" :key="warehouse.id"
-                       class="p-3 rounded-xl border-2 transition-all"
+                       class="relative p-3 rounded-xl border-2 transition-all duration-200"
                        :class="productForm.warehouseEnabled[warehouse.id] 
-                         ? 'border-blue-300 dark:border-blue-700 bg-blue-50/50 dark:bg-blue-950/30' 
-                         : 'border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/50'">
+                         ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50/60 dark:bg-emerald-950/25 shadow-sm' 
+                         : 'border-gray-200 dark:border-zinc-700 bg-gray-50/80 dark:bg-zinc-800/40 opacity-60'">
                     
+                    <!-- Badge "En esta sede" para las activas -->
+                    <div v-if="productForm.warehouseEnabled[warehouse.id]" class="absolute -top-2 -right-2">
+                      <span class="px-1.5 py-0.5 bg-emerald-500 text-white text-[9px] font-bold rounded-full uppercase tracking-wide shadow-sm">Aquí</span>
+                    </div>
+
+                    <!-- Tooltip para sedes sin el producto -->
+                    <div v-if="!productForm.warehouseEnabled[warehouse.id]" class="group/nothere">
+                      <div class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/nothere:opacity-100 transition-opacity duration-200 pointer-events-none z-20 whitespace-nowrap bg-zinc-900 dark:bg-zinc-700 text-white text-[11px] font-medium px-2.5 py-1.5 rounded-lg shadow-lg">
+                        Producto no existe en esta sede
+                        <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-900 dark:border-t-zinc-700"></div>
+                      </div>
+                    </div>
+
                     <!-- Checkbox + Nombre -->
                     <label class="flex items-center gap-2 cursor-pointer mb-2">
                       <input 
                         v-model="productForm.warehouseEnabled[warehouse.id]"
                         type="checkbox"
-                        class="w-4 h-4 text-blue-600 bg-white dark:bg-zinc-700 border-gray-300 dark:border-zinc-600 rounded focus:ring-blue-500"
+                        class="w-4 h-4 text-emerald-600 bg-white dark:bg-zinc-700 border-gray-300 dark:border-zinc-600 rounded focus:ring-emerald-500"
                       />
-                      <span class="text-[15px] font-semibold text-gray-900 dark:text-white truncate">{{ warehouse.name }}</span>
+                      <span class="text-[15px] font-semibold truncate"
+                            :class="productForm.warehouseEnabled[warehouse.id] ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-zinc-500'">
+                        {{ warehouse.name }}
+                      </span>
                       <span v-if="warehouse.is_default" class="text-[12px] font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 px-1.5 py-0.5 rounded">PRINCIPAL</span>
                     </label>
                     
@@ -1334,7 +1357,7 @@
                           :step="productForm.allow_decimal ? '0.01' : '1'"
                           min="0"
                           :placeholder="productForm.allow_decimal ? '0.00' : '0'"
-                          class="w-full px-3 pr-10 py-2 border border-gray-200 dark:border-zinc-700 rounded-lg text-[15px] font-semibold text-center bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-400 transition-all"
+                          class="w-full px-3 pr-10 py-2 border border-emerald-200 dark:border-emerald-800 rounded-lg text-[15px] font-semibold text-center bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-400 transition-all"
                         />
                         <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-gray-400 dark:text-zinc-500">
                           {{ getUnitAbbreviation(productForm.measurement_unit) }}
@@ -1342,7 +1365,7 @@
                       </div>
                     </div>
                     <div v-else class="text-center py-2">
-                      <span class="text-[13px] text-gray-400 dark:text-zinc-500">No disponible</span>
+                      <span class="text-[11px] text-gray-400 dark:text-zinc-500 italic">Sin inventario en esta sede</span>
                     </div>
                   </div>
                 </div>
@@ -2049,7 +2072,7 @@
                 <span>Máx: {{ selectedProduct.max_stock || 0 }}</span>
               </div>
             </div>
-            <div class="bg-gray-50 dark:bg-[#282a2c] rounded-2xl p-4">
+            <div v-if="!isVendedor" class="bg-gray-50 dark:bg-[#282a2c] rounded-2xl p-4">
               <p class="text-[13px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Costo</p>
               <p class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">${{ formatCurrency(selectedProduct.cost_price) }}</p>
               <p class="text-[13px] text-[#5f6368] dark:text-[#9aa0a6] mt-1">
@@ -2073,7 +2096,7 @@
 
           <!-- Pie del modal con acciones (Gemini style) -->
           <div class="flex items-center justify-end space-x-3">
-            <button @click="editProduct(selectedProduct)" 
+            <button v-if="!isVendedor" @click="editProduct(selectedProduct)" 
                     class="px-5 py-2.5 bg-[#f0f4f9] dark:bg-[#1e1f20] hover:bg-[#e4e9ef] dark:hover:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] rounded-full text-[15px] font-medium inline-flex items-center gap-2 transition-colors">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -2335,6 +2358,7 @@ import { categoriesService } from '../services/categoriesService.js'
 import { warehouseService } from '../services/warehouseService.js'
 import { apiCall } from '../services/api.js' // �x- Para cargar proveedores
 import { appStore } from '../store/appStore.js'
+import { useAuth } from '../store/auth.js'
 import { useUIContextStore } from '../store/uiContextStore.js'
 import { useAutoRefresh } from '../composables/useRouteState.js'
 import { useScreenScaling } from '../composables/useScreenScaling.js'
@@ -2346,6 +2370,26 @@ import FashionProductCard from './FashionProductCard.vue'
 
 // --- ESTADOS PARA TABLA ANIDADA (Variantes) ---
 const expandedProducts = ref(new Set());
+
+// --- ROLES Y PERMISOS ---
+const { user: authUser } = useAuth()
+const isVendedor = computed(() => {
+  const role = authUser.value?.role?.name || authUser.value?.role || ''
+  const r = role.toLowerCase()
+  return r === 'vendedor' || r === 'cajero'
+})
+const isAdminUser = computed(() => {
+  const role = authUser.value?.role?.name || authUser.value?.role || ''
+  const r = role.toLowerCase()
+  return r === 'administrador' || r === 'admin' || r === 'administrador pos' || r === 'admin_pos'
+})
+const isAdminPos = computed(() => {
+  const role = authUser.value?.role?.name || authUser.value?.role || ''
+  return role.toLowerCase() === 'administrador pos'
+})
+const isWarehouseScoped = computed(() => {
+  return isVendedor.value || isAdminPos.value
+})
 const expandedWarehouseSelection = ref({}) // { productId: warehouseId } - sede seleccionada en sub-tabla expandida
 const toggleProduct = (productId) => {
   if (expandedProducts.value.has(productId)) {
@@ -2855,7 +2899,12 @@ const lowStockProducts = computed(() => {
   return count
 })
 const totalValue = computed(() => 
-  products.value.reduce((sum, p) => sum + (parseFloat(p.sale_price || 0) * (p.current_stock || 0)), 0)
+  products.value.reduce((sum, p) => {
+    if (p.variants && p.variants.length > 0) {
+      return sum + p.variants.reduce((vs, v) => vs + ((v.stock || 0) * parseFloat(v.price || p.sale_price || 0)), 0)
+    }
+    return sum + (parseFloat(p.sale_price || 0) * (p.current_stock || 0))
+  }, 0)
 )
 const uniqueCategories = computed(() => {
   const categoryIds = products.value.map(p => p.category_id).filter(Boolean)
@@ -4079,6 +4128,11 @@ const loadProducts = async () => {
     // Obtener TODOS los productos sin paginación del servidor
     params.per_page = 1000 // Obtener un número alto para evitar paginación del servidor
     
+    // Vendedores y Admin POS: filtrar solo productos de su sede asignada
+    if (isWarehouseScoped.value && authUser.value?.warehouse_id) {
+      params.warehouse_id = authUser.value.warehouse_id
+    }
+    
     const response = await productsService.getAll(params)
     
     // La API devuelve datos paginados, extraer el array de productos
@@ -4125,6 +4179,11 @@ const loadSuppliers = async () => {
 
 // �x- Computed: Filtrar bodegas según plan del tenant
 const availableWarehouses = computed(() => {
+  // Vendedores y Admin POS: solo ver su sede asignada
+  if (isWarehouseScoped.value && authUser.value?.warehouse_id) {
+    return warehouses.value.filter(w => w.active && w.id === authUser.value.warehouse_id)
+  }
+  
   const plan = appStore.tenantPlan
   const isPremiumOrEnterprise = plan === 'premium' || plan === 'enterprise'
   
@@ -4151,8 +4210,10 @@ const showMultipleStockColumns = computed(() => {
 
 // Computed: ID de la sede actual del usuario (sesión de caja o bodega por defecto)
 const currentUserWarehouseId = computed(() => {
+  // Prioridad: sesión > warehouse asignada al usuario > default
   const sessionWh = appStore.cashSession.current?.warehouse_id
   if (sessionWh) return sessionWh
+  if (authUser.value?.warehouse_id) return authUser.value.warehouse_id
   const defaultWh = warehouses.value.find(w => w.is_default && w.active)
   return defaultWh?.id || (warehouses.value.length > 0 ? warehouses.value[0].id : 1)
 })
@@ -4563,6 +4624,9 @@ const editProduct = async (product) => {
 }
 
 const viewProduct = async (product, forWarehouseId = null) => {
+  // Vendedores no pueden abrir el modal de detalles (permite edición)
+  if (isVendedor.value) return
+  
   selectedProduct.value = product
   variantChanges.value = {} // Limpiar cambios previos
   selectedImageIndex.value = 0

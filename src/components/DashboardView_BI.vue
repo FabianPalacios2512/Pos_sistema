@@ -94,7 +94,7 @@
             <span class="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-zinc-500">Margen Bruto</span>
           </div>
           <p class="text-2xl font-bold tabular-nums tracking-tight">{{ kpis.gross_margin }}%</p>
-          <p class="text-[11px] text-gray-400 dark:text-zinc-500 mt-1">Costo: ${{ fmt(kpis.total_cost) }}</p>
+          <p class="text-[11px] text-gray-400 dark:text-zinc-500 mt-1">{{ kpis.total_cost > 0 ? `Costo: $${fmt(kpis.total_cost)}` : 'Sin costos registrados' }}</p>
         </div>
 
         <!-- Average Ticket -->
@@ -110,10 +110,10 @@
         <!-- Inventory Value -->
         <div class="bg-white dark:bg-[#1a1d27] rounded-lg border border-gray-200 dark:border-zinc-800 p-4">
           <div class="flex items-center justify-between mb-1">
-            <span class="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-zinc-500">Valor Inventario</span>
+            <span class="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-zinc-500">Capital Invertido</span>
           </div>
           <p class="text-2xl font-bold tabular-nums tracking-tight">${{ fmt(kpis.inventory_value) }}</p>
-          <p class="text-[11px] text-gray-400 dark:text-zinc-500 mt-1">Capital inmovilizado</p>
+          <p class="text-[11px] text-gray-400 dark:text-zinc-500 mt-1">costo × stock</p>
         </div>
 
         <!-- Net Profit -->

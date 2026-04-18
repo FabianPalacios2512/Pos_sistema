@@ -27,7 +27,7 @@
               <!-- Close Button -->
               <button @click="handleClose" 
                       class="p-2 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="  0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
               </button>
@@ -541,6 +541,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import api from '@/services/api'
 import { warehouseService } from '@/services/warehouseService'
+import { useToast } from '../composables/useToast.js'
 
 const props = defineProps({
   isOpen: {
@@ -550,6 +551,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close', 'imported'])
+
+const { showError, showWarning } = useToast()
 
 // State
 const currentStep = ref(1)
@@ -697,7 +700,7 @@ const processFile = async (file) => {
   
   const extension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase()
   if (!validExtensions.includes(extension)) {
-    alert('Por favor sube un archivo Excel (.xlsx, .xls) o CSV (.csv)')
+    showWarning('Por favor sube un archivo Excel (.xlsx, .xls) o CSV (.csv)')
     return
   }
 
@@ -762,7 +765,7 @@ const processFile = async (file) => {
       errorMessage = error.message
     }
     
-    alert('Error al procesar el archivo: ' + errorMessage)
+    showError('Error al procesar el archivo: ' + errorMessage)
     clearFile()
   } finally {
     isLoading.value = false
@@ -864,7 +867,7 @@ const generatePreview = async () => {
     }
   } catch (error) {
     console.error('Error generating preview:', error)
-    alert('Error al generar preview: ' + (error.message || 'Error desconocido'))
+    showError('Error al generar preview: ' + (error.message || 'Error desconocido'))
   } finally {
     isLoading.value = false
   }

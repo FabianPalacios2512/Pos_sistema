@@ -241,6 +241,9 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { appStore } from '@/store/appStore'
 import axios from 'axios'
+import { useToast } from '@/composables/useToast.js'
+
+const { showError } = useToast()
 
 const router = useRouter()
 const userName = ref('')
@@ -303,7 +306,7 @@ const selectStoreType = async (storeType) => {
     
   } catch (error) {
     console.error('Error al guardar tipo de tienda:', error)
-    alert('No se pudo guardar la configuración. Por favor intenta nuevamente.')
+    showError('No se pudo guardar la configuración. Por favor intenta nuevamente.')
     savingStoreType.value = false
   }
 }

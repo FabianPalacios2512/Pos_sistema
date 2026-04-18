@@ -706,6 +706,9 @@
 <script setup>
 import { ref, computed, reactive, onMounted } from 'vue'
 import rolesService from '../services/rolesService.js'
+import { useToast } from '../composables/useToast.js'
+
+const { showSuccess, showError } = useToast()
 
 // Props
 const props = defineProps({
@@ -862,11 +865,11 @@ const saveRole = async () => {
     closeRoleModal()
     
     // Mostrar mensaje de éxito
-    alert(editingRole.value ? 'Rol actualizado exitosamente' : 'Rol creado exitosamente')
+    showSuccess(editingRole.value ? 'Rol actualizado exitosamente' : 'Rol creado exitosamente')
     
   } catch (error) {
     console.error('Error saving role:', error)
-    alert('Error al guardar el rol: ' + (error.response?.data?.message || error.message))
+    showError('Error al guardar el rol: ' + (error.response?.data?.message || error.message))
   } finally {
     loading.value = false
   }
@@ -882,10 +885,10 @@ const deleteRole = async (role) => {
   try {
     await rolesService.deleteRole(role.id)
     await loadRoles()
-    alert('Rol eliminado exitosamente')
+    showSuccess('Rol eliminado exitosamente')
   } catch (error) {
     console.error('Error deleting role:', error)
-    alert('Error al eliminar el rol: ' + (error.response?.data?.message || error.message))
+    showError('Error al eliminar el rol: ' + (error.response?.data?.message || error.message))
   } finally {
     loading.value = false
   }
@@ -955,10 +958,10 @@ const toggleRoleStatus = async (role) => {
       active: !role.active
     })
     await loadRoles()
-    alert(`Rol ${role.active ? 'desactivado' : 'activado'} exitosamente`)
+    showSuccess(`Rol ${role.active ? 'desactivado' : 'activado'} exitosamente`)
   } catch (error) {
     console.error('Error toggling role status:', error)
-    alert('Error al cambiar el estado del rol')
+    showError('Error al cambiar el estado del rol')
   } finally {
     loading.value = false
   }

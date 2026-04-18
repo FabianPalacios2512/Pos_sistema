@@ -47,14 +47,31 @@ class DataAnalysisController extends Controller
 
     public function analyzeInventoryValue()
     {
-        // Consulta actual (solo stock > 0 y activos)
-        $onlyPositiveStock = DB::selectOne('SELECT SUM(current_stock * cost_price) as total FROM products WHERE active = 1 AND current_stock > 0')->total ?? 0;
+        // Helper: calcular valor de inventario con variantes
+        $calcInventoryValue = function ($activeOnly = true, $positiveStockOnly = false) {
+            $simpleQ = DB::table('products');
+            if ($activeOnly) $simpleQ->where('active', true);
+            if ($positiveStockOnly) $simpleQ->where('current_stock', '>', 0);
+            $simple = (float) $simpleQ
+                ->where(function ($q) { $q->whereNull('product_type')->orWhere('product_type', 'simple'); })
+                ->selectRaw('COALESCE(SUM(current_stock * cost_price), 0) as val')
+                ->value('val');
 
-        // Consulta REAL (todos los productos activos)
-        $allActiveProducts = DB::selectOne('SELECT SUM(current_stock * cost_price) as total FROM products WHERE active = 1')->total ?? 0;
+            $varQ = DB::table('product_variants as pv')
+                ->join('products as p', 'pv.product_id', '=', 'p.id')
+                ->where('p.product_type', 'variable')->where('pv.active', true);
+            if ($activeOnly) $varQ->where('p.active', true);
+            if ($positiveStockOnly) $varQ->where('pv.stock', '>', 0);
+            $variable = (float) $varQ
+                ->selectRaw('COALESCE(SUM(pv.stock * COALESCE(pv.cost_price, p.cost_price, 0)), 0) as val')
+                ->value('val');
 
-        // TODOS los productos (incluyendo inactivos)
-        $allProducts = DB::selectOne('SELECT SUM(current_stock * cost_price) as total FROM products')->total ?? 0;
+            return $simple + $variable;
+        };
+
+        $onlyPositiveStock = $calcInventoryValue(true, true);
+        $allActiveProducts = $calcInventoryValue(true, false);
+        $allProducts = $calcInventoryValue(false, false);
 
         // Productos inactivos con valor
         $inactiveProducts = DB::select('SELECT id, name, current_stock, cost_price, (current_stock * cost_price) as valor, active FROM products WHERE active = 0');

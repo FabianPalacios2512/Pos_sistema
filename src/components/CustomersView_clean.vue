@@ -1490,7 +1490,7 @@ const loadCustomers = async () => {
     customers.value = response.data || []
   } catch (error) {
     console.error('Error cargando clientes:', error)
-    alert('Error al cargar los clientes')
+    showError('Error al cargar los clientes')
   } finally {
     loading.value = false
   }
@@ -1815,7 +1815,7 @@ const getCustomerColor = (name) => {
 }
 
 const exportCustomers = () => {
-  alert('Funcionalidad de exportación próximamente')
+  showInfo('Funcionalidad de exportación próximamente')
 }
 
 const formatCurrency = (value) => {

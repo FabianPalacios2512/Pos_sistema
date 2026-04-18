@@ -229,6 +229,9 @@
 <script setup>
 import { ref, computed, watch, onUnmounted, onMounted } from 'vue'
 import { useRadioState } from '../composables/useRadioState'
+import { useToast } from '../composables/useToast.js'
+
+const { showSuccess } = useToast()
 
 // Props
 defineProps({
@@ -351,7 +354,7 @@ const isFavorite = (id) => favorites.value.has(id)
 // Request Logic
 const submitRequest = () => {
   if (!requestStationName.value) return
-  alert('¡Gracias! Hemos recibido tu solicitud. ')
+  showSuccess('¡Gracias! Hemos recibido tu solicitud.')
   requestStationName.value = ''
   showRequestForm.value = false
 }

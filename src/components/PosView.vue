@@ -1628,19 +1628,19 @@
        <!-- BOTÓN COBRAR - Prominente y limpio -->
        <button
           @click="handleCobrarClick"
-          :disabled="!canShowPaymentModal || quotationMode || (selectedPaymentMethod === 'efectivo' && total > 0 && (!cashReceived || cashReceived < total))"
+          :disabled="!canShowPaymentModal || quotationMode || (selectedPaymentMethod === 'efectivo' && total > 0 && !isFashionStore && !isFastFoodStore && (!cashReceived || cashReceived < total))"
           class="w-full h-[64px] rounded-xl font-bold text-base flex items-center justify-center gap-3 group relative overflow-hidden transition-all duration-200"
           :class="[
             (!canShowPaymentModal || quotationMode)
               ? 'bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500 cursor-not-allowed border border-gray-200 dark:border-zinc-700'
-            : (selectedPaymentMethod === 'efectivo' && total > 0 && (!cashReceived || cashReceived < total))
+            : (selectedPaymentMethod === 'efectivo' && total > 0 && !isFashionStore && !isFastFoodStore && (!cashReceived || cashReceived < total))
               ? 'bg-gray-100 dark:bg-zinc-700 text-gray-500 dark:text-zinc-400 cursor-not-allowed border border-gray-200 dark:border-zinc-700'
               : 'bg-emerald-600 dark:bg-emerald-600 text-white hover:bg-emerald-700 dark:hover:bg-emerald-500 shadow-lg shadow-emerald-500/25 dark:shadow-emerald-900/40'
           ]"
         >
           <!-- Efecto de brillo animado cuando está listo -->
           <div 
-            v-if="canShowPaymentModal && !quotationMode && !(selectedPaymentMethod === 'efectivo' && total > 0 && (!cashReceived || cashReceived < total))" 
+            v-if="canShowPaymentModal && !quotationMode && !(selectedPaymentMethod === 'efectivo' && total > 0 && !isFashionStore && !isFastFoodStore && (!cashReceived || cashReceived < total))" 
             class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-shimmer"
           ></div>
 
@@ -1863,6 +1863,7 @@
       :customer="selectedCustomer"
       :systemSettings="systemSettings"
       :invoiceNumber="getNextInvoiceNumber()"
+      :storeType="currentLayoutType"
       :backendProcessing="backendProcessingPayment"
       :backendSuccess="backendPaymentSuccess"
       @payment-confirmed="handlePaymentConfirmed"
@@ -3219,7 +3220,8 @@ const currentUser = computed(() => {
 // Determinar si el usuario es administrador (cierre rápido sin contraseña)
 const isAdminUser = computed(() => {
   const role = currentUser.value?.role?.name || currentUser.value?.role || ''
-  return role.toLowerCase() === 'administrador' || role.toLowerCase() === 'admin'
+  const r = role.toLowerCase()
+  return r === 'administrador' || r === 'admin' || r === 'administrador pos' || r === 'admin_pos'
 })
 
 // Loading state para WhatsApp y Email
@@ -5151,6 +5153,52 @@ const getCategoryEmoji = (categoryName) => {
   return ''
 }
 
+// Convertir hex de color a nombre legible en español
+const hexToColorName = (hex) => {
+  const colors = {
+    '#FF0000': 'Rojo', '#DC2626': 'Rojo', '#EF4444': 'Rojo', '#DB0A0A': 'Rojo',
+    '#B91C1C': 'Rojo Oscuro', '#7F1D1D': 'Vino',
+    '#FF4500': 'Naranja Rojo', '#FF6600': 'Naranja', '#F97316': 'Naranja', '#EA580C': 'Naranja',
+    '#FF8C00': 'Naranja Oscuro', '#FFA500': 'Naranja',
+    '#FFD700': 'Dorado', '#FFFF00': 'Amarillo', '#EAB308': 'Amarillo', '#FACC15': 'Amarillo',
+    '#FDE047': 'Amarillo Claro',
+    '#00FF00': 'Verde', '#008000': 'Verde', '#22C55E': 'Verde', '#16A34A': 'Verde',
+    '#4ADE80': 'Verde Claro', '#166534': 'Verde Oscuro', '#14532D': 'Verde Bosque',
+    '#10B981': 'Esmeralda', '#059669': 'Esmeralda',
+    '#00FFFF': 'Cyan', '#06B6D4': 'Cyan', '#0891B2': 'Cyan',
+    '#0000FF': 'Azul', '#2563EB': 'Azul', '#3B82F6': 'Azul', '#1D4ED8': 'Azul',
+    '#60A5FA': 'Azul Claro', '#1E3A8A': 'Azul Oscuro', '#000080': 'Azul Marino',
+    '#6366F1': 'Índigo', '#4F46E5': 'Índigo',
+    '#8B5CF6': 'Violeta', '#7C3AED': 'Violeta', '#A855F7': 'Púrpura', '#9333EA': 'Púrpura',
+    '#800080': 'Morado',
+    '#EC4899': 'Rosa', '#DB2777': 'Rosa', '#F472B6': 'Rosa Claro',
+    '#FF69B4': 'Rosa', '#FF1493': 'Rosa Fuerte', '#FFC0CB': 'Rosa Pastel',
+    '#FFFFFF': 'Blanco', '#F5F5F5': 'Blanco Humo', '#FAFAFA': 'Blanco',
+    '#000000': 'Negro', '#1A1A1A': 'Negro', '#171717': 'Negro',
+    '#808080': 'Gris', '#6B7280': 'Gris', '#9CA3AF': 'Gris Claro', '#4B5563': 'Gris Oscuro',
+    '#D4D4D4': 'Gris Claro', '#374151': 'Gris Oscuro',
+    '#A52A2A': 'Marrón', '#92400E': 'Marrón', '#78350F': 'Marrón Oscuro',
+    '#D2691E': 'Caramelo', '#8B4513': 'Café',
+    '#F5F5DC': 'Beige', '#FEF3C7': 'Crema', '#FFFDD0': 'Crema',
+  }
+  const upper = hex.toUpperCase()
+  if (colors[upper]) return colors[upper]
+  const r = parseInt(upper.slice(1,3), 16), g = parseInt(upper.slice(3,5), 16), b = parseInt(upper.slice(5,7), 16)
+  if (r > 200 && g < 80 && b < 80) return 'Rojo'
+  if (r > 200 && g > 100 && g < 180 && b < 80) return 'Naranja'
+  if (r > 200 && g > 200 && b < 100) return 'Amarillo'
+  if (r < 80 && g > 150 && b < 80) return 'Verde'
+  if (r < 80 && g > 150 && b > 150) return 'Cyan'
+  if (r < 80 && g < 80 && b > 150) return 'Azul'
+  if (r > 100 && r < 180 && g < 80 && b > 150) return 'Púrpura'
+  if (r > 180 && g < 100 && b > 150) return 'Rosa'
+  if (r > 220 && g > 220 && b > 220) return 'Blanco'
+  if (r < 50 && g < 50 && b < 50) return 'Negro'
+  if (Math.abs(r - g) < 30 && Math.abs(g - b) < 30) return 'Gris'
+  if (r > 120 && g < 100 && b < 60) return 'Marrón'
+  return hex
+}
+
 // Manejar confirmación del modal de variantes
 const handleVariantConfirmed = ({ variant, selectedOptions }) => {
   if (!variant || !selectedProductForVariants.value) return
@@ -5174,7 +5222,13 @@ const handleVariantConfirmed = ({ variant, selectedOptions }) => {
   } else {
     // Crear resumen de opciones para mostrar (ej: "Talla: M / Color: Rojo")
     const optionsSummary = Object.entries(selectedOptions)
-      .map(([key, value]) => `${key}: ${value}`)
+      .map(([key, value]) => {
+        // Convertir hex de color a nombre legible
+        if (key.toLowerCase() === 'color' && typeof value === 'string' && value.startsWith('#')) {
+          return `${key}: ${hexToColorName(value)}`
+        }
+        return `${key}: ${value}`
+      })
       .join(' / ')
     
     // Agregar nueva variante al carrito
@@ -6758,7 +6812,7 @@ const useCalculatorResult = () => {
 const printQuote = () => {
   // Validar que hay productos en el carrito
   if (cart.items.length === 0) {
-    alert('No hay productos en el carrito para cotizar')
+    showWarning('No hay productos en el carrito para cotizar')
     return
   }
   
@@ -6770,7 +6824,7 @@ const confirmQuotation = async () => {
   try {
     // Validar si se requiere cliente específico para cotizaciones
     if (systemSettings.require_customer_quotations && (!selectedCustomer.value || !selectedCustomer.value.id)) {
-      alert('La configuración del sistema requiere seleccionar un cliente específico para crear cotizaciones.\n\nNo se puede usar "Cliente Final".')
+      showWarning('La configuración del sistema requiere seleccionar un cliente específico para crear cotizaciones. No se puede usar "Cliente Final".')
       showQuotationConfirmModal.value = false
       return
     }
@@ -6848,7 +6902,7 @@ const confirmQuotation = async () => {
     
   } catch (error) {
     console.error('Error al crear cotización:', error)
-    alert('Error al crear la cotización. Inténtelo de nuevo.')
+    showError('Error al crear la cotización. Inténtelo de nuevo.')
     showQuotationConfirmModal.value = false
   }
 }
@@ -7524,7 +7578,8 @@ onMounted(async () => {
     currentSession.value = appStore.cashSession.current
     
     // AUTO-REFRESH FORZADO: Recargar productos SIEMPRE al entrar al POS
-    const warehouseId = currentSession.value?.warehouse_id
+    // Prioridad: 1) warehouse de la sesión de caja, 2) warehouse asignada al usuario
+    const warehouseId = currentSession.value?.warehouse_id || currentUser.value?.warehouse_id
     const scope = globalSearch.value ? 'global' : 'local'
     
     // Ejecutar cargas en paralelo para mayor velocidad
@@ -7663,7 +7718,7 @@ const handleLoadQuotation = () => {
     const quote = quotationModalData.value.data || quotationModalData.value.quotationToLoad
     
     if (!validItems || validItems.length === 0) {
-      alert('No hay productos disponibles para cargar de esta cotización')
+      showWarning('No hay productos disponibles para cargar de esta cotización')
       return
     }
 
@@ -7709,7 +7764,7 @@ const handleLoadQuotation = () => {
     
   } catch (error) {
     console.error('Error al cargar cotización:', error)
-    alert('Error al cargar la cotización. Inténtelo de nuevo.')
+    showError('Error al cargar la cotización. Inténtelo de nuevo.')
   }
 }
 
@@ -7770,13 +7825,13 @@ const handleAddPartialStock = (item) => {
     // Buscar el producto en el catálogo para obtener sus datos completos
     const product = appStore.products.find(p => p.name === item.name)
     if (!product) {
-      alert('Producto no encontrado en el catálogo')
+      showError('Producto no encontrado en el catálogo')
       return
     }
     
     // Verificar que realmente hay stock disponible
     if (product.current_stock < 1) {
-      alert('No hay stock disponible para este producto')
+      showWarning('No hay stock disponible para este producto')
       return
     }
     
@@ -7803,7 +7858,7 @@ const handleAddPartialStock = (item) => {
       if (currentQuantity < maxQuantity) {
         cart.items[existingItemIndex].quantity = maxQuantity
       } else {
-        alert(`Ya tienes la cantidad máxima disponible de ${product.name} en el carrito`)
+        showInfo(`Ya tienes la cantidad máxima disponible de ${product.name} en el carrito`)
         return
       }
     } else {
@@ -7811,11 +7866,11 @@ const handleAddPartialStock = (item) => {
       cart.items.push(cartItem)
     }
     
-    alert(`Se agregó ${cartItem.quantity} unidad(es) de ${product.name} al carrito`)
+    showSuccess(`Se agregó ${cartItem.quantity} unidad(es) de ${product.name} al carrito`)
     
   } catch (error) {
     console.error('Error al agregar producto con stock parcial:', error)
-    alert('Error al agregar el producto. Inténtelo de nuevo.')
+    showError('Error al agregar el producto. Inténtelo de nuevo.')
   }
 }
 
@@ -7950,7 +8005,7 @@ const handleSendQuotationWhatsApp = async () => {
 
   } catch (error) {
     console.error('Error enviando cotización por WhatsApp:', error)
-    alert(`Error al enviar cotización por WhatsApp\n\n${error.message}`)
+    showError(`Error al enviar cotización por WhatsApp: ${error.message}`)
   }
 }
 
@@ -8166,7 +8221,7 @@ const startQRScanner = async () => {
     
   } catch (error) {
     console.error('Error al iniciar scanner QR:', error)
-    alert('Error al acceder a la cámara. Por favor, verifique los permisos.')
+    showError('Error al acceder a la cámara. Por favor, verifique los permisos.')
     showQRScanner.value = false
   }
 }
@@ -8194,7 +8249,7 @@ const handleQRResult = (data) => {
     handleSearchEnter()
     
   } else {
-    alert('Código QR no válido. Se esperaba un código de cotización (COT-XXXXXX)')
+    showWarning('Código QR no válido. Se esperaba un código de cotización (COT-XXXXXX)')
   }
 }
 
@@ -8230,6 +8285,17 @@ const handleOpenCashSession = async (sessionData) => {
       // RECARGAR PRODUCTOS DE LA BODEGA SELECCIONADA
       if (currentSession.value?.warehouse_id) {
         await appStore.loadProducts(currentSession.value.warehouse_id)
+      }
+
+      // ⚠️ SEGURIDAD: Si había productos en el carrito de otra sede, limpiar para evitar
+      // descuentos de stock inconsistentes. El carrito fue construido sin saber la sede
+      // de la caja, por lo que los productos pueden no existir en esta sede.
+      if (cart.items.length > 0) {
+        const sedeNombre = currentSession.value?.warehouse?.name || 'esta sede'
+        const itemCount = cart.items.length
+        cart.items.splice(0, cart.items.length)
+        emit('cart-status-changed', false)
+        showWarning(`⚠️ Se abrió caja en "${sedeNombre}". El carrito tenía ${itemCount} producto(s) que pueden no estar disponibles aquí — fue limpiado automáticamente para evitar ventas con stock incorrecto.`)
       }
       
     }

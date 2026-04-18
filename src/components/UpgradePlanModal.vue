@@ -529,6 +529,9 @@
 import { ref, computed, watch } from 'vue'
 import { appStore, subscriptionEndDate } from '../store/appStore.js'
 import axios from 'axios'
+import { useToast } from '../composables/useToast.js'
+
+const { showError } = useToast()
 
 const props = defineProps({
   isOpen: {
@@ -869,7 +872,7 @@ const processPayment = async () => {
     
   } catch (error) {
     console.error('Error processing payment:', error)
-    alert('Error al procesar el pago\n\n' + (error.response?.data?.error || error.message || 'Por favor, intenta nuevamente.'))
+    showError('Error al procesar el pago: ' + (error.response?.data?.error || error.message || 'Por favor, intenta nuevamente.'))
   } finally {
     isProcessing.value = false
   }

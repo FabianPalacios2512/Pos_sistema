@@ -26,11 +26,8 @@ class CashSessionController extends Controller
             $currentUser = Auth::user();
             $totalWarehouses = Warehouse::where('active', true)->count();
             if ($totalWarehouses > 1 && $currentUser) {
-                $currentUser->loadMissing('role');
-                $roleName = strtolower($currentUser->role->name ?? '');
-                $isAdmin = in_array($roleName, ['administrador', 'admin', 'superadmin']);
-
-                if (!$isAdmin && $currentUser->warehouse_id) {
+                // Administrador ve todo, Admin POS y vendedores ven solo su sede
+                if (!$currentUser->isFullAdmin() && $currentUser->warehouse_id) {
                     $query->where('warehouse_id', $currentUser->warehouse_id);
                 }
             }
@@ -182,13 +179,12 @@ class CashSessionController extends Controller
             }
 
             // Validar sede asignada (solo si el negocio tiene más de 1 sede)
-            // Administradores pueden abrir caja en cualquier sede
+            // Administradores (full y POS) pueden abrir caja en su sede, full admin en cualquiera
             $totalWarehouses = Warehouse::where('active', true)->count();
             if ($totalWarehouses > 1) {
                 $user = User::with('role')->find($userId);
-                $isAdmin = $user?->role && in_array(strtolower($user->role->name), ['administrador', 'admin']);
 
-                if (!$isAdmin) {
+                if (!$user->isFullAdmin()) {
                     if ($user && !$user->warehouse_id) {
                         return response()->json([
                             'success' => false,

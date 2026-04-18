@@ -401,16 +401,26 @@ class OptimizedDashboardController extends Controller
             }
 
             // ═══════════════════════════════════════════════════════════════
-            // 5. VALOR DEL INVENTARIO
+            // 5. VALOR DEL INVENTARIO (con soporte correcto para variantes)
             // ═══════════════════════════════════════════════════════════════
-            $inventory = DB::table('products')
-                ->selectRaw("
-                    COALESCE(SUM(current_stock * cost_price), 0) as cost_value,
-                    COALESCE(SUM(current_stock * sale_price), 0) as sale_value,
-                    COUNT(CASE WHEN active = 1 THEN 1 END) as active_products
-                ")
+            // Productos simples
+            $simpleInv = DB::table('products')
                 ->where('active', true)
+                ->where(function ($q) { $q->whereNull('product_type')->orWhere('product_type', 'simple'); })
+                ->selectRaw('COALESCE(SUM(current_stock * cost_price), 0) as cost_value, COALESCE(SUM(current_stock * sale_price), 0) as sale_value')
                 ->first();
+            // Productos variables (por variante)
+            $variableInv = DB::table('product_variants as pv')
+                ->join('products as p', 'pv.product_id', '=', 'p.id')
+                ->where('p.active', true)->where('p.product_type', 'variable')->where('pv.active', true)
+                ->selectRaw('COALESCE(SUM(pv.stock * COALESCE(pv.cost_price, p.cost_price, 0)), 0) as cost_value, COALESCE(SUM(pv.stock * COALESCE(pv.price, p.sale_price, 0)), 0) as sale_value')
+                ->first();
+            $activeProductCount = DB::table('products')->where('active', true)->count();
+            $inventory = (object) [
+                'cost_value' => ($simpleInv->cost_value ?? 0) + ($variableInv->cost_value ?? 0),
+                'sale_value' => ($simpleInv->sale_value ?? 0) + ($variableInv->sale_value ?? 0),
+                'active_products' => $activeProductCount,
+            ];
 
             // ═══════════════════════════════════════════════════════════════
             // 6. CÁLCULO DE MARGEN BRUTO

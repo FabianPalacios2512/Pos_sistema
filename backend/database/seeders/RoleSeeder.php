@@ -12,7 +12,7 @@ class RoleSeeder extends Seeder
         $roles = [
             [
                 'name' => 'Administrador',
-                'description' => 'Acceso completo a todo el sistema',
+                'description' => 'Acceso completo a todo el sistema en todas las sedes',
                 'permissions' => [
                     'dashboard.view', 'dashboard.analytics',
                     'products.view', 'products.create', 'products.edit', 'products.delete', 'products.import', 'products.export',
@@ -26,6 +26,24 @@ class RoleSeeder extends Seeder
                     'users.view', 'users.create', 'users.edit', 'users.delete',
                     'roles.view', 'roles.create', 'roles.edit', 'roles.delete',
                     'settings.view', 'settings.edit', 'settings.backup'
+                ],
+                'active' => true
+            ],
+            [
+                'name' => 'Administrador POS',
+                'description' => 'Administrador de sede - acceso completo pero solo en su sede asignada',
+                'permissions' => [
+                    'dashboard.view', 'dashboard.analytics',
+                    'products.view', 'products.create', 'products.edit', 'products.delete', 'products.import', 'products.export',
+                    'categories.view', 'categories.create', 'categories.edit', 'categories.delete',
+                    'inventory.view', 'inventory.movements', 'inventory.adjust', 'inventory.reports',
+                    'sales.view', 'sales.create', 'sales.edit', 'sales.delete', 'sales.refund', 'sales.reports',
+                    'customers.view', 'customers.create', 'customers.edit', 'customers.delete', 'customers.reports',
+                    'suppliers.view', 'suppliers.create', 'suppliers.edit', 'suppliers.delete',
+                    'expenses.view', 'expenses.create', 'expenses.edit', 'expenses.delete', 'expenses.reports',
+                    'reports.view', 'reports.sales', 'reports.inventory', 'reports.financial',
+                    'users.view', 'users.create', 'users.edit',
+                    'settings.view'
                 ],
                 'active' => true
             ],

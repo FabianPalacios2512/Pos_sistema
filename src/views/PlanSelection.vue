@@ -545,6 +545,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import { useToast } from '../composables/useToast.js'
+
+const { showSuccess, showError, showWarning } = useToast()
 
 // Validar subdominio para prevenir open redirect
 const isValidSubdomain = (s) => /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/.test(s) && s.length <= 63
@@ -663,7 +666,7 @@ const handlePlanSelection = async (plan) => {
       const errorMessage = error.response?.data?.message || 'Error al activar el trial'
       const errorDetails = error.response?.data?.errors ? JSON.stringify(error.response.data.errors) : ''
       
-      alert(`${errorMessage}${errorDetails ? '\n\n' + errorDetails : ''}. Por favor, intenta nuevamente.`)
+      showError(`${errorMessage}${errorDetails ? ': ' + errorDetails : ''}. Por favor, intenta nuevamente.`)
     } finally {
       isProcessing.value = false
     }
@@ -766,7 +769,7 @@ const handlePlanSelection = async (plan) => {
     
     // Mostrar error del servidor o mensaje genérico
     const errorMessage = error.response?.data?.error || error.message || 'Por favor, intenta nuevamente.'
-    alert('Error al procesar el pago\n\n' + errorMessage)
+    showError('Error al procesar el pago: ' + errorMessage)
   } finally {
     isProcessing.value = false
   }
@@ -823,7 +826,7 @@ const updateTenantPlan = async (plan) => {
       if (redirectUrl.value) {
         window.location.href = redirectUrl.value
       } else {
-        alert('Plan activado exitosamente')
+        showSuccess('Plan activado exitosamente')
       }
     }
     
@@ -998,7 +1001,7 @@ const performAutoLogin = async () => {
       localStorage.setItem('registration_data', JSON.stringify(data))
     }
     
-    alert('No se pudo iniciar sesión automáticamente. Por favor, inicia sesión manualmente.')
+    showWarning('No se pudo iniciar sesión automáticamente. Por favor, inicia sesión manualmente.')
     redirectToLogin()
   }
 }

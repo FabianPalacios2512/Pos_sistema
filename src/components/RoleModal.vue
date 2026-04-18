@@ -209,6 +209,7 @@
 
 <script setup>
 import { ref, watch, computed } from 'vue'
+import { useToast } from '../composables/useToast.js'
 
 const props = defineProps({
   show: {
@@ -227,6 +228,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'save'])
 
+const { showWarning } = useToast()
 const loading = ref(false)
 const form = ref({
   name: '',
@@ -321,7 +323,7 @@ const closeModal = () => {
 
 const handleSubmit = async () => {
   if (form.value.permissions.length === 0) {
-    alert('Debes seleccionar al menos un permiso')
+    showWarning('Debes seleccionar al menos un permiso')
     return
   }
 

@@ -52,11 +52,11 @@
         </div>
         <div class="flex flex-col gap-1 px-5 py-4">
           <div class="flex items-center justify-between">
-            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Valor Total</p>
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Valor Potencial</p>
             <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
           <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">${{ totalInventoryValue.toLocaleString() }}</p>
-          <p class="text-xs text-gray-400 dark:text-zinc-500">Valorización actual</p>
+          <p class="text-xs text-gray-400 dark:text-zinc-500">precio × stock</p>
         </div>
         <div class="flex flex-col gap-1 px-5 py-4">
           <div class="flex items-center justify-between">
@@ -65,6 +65,29 @@
           </div>
           <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ todayMovements }}</p>
           <p class="text-xs text-gray-400 dark:text-zinc-500">Actualizado hoy</p>
+        </div>
+      </div>
+
+      <!-- Selector de Sede - Prominente entre KPIs y tabla -->
+      <div v-if="showWarehouseFilter" class="flex items-center gap-3 px-1">
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.15c0 .415.336.75.75.75z"/>
+          </svg>
+          <span class="text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Sede:</span>
+        </div>
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <button @click="selectedWarehouse = null; refreshInventoryData()"
+                  :class="selectedWarehouse === null ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm' : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700'"
+                  class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all">
+            Todas
+          </button>
+          <button v-for="wh in warehouses" :key="wh.id"
+                  @click="selectedWarehouse = wh.id; refreshInventoryData()"
+                  :class="selectedWarehouse === wh.id ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm' : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700'"
+                  class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all">
+            {{ wh.name }}{{ wh.is_default ? ' ★' : '' }}
+          </button>
         </div>
       </div>
 
@@ -133,31 +156,20 @@
           
           <div v-else>
             <!-- Filtros -->
-            <div class="p-4 bg-gray-50 dark:bg-zinc-800">
+            <div class="px-4 py-3 bg-gray-50 dark:bg-zinc-800">
               <div class="flex flex-wrap items-center gap-3">
                 <div class="flex-1 min-w-48 relative">
-                  <svg class="absolute left-3.5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <svg class="absolute left-3.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                   </svg>
                   <input v-model="searchTerm" 
                          type="text" 
                          placeholder="Buscar productos..." 
-                         class="w-full pl-11 pr-4 py-3 text-sm rounded-xl bg-white dark:bg-zinc-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200">
+                         class="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl bg-white dark:bg-zinc-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200">
                 </div>
                 
-                <!-- Selector de Sede/Bodega -->
-                <select v-if="showWarehouseFilter"
-                        v-model="selectedWarehouse" 
-                        @change="refreshInventoryData"
-                        class="px-4 py-3 text-sm rounded-xl bg-white dark:bg-zinc-700 text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 min-w-44 cursor-pointer">
-                  <option :value="null">Todas las sedes</option>
-                  <option v-for="warehouse in warehouses" :key="warehouse.id" :value="warehouse.id">
-                    {{ warehouse.name }}{{ warehouse.is_default ? ' ★' : '' }}
-                  </option>
-                </select>
-                
                 <select v-model="categoryFilter" 
-                        class="px-4 py-3 text-sm rounded-xl bg-white dark:bg-zinc-700 text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 min-w-40 cursor-pointer">
+                        class="px-3 py-2.5 text-sm rounded-xl bg-white dark:bg-zinc-700 text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 min-w-40 cursor-pointer">
                   <option value="">Todas las categorías</option>
                   <option v-for="category in categories" :key="category.id" :value="category.name">
                     {{ category.name }}
@@ -165,7 +177,7 @@
                 </select>
                 
                 <select v-model="stockFilter" 
-                        class="px-4 py-3 text-sm rounded-xl bg-white dark:bg-zinc-700 text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 min-w-36 cursor-pointer">
+                        class="px-3 py-2.5 text-sm rounded-xl bg-white dark:bg-zinc-700 text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 min-w-36 cursor-pointer">
                   <option value="">Todo el stock</option>
                   <option value="low">Stock bajo</option>
                   <option value="normal">Stock normal</option>
@@ -173,9 +185,9 @@
                 </select>
                 
                 <button @click="clearAllFilters" 
-                        class="p-2.5 text-gray-600 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-600/20 rounded-xl transition-all duration-200"
+                        class="p-2 text-gray-600 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-600/20 rounded-xl transition-all duration-200"
                         title="Limpiar filtros">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" 
                           d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                   </svg>
@@ -183,108 +195,129 @@
               </div>
             </div>
           
-          <!-- Tabla de Stock - Gemini Style -->
-          <div class="overflow-x-auto">
+          <!-- Tabla de Stock -->
+          <div class="overflow-x-auto" style="scrollbar-width: thin;">
             <table class="min-w-full">
               <thead class="bg-gray-50 dark:bg-zinc-800">
                 <tr>
-                  <th class="px-6 py-3.5 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Producto</th>
-                  <th class="px-6 py-3.5 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Categoría</th>
-                  <th class="px-6 py-3.5 text-center text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
-                    Stock{{ selectedWarehouseName ? ' — ' + selectedWarehouseName : '' }}
-                  </th>
-                  <th class="px-6 py-3.5 text-center text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Ventas</th>
-                  <th class="px-6 py-3.5 text-right text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Ingresos</th>
-                  <th class="px-6 py-3.5 text-center text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Estado</th>
-                  <th class="px-6 py-3.5 text-center text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Acciones</th>
+                  <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Producto</th>
+                  <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Categoría</th>
+                  <!-- Modo Matriz: columnas por sede -->
+                  <template v-if="!selectedWarehouse && warehouses.length > 1">
+                    <th v-for="wh in visibleWarehouses" :key="wh.id" class="px-3 py-2.5 text-center text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider whitespace-nowrap min-w-[90px]">
+                      <div class="flex items-center justify-center gap-1">
+                        <svg class="w-3 h-3 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        {{ wh.name }}
+                      </div>
+                    </th>
+                  </template>
+                  <template v-else>
+                    <th class="px-4 py-2.5 text-center text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
+                      Stock{{ selectedWarehouseName ? ' — ' + selectedWarehouseName : '' }}
+                    </th>
+                  </template>
+                  <th class="px-4 py-2.5 text-center text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Ventas</th>
+                  <th class="px-4 py-2.5 text-right text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Ingresos</th>
+                  <th class="px-4 py-2.5 text-center text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Estado</th>
+                  <th class="px-4 py-2.5 text-center text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Acciones</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-gray-200 dark:divide-zinc-700 bg-white dark:bg-zinc-900">
-                <tr v-for="product in paginatedProducts" :key="product._rowKey || product.id" class="hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors duration-150 group">
-                  <td class="px-6 py-4">
+              <tbody class="divide-y divide-gray-100 dark:divide-zinc-800 bg-white dark:bg-zinc-900">
+                <tr v-for="product in paginatedProducts" :key="product._rowKey || product.id" class="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors duration-150 group">
+                  <td class="px-4 py-2">
                     <div class="flex items-center">
-                      <!-- Imagen del producto -->
-                      <div class="w-12 h-12 rounded-xl mr-4 overflow-hidden flex-shrink-0"
+                      <div class="w-9 h-9 rounded-lg mr-3 overflow-hidden flex-shrink-0"
                            :class="getProductImage(product) ? 'bg-white dark:bg-zinc-800' : 'bg-gray-50 dark:bg-zinc-800 flex items-center justify-center'">
                         <img v-if="getProductImage(product)"
                              :src="getProductImage(product)" 
                              :alt="product.name"
                              class="w-full h-full object-cover">
-                        <svg v-else class="w-6 h-6 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <svg v-else class="w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.75 7.5h16.5m-15.75 0l1.5-1.875A2.625 2.625 0 018.25 4.5h7.5a2.625 2.625 0 012.25 1.125l1.5 1.875"/>
                         </svg>
                       </div>
                       <div class="min-w-0">
-                        <p class="text-sm font-medium text-gray-900 dark:text-white leading-tight">{{ product.name }}</p>
-                        <div v-if="product._isVariantRow && product._variantOptions" class="flex flex-wrap items-center gap-1.5 mt-2">
+                        <p class="text-sm font-medium text-gray-900 dark:text-white leading-tight truncate">{{ product.name }}</p>
+                        <div v-if="product._isVariantRow && product._variantOptions" class="flex flex-wrap items-center gap-1 mt-1">
                           <template v-for="(opt, idx) in product._variantOptions" :key="idx">
-                            <span v-if="opt.name.toLowerCase() === 'color' && String(opt.value).startsWith('#')" class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700">
-                              <span class="inline-block w-6 h-6 rounded-full border-2 border-gray-300 dark:border-zinc-500 shadow-inner" :style="{ backgroundColor: opt.value }"></span>
-                              <span class="text-xs font-semibold text-gray-600 dark:text-zinc-300">Color</span>
+                            <span v-if="opt.name.toLowerCase() === 'color' && String(opt.value).startsWith('#')" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700">
+                              <span class="inline-block w-3.5 h-3.5 rounded-full border border-gray-300 dark:border-zinc-500" :style="{ backgroundColor: opt.value }"></span>
+                              <span class="text-[10px] font-medium text-gray-500 dark:text-zinc-400">Color</span>
                             </span>
-                            <span v-else class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700">
-                              <span class="text-[10px] font-medium text-gray-400 dark:text-zinc-500 uppercase">{{ opt.name }}</span>
-                              <span class="text-sm font-bold text-gray-800 dark:text-zinc-100 uppercase">{{ opt.value }}</span>
+                            <span v-else class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700">
+                              <span class="text-[9px] font-medium text-gray-400 dark:text-zinc-500 uppercase">{{ opt.name }}</span>
+                              <span class="text-[11px] font-bold text-gray-700 dark:text-zinc-200 uppercase">{{ opt.value }}</span>
                             </span>
                           </template>
                         </div>
-                        <p class="text-xs text-gray-400 dark:text-zinc-500 mt-1 font-mono">{{ product.barcode || 'Sin código' }}</p>
+                        <p v-if="product.barcode" class="text-[10px] text-gray-400 dark:text-zinc-500 font-mono mt-0.5">{{ product.barcode }}</p>
                       </div>
                     </div>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-50 dark:bg-zinc-700 text-gray-900 dark:text-white">
-                      {{ product.category }}
+                  <td class="px-4 py-2 whitespace-nowrap">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-50 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300">
+                      {{ product.category?.name || product.category || 'Sin categoría' }}
                     </span>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-center">
-                    <div class="flex flex-col items-center">
-                      <span :class="[
-                        'text-base font-bold',
-                        product.current_stock <= (product.min_stock || 10)
-                          ? 'text-rose-600 dark:text-rose-400'
-                          : 'text-gray-900 dark:text-white'
-                      ]">{{ product.current_stock || 0 }}</span>
-                      <span class="text-[10px] text-gray-500 dark:text-zinc-500">Min: {{ product.min_stock || 10 }}</span>
-                    </div>
+                  <!-- Modo Matriz: stock por cada sede -->
+                  <template v-if="!selectedWarehouse && warehouses.length > 1">
+                    <td v-for="wh in visibleWarehouses" :key="wh.id" class="px-3 py-2 whitespace-nowrap text-center">
+                      <span v-if="getProductWarehouseStock(product, wh.id) !== null"
+                            :class="[
+                              'text-sm font-bold tabular-nums',
+                              getProductWarehouseStock(product, wh.id) <= (product.min_stock || 10)
+                                ? 'text-rose-600 dark:text-rose-400'
+                                : 'text-gray-900 dark:text-white'
+                            ]">
+                        {{ getProductWarehouseStock(product, wh.id) }}
+                      </span>
+                      <span v-else class="text-[11px] text-gray-300 dark:text-zinc-600">—</span>
+                    </td>
+                  </template>
+                  <template v-else>
+                    <td class="px-4 py-2 whitespace-nowrap text-center">
+                      <div class="flex flex-col items-center">
+                        <span :class="[
+                          'text-sm font-bold',
+                          product.current_stock <= (product.min_stock || 10)
+                            ? 'text-rose-600 dark:text-rose-400'
+                            : 'text-gray-900 dark:text-white'
+                        ]">{{ product.current_stock || 0 }}</span>
+                        <span class="text-[10px] text-gray-400 dark:text-zinc-500">Min: {{ product.min_stock || 10 }}</span>
+                      </div>
+                    </td>
+                  </template>
+                  <td class="px-4 py-2 whitespace-nowrap text-center">
+                    <span class="text-sm font-medium text-gray-900 dark:text-white">{{ product.total_sold || 0 }}</span>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-center">
-                    <div class="flex flex-col items-center">
-                      <span class="text-sm font-medium text-gray-900 dark:text-white">{{ product.total_sold || 0 }}</span>
-                      <span class="text-[10px] text-gray-600 dark:text-zinc-400">unidades</span>
-                    </div>
+                  <td class="px-4 py-2 whitespace-nowrap text-right">
+                    <span class="text-sm font-semibold text-emerald-600 dark:text-emerald-400">${{ parseFloat(product.total_revenue || 0).toLocaleString() }}</span>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-right">
-                    <div class="flex flex-col items-end">
-                      <span class="text-sm font-semibold text-emerald-600 dark:text-emerald-400">${{ parseFloat(product.total_revenue || 0).toLocaleString() }}</span>
-                      <span class="text-[10px] text-gray-600 dark:text-zinc-400">Precio: ${{ parseFloat(product.sale_price || 0).toLocaleString() }}</span>
-                    </div>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                  <td class="px-4 py-2 whitespace-nowrap text-center">
                     <span :class="[
-                      'inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium uppercase tracking-wide',
-                      product.current_stock <= product.min_stock 
+                      'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide',
+                      (product.current_stock || 0) <= (product.min_stock || 10) 
                         ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400' 
                         : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400'
                     ]">
-                      {{ product.current_stock <= product.min_stock ? 'Bajo Stock' : 'En Stock' }}
+                      {{ (product.current_stock || 0) <= (product.min_stock || 10) ? 'Bajo' : 'OK' }}
                     </span>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-center">
-                    <div class="flex items-center justify-center gap-1">
+                  <td class="px-4 py-2 whitespace-nowrap text-center">
+                    <div class="flex items-center justify-center gap-0.5">
                       <button @click="adjustStock(product)" 
-                              class="p-2 text-gray-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-200"
-                              :title="product._isVariantRow ? 'Ver detalles de esta variante' : 'Ver Detalles'">>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                              class="p-1.5 text-gray-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all"
+                              title="Ajustar Stock">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
                       </button>
                       <button @click="viewMovements(product)" 
-                              class="p-2 text-gray-600 dark:text-zinc-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl transition-all duration-200"
+                              class="p-1.5 text-gray-500 dark:text-zinc-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-all"
                               title="Ver Historial">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                       </button>
                     </div>
@@ -493,7 +526,7 @@
                     </div>
                     <div class="flex-1 min-w-0">
                       <p class="font-medium text-gray-900 dark:text-white">{{ product.name }}</p>
-                      <p class="text-sm text-gray-600 dark:text-zinc-400">{{ product.category }}</p>
+                      <p class="text-sm text-gray-600 dark:text-zinc-400">{{ product.category?.name || product.category || 'Sin categoría' }}</p>
                       <p class="text-xs text-gray-600 dark:text-zinc-400">
                         {{ product.barcode || 'Sin código' }} | Stock: {{ product.current_stock || 0 }}
                       </p>
@@ -580,18 +613,33 @@
       </div>
     </div>
 
-    <!-- Modal Detalles de Producto - Read-only Catálogo -->
+    <!-- Modal Ajustar Stock - Gemini Style -->
     <div v-if="showAdjustModal" 
          class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in"
          @click.self="showAdjustModal = false">
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-3xl flex flex-col max-h-[90vh] animate-scale-in">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-5xl flex flex-col max-h-[90vh] animate-scale-in">
         
         <!-- Header compacto -->
         <div class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-700 px-6 py-3 flex-shrink-0 rounded-t-2xl">
           <div class="flex items-center justify-between">
             <div>
-              <h3 class="text-lg font-bold text-gray-900 dark:text-white">Detalles de Producto</h3>
-              <p class="text-xs text-gray-500 dark:text-zinc-500">Información del catálogo y stock global</p>
+              <h3 class="text-lg font-bold text-gray-900 dark:text-white">Ajustar Stock</h3>
+              <div class="flex items-center gap-2 mt-0.5">
+                <p class="text-xs text-gray-500 dark:text-zinc-500">Modifica la cantidad en inventario</p>
+                <template v-if="adjustModalWarehouses.length > 1 && adjustModalSelectedWarehouse">
+                  <span class="text-gray-300 dark:text-zinc-600">·</span>
+                  <span class="text-xs font-semibold text-slate-600 dark:text-slate-400 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                    {{ adjustModalWarehouses.find(w => w.id === adjustModalSelectedWarehouse)?.name }}
+                  </span>
+                </template>
+                <template v-else-if="adjustModalWarehouses.length > 1 && !adjustModalSelectedWarehouse">
+                  <span class="text-gray-300 dark:text-zinc-600">·</span>
+                  <span class="text-xs font-semibold text-amber-600 dark:text-amber-400">⚠ Selecciona una sede</span>
+                </template>
+              </div>
             </div>
             <button @click="showAdjustModal = false" 
                     class="p-1.5 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-all">
@@ -611,121 +659,268 @@
               <div>
                 <h4 class="text-sm font-semibold text-gray-900 dark:text-white">{{ selectedProductForAdjust.name }}</h4>
                 <div class="flex items-center gap-2 mt-0.5">
-                  <span class="text-xs text-gray-500 dark:text-zinc-500">{{ selectedProductForAdjust.category }}</span>
+                  <span class="text-xs text-gray-500 dark:text-zinc-500">{{ selectedProductForAdjust.category?.name || selectedProductForAdjust.category || 'Sin categoría' }}</span>
                   <span v-if="productVariants.length > 0" class="text-xs text-gray-400 dark:text-zinc-500">· {{ productVariants.length }} variantes</span>
                 </div>
               </div>
-              <div class="text-right">
-                <span class="text-sm font-bold text-gray-900 dark:text-white">{{ productDetailGlobalStock }}</span>
-                <span class="text-xs text-gray-500 dark:text-zinc-500 ml-1">stock global</span>
+              <div v-if="productVariants.length === 0" class="text-right">
+                <span class="text-sm font-bold text-gray-900 dark:text-white">{{ adjustModalCurrentStock }}</span>
+                <span class="text-xs text-gray-500 dark:text-zinc-500 ml-1">/ mín {{ selectedProductForAdjust.min_stock || 10 }}</span>
               </div>
             </div>
           </div>
 
-          <!-- Tabla de variantes read-only (si existen) -->
-          <div v-if="productVariants.length > 0" class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 overflow-hidden">
-            <table class="min-w-full">
-              <thead class="bg-gray-50 dark:bg-zinc-800/60">
-                <tr>
-                  <th class="px-4 py-2.5 text-left text-[10px] font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Variante</th>
-                  <th class="px-4 py-2.5 text-left text-[10px] font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">SKU</th>
-                  <th class="px-4 py-2.5 text-right text-[10px] font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Precio</th>
-                  <th class="px-4 py-2.5 text-center text-[10px] font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Stock Global</th>
-                  <th class="px-4 py-2.5 text-center text-[10px] font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Acción</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-100 dark:divide-zinc-800">
-                <tr v-for="variant in productVariants" :key="variant.id" class="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors duration-150">
-                  <!-- Variante: opciones (color, talla, etc.) -->
-                  <td class="px-4 py-3">
-                    <div class="flex flex-wrap items-center gap-1.5">
-                      <template v-for="(opt, oi) in parseVariantOptions(variant.options_summary)" :key="oi">
-                        <span v-if="opt.name.toLowerCase() === 'color' && String(opt.value).startsWith('#')" class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-gray-50 dark:bg-zinc-700/60 border border-gray-200 dark:border-zinc-600">
-                          <span class="inline-block w-4 h-4 rounded-full border-2 border-gray-300 dark:border-zinc-500 shadow-inner" :style="{ backgroundColor: opt.value }"></span>
-                          <span class="text-[10px] font-medium text-gray-500 dark:text-zinc-400">Color</span>
-                        </span>
-                        <span v-else class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-gray-50 dark:bg-zinc-700/60 border border-gray-200 dark:border-zinc-600">
-                          <span class="text-[10px] font-medium text-gray-400 dark:text-zinc-500 uppercase">{{ opt.name }}</span>
-                          <span class="text-xs font-bold text-gray-800 dark:text-zinc-100 uppercase">{{ opt.value }}</span>
-                        </span>
-                      </template>
-                    </div>
-                  </td>
-                  <!-- SKU -->
-                  <td class="px-4 py-3">
-                    <span class="text-xs font-mono text-gray-500 dark:text-zinc-400">{{ variant.sku }}</span>
-                  </td>
-                  <!-- Precio -->
-                  <td class="px-4 py-3 text-right">
-                    <span class="text-xs font-semibold text-gray-700 dark:text-zinc-300">${{ Number(variant.price || 0).toLocaleString('es-CO') }}</span>
-                  </td>
-                  <!-- Stock Global (read-only badge) -->
-                  <td class="px-4 py-3 text-center">
-                    <span :class="[
-                      'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border',
-                      (variant.stock || 0) <= (selectedProductForAdjust?.min_stock || 10) 
-                        ? 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-800' 
-                        : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border-gray-200 dark:border-zinc-700'
-                    ]">
-                      {{ variant.stock || 0 }} uds
-                    </span>
-                  </td>
-                  <!-- Acción: Ver Distribución -->
-                  <td class="px-4 py-3 text-center">
-                    <button @click="navigateToStockDistribution(selectedProductForAdjust)"
-                            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-700 hover:border-slate-300 dark:hover:border-zinc-600 transition-all duration-200">
-                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.15c0 .415.336.75.75.75z"/>
-                      </svg>
-                      Ver Distribución
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Producto simple (sin variantes) -->
-          <div v-else class="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-gray-200 dark:border-zinc-800">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Stock Global</p>
-                <span :class="[
-                  'inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold border',
-                  (selectedProductForAdjust.current_stock || 0) <= (selectedProductForAdjust.min_stock || 10) 
-                    ? 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-800' 
-                    : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border-gray-200 dark:border-zinc-700'
-                ]">
-                  {{ selectedProductForAdjust.current_stock || 0 }} uds
-                </span>
-                <span class="text-xs text-gray-500 dark:text-zinc-500 ml-2">mín {{ selectedProductForAdjust.min_stock || 10 }}</span>
-              </div>
-              <button @click="navigateToStockDistribution(selectedProductForAdjust)"
-                      class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-600 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-700 hover:border-slate-300 dark:hover:border-zinc-600 transition-all duration-200">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.15c0 .415.336.75.75.75z"/>
+          <!-- Selector de Sede -->
+          <div v-if="adjustModalWarehouses.length > 1" class="bg-white dark:bg-zinc-900 rounded-xl px-5 py-3 mb-4 border border-gray-200 dark:border-zinc-800">
+            <label class="block text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2">
+              <div class="flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                 </svg>
-                Ver Distribución
+                ¿En qué sede ajustar el stock?
+              </div>
+            </label>
+            <div class="grid gap-2" :class="adjustModalWarehouses.length <= 3 ? `grid-cols-${adjustModalWarehouses.length}` : 'grid-cols-3'">
+              <button
+                v-for="wh in adjustModalWarehouses"
+                :key="wh.id"
+                type="button"
+                @click="adjustModalSelectedWarehouse = wh.id; onAdjustWarehouseChange()"
+                :class="[
+                  'px-3 py-2.5 rounded-lg transition-all text-left border text-sm font-medium',
+                  adjustModalSelectedWarehouse === wh.id
+                    ? 'bg-slate-50 dark:bg-slate-800/40 border-slate-700 dark:border-slate-400 text-gray-900 dark:text-white'
+                    : 'bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700/50 text-gray-600 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-700/50'
+                ]"
+              >
+                <div class="flex items-center justify-between">
+                  <span class="truncate">{{ wh.name }}</span>
+                  <svg v-if="adjustModalSelectedWarehouse === wh.id" class="w-4 h-4 text-slate-700 dark:text-slate-400 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                  </svg>
+                </div>
               </button>
             </div>
           </div>
 
-          <!-- Nota informativa -->
-          <div class="mt-4 flex items-start gap-2.5 px-1">
-            <svg class="w-4 h-4 text-gray-400 dark:text-zinc-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/>
-            </svg>
-            <p class="text-xs text-gray-400 dark:text-zinc-500 leading-relaxed">
-              El stock solo se modifica mediante Ventas, Compras o Traslados entre sedes. 
-              Para ajustar distribución por bodega, usa <span class="font-medium text-gray-500 dark:text-zinc-400">Ver Distribución</span>.
-            </p>
+          <!-- Grid de Formulario -->
+          <!-- Mensaje cuando no se ha seleccionado sede -->
+          <!-- Sin sede seleccionada -->
+          <div v-if="adjustModalWarehouses.length > 1 && !adjustModalSelectedWarehouse" class="flex flex-col items-center justify-center py-10 text-center">
+            <div class="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center mb-3">
+              <svg class="w-7 h-7 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+              </svg>
+            </div>
+            <p class="text-sm font-semibold text-gray-700 dark:text-zinc-300">Selecciona la sede primero</p>
+            <p class="text-xs text-gray-400 dark:text-zinc-500 mt-1">Elige en cuál sede quieres ajustar el inventario</p>
           </div>
-          
-          <!-- Footer -->
-          <div class="flex justify-end pt-4 mt-4 border-t border-gray-200 dark:border-zinc-700">
+          <!-- Sede seleccionada pero producto no existe en ella -->
+          <div v-else-if="adjustModalSelectedWarehouse && !selectedWarehouseHasProduct" class="flex flex-col items-center justify-center py-8 text-center px-4">
+            <div class="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-rose-950 flex items-center justify-center mb-3">
+              <svg class="w-7 h-7 text-rose-500 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+              </svg>
+            </div>
+            <p class="text-sm font-bold text-gray-800 dark:text-zinc-200">Producto no registrado en esta sede</p>
+            <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1.5 max-w-xs leading-relaxed">
+              <strong>{{ selectedProductForAdjust?.name }}</strong> no tiene inventario en esta sede. Ajustar aquí directamente puede causar inconsistencias en la base de datos.
+            </p>
+            <div class="mt-4 w-full max-w-xs space-y-2 text-left">
+              <div class="flex items-start gap-2.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2.5">
+                <svg class="w-4 h-4 text-amber-500 dark:text-amber-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                <p class="text-xs text-amber-700 dark:text-amber-400"><span class="font-bold">Opción A:</span> Ve a <strong>Traslados</strong> y mueve unidades desde otra sede</p>
+              </div>
+              <div class="flex items-start gap-2.5 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2.5">
+                <svg class="w-4 h-4 text-blue-500 dark:text-blue-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                <p class="text-xs text-blue-700 dark:text-blue-400"><span class="font-bold">Opción B:</span> Edita el producto y <strong>habilita esta sede</strong> en "Stock por Sede"</p>
+              </div>
+            </div>
+          </div>
+          <div v-else class="grid grid-cols-12 gap-5">
+            
+            <!-- Columna Izquierda: Variantes (si existen) -->
+            <div v-if="productVariants.length > 0" class="col-span-5 space-y-5">
+              <div class="bg-white dark:bg-zinc-900 rounded-2xl p-5">
+                <h4 class="text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Selecciona la Variante</h4>
+                <div class="space-y-1 max-h-[320px] overflow-y-auto">
+                  <button
+                    v-for="variant in productVariants"
+                    :key="variant.id"
+                    @click="selectVariant(variant)"
+                    type="button"
+                    :class="[
+                      'w-full px-3 py-2.5 rounded-lg transition-all text-left border',
+                      selectedVariant?.id === variant.id 
+                        ? 'bg-slate-50 dark:bg-slate-800/40 border-l-[3px] border-l-slate-700 dark:border-l-slate-400 border-t-gray-200 border-r-gray-200 border-b-gray-200 dark:border-t-zinc-700 dark:border-r-zinc-700 dark:border-b-zinc-700'
+                        : 'bg-white dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700/50 hover:bg-gray-50 dark:hover:bg-zinc-700/50'
+                    ]"
+                  >
+                    <div class="flex items-center justify-between">
+                      <div class="flex-1 min-w-0">
+                        <p class="font-medium text-gray-900 dark:text-white text-sm">
+                          {{ formatVariantLabel(variant) }}
+                        </p>
+                        <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
+                          <span class="font-mono">{{ variant.sku }}</span>
+                          <span class="text-gray-300 dark:text-zinc-600">·</span>
+                          <span>${{ Number(variant.price || 0).toLocaleString('es-CO') }}</span>
+                        </div>
+                      </div>
+                      <div class="text-right pl-3">
+                        <span class="text-sm font-bold" :class="(variant.stock || 0) <= (selectedProductForAdjust?.min_stock || 10) ? 'text-rose-600 dark:text-rose-400' : 'text-gray-900 dark:text-white'">{{ variant.stock || 0 }}</span>
+                        <span class="text-xs text-gray-400 dark:text-zinc-500 ml-0.5">uds</span>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+                <p v-if="adjustForm.errors.variant" class="text-rose-600 dark:text-rose-400 text-xs mt-2 flex items-center">
+                  <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                  </svg>
+                  {{ adjustForm.errors.variant }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Columna Derecha: Formulario de Ajuste -->
+            <div :class="productVariants.length > 0 ? 'col-span-7' : 'col-span-12'">
+              <div class="bg-white dark:bg-zinc-900 rounded-2xl p-5 space-y-4">
+                
+                <!-- Tipo de Ajuste -->
+                <div>
+                  <label class="block text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Tipo de Ajuste</label>
+                  <div class="grid grid-cols-2 gap-2">
+                    <button type="button" @click="setQuickAdjustment('restock')"
+                            :class="['px-3 py-2.5 rounded-lg transition-all border text-sm font-medium',
+                                     adjustForm.adjustmentType === 'restock' 
+                                       ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-gray-900 dark:border-white'
+                                       : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700']">
+                      <div class="flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        <span>Restock</span>
+                      </div>
+                    </button>
+                    <button type="button" @click="setQuickAdjustment('correction')"
+                            :class="['px-3 py-2.5 rounded-lg transition-all border text-sm font-medium',
+                                     adjustForm.adjustmentType === 'correction'
+                                       ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-gray-900 dark:border-white'
+                                       : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700']">
+                      <div class="flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        <span>Corrección</span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Nuevo Stock -->
+                <div>
+                  <label class="block text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Nuevo Stock</label>
+                  <div class="relative">
+                    <input v-model="adjustForm.new_stock"
+                           type="number"
+                           min="0"
+                           step="1"
+                           :class="['w-full px-4 py-3 pr-12 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm border',
+                                    adjustForm.errors.new_stock
+                                      ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border-rose-300 dark:border-rose-700'
+                                      : 'bg-white dark:bg-zinc-800 text-gray-900 dark:text-white border-gray-300 dark:border-zinc-600']"
+                           placeholder="Ingresa la cantidad nueva"
+                           @blur="validateNewStock">
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-600 dark:text-zinc-400 font-medium">uds</span>
+                  </div>
+                  <p v-if="adjustForm.errors.new_stock" class="text-rose-600 dark:text-rose-400 text-xs mt-1.5 flex items-center">
+                    <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                    {{ adjustForm.errors.new_stock }}
+                  </p>
+                </div>
+
+                <!-- Motivo -->
+                <div>
+                  <label class="block text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Motivo del Ajuste</label>
+                  <select v-model="adjustForm.reason"
+                          :class="['w-full px-4 py-3 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm cursor-pointer border',
+                                   adjustForm.errors.reason
+                                     ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border-rose-300 dark:border-rose-700'
+                                     : 'bg-white dark:bg-zinc-800 text-gray-900 dark:text-white border-gray-300 dark:border-zinc-600']"
+                          @change="validateReason">
+                    <option value="">Selecciona un motivo...</option>
+                    <option value="Reposición de inventario">Reposición de inventario</option>
+                    <option value="Conteo físico">Conteo físico</option>
+                    <option value="Producto dañado">Producto dañado</option>
+                    <option value="Producto vencido">Producto vencido</option>
+                    <option value="Corrección de error">Corrección de error</option>
+                    <option value="Merma">Merma</option>
+                    <option value="Devolución proveedor">Devolución proveedor</option>
+                    <option value="Otro">Otro motivo</option>
+                  </select>
+                  <input v-if="adjustForm.reason === 'Otro'"
+                         v-model="adjustForm.customReason"
+                         type="text"
+                         class="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white text-sm mt-2 border border-gray-300 dark:border-zinc-600"
+                         placeholder="Especifica el motivo...">
+                  <p v-if="adjustForm.errors.reason" class="text-rose-600 dark:text-rose-400 text-xs mt-1.5 flex items-center">
+                    <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                    {{ adjustForm.errors.reason }}
+                  </p>
+                </div>
+
+              </div>
+
+              <!-- Resumen del Cambio -->
+              <div v-if="adjustForm.new_stock !== '' && !isNaN(adjustForm.new_stock)"
+                   class="mt-4 relative overflow-hidden rounded-2xl transition-all border"
+                   :class="stockDifferenceColor">
+                <div class="p-4">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                      <div class="w-10 h-10 rounded-full flex items-center justify-center"
+                           :class="stockDifferenceIconBg">
+                        <svg class="w-5 h-5" :class="stockDifferenceIconColor" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round"
+                                :d="stockDifference >= 0 ? 'M12 6v6m0 0v6m0-6h6m-6 0H6' : 'M18 12H6'"></path>
+                        </svg>
+                      </div>
+                      <div>
+                        <p class="font-semibold text-lg" :class="stockDifferenceTextColor">
+                          {{ stockDifference >= 0 ? '+' : '' }}{{ stockDifference }} unidades
+                        </p>
+                        <p class="text-sm opacity-75">
+                          {{ selectedVariant ? selectedVariant.stock : selectedProductForAdjust.current_stock || 0 }} → {{ adjustForm.new_stock }}
+                        </p>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
+                            :class="stockDifference >= 0 ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400'">
+                        {{ stockDifference >= 0 ? 'Entrada' : 'Salida' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer: Botones de Acción -->
+          <div class="flex justify-end gap-3 pt-4 mt-4 border-t border-gray-200 dark:border-zinc-700">
             <button @click="showAdjustModal = false" 
                     class="px-5 py-2.5 text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 text-sm font-medium rounded-lg border border-gray-300 dark:border-zinc-700 transition-all duration-200">
-              Cerrar
+              Cancelar
+            </button>
+            <button @click="processStockAdjustment"
+                    :disabled="!isFormValid || adjustmentLoading"
+                    class="px-6 py-2.5 bg-gray-900 hover:bg-black disabled:bg-gray-200 disabled:text-gray-400 dark:bg-white dark:hover:bg-gray-100 dark:disabled:bg-zinc-700 dark:disabled:text-zinc-500 text-white dark:text-gray-900 rounded-lg text-sm font-semibold transition-all duration-200 disabled:cursor-not-allowed">
+              {{ adjustmentLoading ? 'Procesando...' : 'Confirmar Ajuste' }}
             </button>
           </div>
         </div>
@@ -913,6 +1108,7 @@ import { notificationStore } from '../store/notifications.js'
 import { useToast } from '../composables/useToast.js'
 import { appStore } from '../store/appStore.js' // NUEVO: para obtener el plan
 import { useAutoRefresh } from '../composables/useRouteState.js'
+import { useAuth } from '../store/auth.js'
 import { useUIContextStore } from '../store/uiContextStore.js' // IA
 import MovementsSection from './inventory/sections/MovementsSection.vue'
 import TablePaginator from './TablePaginator.vue'
@@ -933,6 +1129,20 @@ const { showSuccess, showError, showWarning } = useToast()
 
 // NUEVO: Estado para multi-sede
 const warehouses = ref([])
+
+// --- ROLES Y PERMISOS ---
+const { user: authUser } = useAuth()
+const isVendedor = computed(() => {
+  const role = authUser.value?.role?.name || authUser.value?.role || ''
+  const r = role.toLowerCase()
+  return r === 'vendedor' || r === 'cajero'
+})
+const visibleWarehouses = computed(() => {
+  if (isVendedor.value && authUser.value?.warehouse_id) {
+    return warehouses.value.filter(w => w.id === authUser.value.warehouse_id)
+  }
+  return warehouses.value
+})
 const selectedWarehouse = ref(null)
 const showWarehouseFilter = ref(false)
 
@@ -1010,6 +1220,21 @@ const selectedProductForAdjust = ref(null)
 const productVariants = ref([]) // NUEVO: Lista de variantes
 const selectedVariant = ref(null) // NUEVO: Variante seleccionada
 const adjustmentLoading = ref(false)
+const adjustModalWarehouses = ref([]) // Sedes disponibles para el ajuste
+const adjustModalSelectedWarehouse = ref(null) // Sede seleccionada en el modal
+
+// Stock actual mostrado en el modal (cambia según sede seleccionada)
+const adjustModalCurrentStock = computed(() => {
+  if (!selectedProductForAdjust.value) return 0
+  if (adjustModalWarehouses.value.length > 1 && adjustModalSelectedWarehouse.value) {
+    // Buscar stock en la sede seleccionada
+    const pw = selectedProductForAdjust.value.warehouses?.find(
+      w => (w.id || w.warehouse_id) === adjustModalSelectedWarehouse.value
+    )
+    return pw?.pivot?.stock ?? pw?.stock_quantity ?? selectedProductForAdjust.value.current_stock ?? 0
+  }
+  return selectedProductForAdjust.value.current_stock || 0
+})
 
 // Variables para el modal de historial
 const showHistoryModal = ref(false)
@@ -1112,10 +1337,10 @@ const stockDifference = computed(() => {
     return 0
   }
   
-  // Si hay variante seleccionada, usar su stock; si no, usar el del producto
+  // Si hay variante seleccionada, usar su stock; si no, usar stock de la sede seleccionada
   const currentStock = selectedVariant.value 
     ? selectedVariant.value.stock 
-    : (selectedProductForAdjust.value.current_stock || 0)
+    : adjustModalCurrentStock.value
     
   return parseInt(adjustForm.value.new_stock) - currentStock
 })
@@ -1148,7 +1373,29 @@ const stockDifferenceTextColor = computed(() => {
   return 'text-gray-800 dark:text-zinc-300'
 })
 
+// Computed: detecta si el producto/variante EXISTE en la sede seleccionada
+// (diferente a stock 0 — aquí se verifica que haya un registro en product_warehouse)
+const selectedWarehouseHasProduct = computed(() => {
+  if (!adjustModalSelectedWarehouse.value || !selectedProductForAdjust.value) return true // si no hay sede seleccionada aún, no bloquear
+  const isVariable = selectedProductForAdjust.value.type === 'variable' || selectedProductForAdjust.value.product_type === 'variable'
+  if (isVariable) {
+    // Para productos variables: hay producto si hay al menos 1 variante cargada para esta sede
+    return productVariants.value.length > 0
+  } else {
+    // Para productos simples: verificar que la sede esté en el array warehouses del producto
+    const warehouses = selectedProductForAdjust.value.warehouses || []
+    return warehouses.some(wh => {
+      const id = wh.id ?? wh.warehouse_id
+      return parseInt(id) === parseInt(adjustModalSelectedWarehouse.value)
+    })
+  }
+})
+
 const isFormValid = computed(() => {
+  // Si hay múltiples sedes, se requiere elegir una
+  if (adjustModalWarehouses.value.length > 1 && !adjustModalSelectedWarehouse.value) return false
+  // Bloquear si el producto no existe en la sede seleccionada
+  if (!selectedWarehouseHasProduct.value) return false
   return adjustForm.value.new_stock !== '' && 
          !isNaN(adjustForm.value.new_stock) && 
          adjustForm.value.reason !== '' &&
@@ -1310,7 +1557,9 @@ const loadProducts = async () => {
       const baseProduct = {
         ...product,
         type: product.type || product.product_type || 'simple',
-        category: product.category ? product.category.name : 'Sin categoría',
+        category: product.category
+          ? (typeof product.category === 'string' ? product.category : (product.category.name || 'Sin categoría'))
+          : 'Sin categoría',
         current_stock: product.current_stock || 0,
         stock: product.current_stock || 0,
         min_stock: product.min_stock || 10,
@@ -1353,6 +1602,7 @@ const loadProducts = async () => {
             _parentProductId: product.id,
             _variantId: variant.id,
             _variantData: variant,
+            _variantWarehouses: variant.warehouses || [],
             _variantLabel: variantLabel,
             _variantDetailLabel: variantDetailLabel,
             _variantOptions: cleanedOptions,
@@ -1674,6 +1924,17 @@ const adjustStock = async (product) => {
   productVariants.value = []
   selectedVariant.value = null
   
+  // Configurar sedes disponibles para el ajuste
+  adjustModalWarehouses.value = warehouses.value.filter(w => w.active !== false)
+  if (adjustModalWarehouses.value.length > 1) {
+    // Con múltiples sedes, forzar selección manual — no pre-seleccionar para evitar errores
+    adjustModalSelectedWarehouse.value = null
+  } else if (adjustModalWarehouses.value.length === 1) {
+    adjustModalSelectedWarehouse.value = adjustModalWarehouses.value[0].id
+  } else {
+    adjustModalSelectedWarehouse.value = null
+  }
+  
   adjustForm.value = {
     product_id: parentProductId,
     variant_id: null,
@@ -1688,17 +1949,39 @@ const adjustStock = async (product) => {
     }
   }
   
-  // Si el producto es tipo "variable" (fashion), cargar variantes con stock global
+  // Si el producto es tipo "variable" (fashion), cargar variantes con stock de la sede seleccionada
   const isVariable = product.type === 'variable' || product.product_type === 'variable'
   if (isVariable) {
     try {
-      // Sin warehouse_id → stock global (suma de todas las bodegas)
-      const response = await api.get(`/products/${parentProductId}`)
+      const whParam = adjustModalSelectedWarehouse.value ? `?warehouse_id=${adjustModalSelectedWarehouse.value}` : ''
+      const response = await api.get(`/products/${parentProductId}${whParam}`)
       if (response.data && response.data.variants) {
         productVariants.value = response.data.variants
       }
+      // Actualizar datos del producto con la respuesta completa (incluye warehouses)
+      if (response.data) {
+        const fresh = { ...response.data }
+        if (fresh.category && typeof fresh.category === 'object') {
+          fresh.category = fresh.category.name || 'Sin categoría'
+        }
+        selectedProductForAdjust.value = { ...parentForModal, ...fresh }
+      }
     } catch (error) {
       showWarning('Error al cargar las variantes del producto')
+    }
+  } else {
+    // Para productos simples, cargar datos frescos con info de warehouses
+    try {
+      const response = await api.get(`/products/${parentProductId}`)
+      if (response.data) {
+        const fresh = { ...response.data }
+        if (fresh.category && typeof fresh.category === 'object') {
+          fresh.category = fresh.category.name || 'Sin categoría'
+        }
+        selectedProductForAdjust.value = { ...parentForModal, ...fresh }
+      }
+    } catch (error) {
+      // Usar los datos que ya tenemos
     }
   }
   
@@ -1710,6 +1993,32 @@ const navigateToStockDistribution = (product) => {
   showAdjustModal.value = false
   emit('navigate', 'warehouses')
   emit('changeModule', 'warehouses')
+}
+
+// Recargar variantes cuando cambia la sede en el modal de ajuste
+const onAdjustWarehouseChange = async () => {
+  if (!selectedProductForAdjust.value) return
+  const productId = selectedProductForAdjust.value.id
+  const whId = adjustModalSelectedWarehouse.value
+  
+  // Resetear selección de variante y stock
+  selectedVariant.value = null
+  adjustForm.value.variant_id = null
+  adjustForm.value.new_stock = ''
+  
+  const isVariable = selectedProductForAdjust.value.type === 'variable' || selectedProductForAdjust.value.product_type === 'variable'
+  try {
+    const whParam = whId ? `?warehouse_id=${whId}` : ''
+    const response = await api.get(`/products/${productId}${whParam}`)
+    if (response.data) {
+      if (isVariable && response.data.variants) {
+        productVariants.value = response.data.variants
+      }
+      selectedProductForAdjust.value = { ...selectedProductForAdjust.value, ...response.data }
+    }
+  } catch (error) {
+    // Mantener datos actuales
+  }
 }
 
 // Función para parsear options_summary de variante a array de objetos
@@ -1783,11 +2092,12 @@ const processStockAdjustment = async () => {
       : adjustForm.value.reason
     
     // Incluir warehouse_id y variant_id si está disponible
+    const warehouseForAdjust = adjustModalSelectedWarehouse.value || selectedWarehouse.value
     const response = await inventoryService.adjustStock(
       adjustForm.value.product_id, 
       newStock, 
       finalReason,
-      selectedWarehouse.value,
+      warehouseForAdjust,
       adjustForm.value.variant_id // NUEVO: pasar variant_id
     )
     
@@ -1977,16 +2287,16 @@ const createMovement = async () => {
       closeMovementModal()
       
       // Mostrar mensaje de éxito
-      alert('Movimiento registrado exitosamente')
+      showSuccess('Movimiento registrado exitosamente')
     } else {
       const errorMessage = response?.message || 'Error desconocido al registrar el movimiento'
-      alert('Error: ' + errorMessage)
+      showError('Error: ' + errorMessage)
     }
     
   } catch (error) {
     console.error('Error registrando movimiento:', error)
     const errorMessage = error?.response?.data?.message || error?.message || 'Error de conexión con el servidor'
-    alert('Error al conectar con el servidor: ' + errorMessage)
+    showError('Error al conectar con el servidor: ' + errorMessage)
   } finally {
     loading.value = false
   }
@@ -2065,10 +2375,8 @@ const loadWarehousesIfAvailable = async () => {
     showWarehouseFilter.value = warehouses.value.length > 1
     
     if (showWarehouseFilter.value) {
-      // Seleccionar warehouse por defecto
-      const defaultWh = warehouses.value.find(w => w.is_default)
-      selectedWarehouse.value = defaultWh?.id || warehouses.value[0]?.id
-      
+      // Por defecto mostrar "Todas" las sedes para vista completa
+      selectedWarehouse.value = null
     }
   } catch (error) {
     console.error('Error cargando warehouses:', error)
@@ -2084,7 +2392,7 @@ const refreshInventoryData = async () => {
     await loadCategories()
   } catch (error) {
     console.error('Error refrescando datos:', error)
-    alert('Error al actualizar los datos')
+    showError('Error al actualizar los datos')
   } finally {
     loading.value = false
   }
@@ -2135,6 +2443,33 @@ const hexToColorName = (hex) => {
   if (Math.abs(r - g) < 30 && Math.abs(g - b) < 30) return 'Gris'
   if (r > 120 && g < 100 && b < 60) return 'Marrón'
   return hex // fallback: mostrar hex si no se reconoce
+}
+
+// Obtener stock de un producto en una sede específica (para modo matriz)
+const getProductWarehouseStock = (product, warehouseId) => {
+  // Para filas de variante, usar los warehouses de la variante
+  if (product._isVariantRow) {
+    const variantWarehouses = product._variantWarehouses || []
+    if (variantWarehouses.length > 0) {
+      const wh = variantWarehouses.find(w => w.id === warehouseId || w.warehouse_id === warehouseId)
+      if (wh) return wh.pivot?.stock ?? wh.stock ?? 0
+    }
+    return null
+  }
+  // Para productos simples, usar los warehouses del producto
+  if (product.warehouses && product.warehouses.length > 0) {
+    const wh = product.warehouses.find(w => w.id === warehouseId || w.warehouse_id === warehouseId)
+    if (wh) {
+      const pivotStock = wh.pivot?.stock ?? wh.stock ?? 0
+      if (pivotStock === 0 && product.current_stock > 0 && product.warehouses.length === 1) {
+        return product.current_stock
+      }
+      return pivotStock
+    }
+    return null
+  }
+  if (warehouseId === 1) return product.current_stock || 0
+  return null
 }
 
 // Función utilitaria para manejo inteligente de imágenes (copiada de ProductsView)

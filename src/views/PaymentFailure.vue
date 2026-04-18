@@ -62,6 +62,9 @@
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
+import { useToast } from '../composables/useToast.js'
+
+const { showError } = useToast()
 
 const route = useRoute()
 const errorReason = ref('El pago fue rechazado por el procesador de pagos')
@@ -125,7 +128,7 @@ const activateTrial = async () => {
     }
   } catch (error) {
     console.error('Error activando trial:', error)
-    alert('Error al activar trial. Por favor intenta nuevamente.')
+    showError('Error al activar trial. Por favor intenta nuevamente.')
   }
 }
 

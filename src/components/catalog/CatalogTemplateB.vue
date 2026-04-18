@@ -710,6 +710,9 @@ import axios from 'axios'
 import POSVariantSelector from '../POSVariantSelector.vue'
 import QuantityModal from './QuantityModal.vue'
 import CheckoutForm from './CheckoutForm.vue'
+import { useToast } from '../../composables/useToast.js'
+
+const { showError } = useToast()
 
 const props = defineProps({
   storeConfig: {
@@ -1160,7 +1163,7 @@ const handleCheckoutSubmit = async () => {
   } catch (error) {
     console.error('Error al crear pedido:', error)
     const errorMsg = error.response?.data?.message || error.response?.data?.errors || 'Error al procesar tu pedido. Por favor intenta nuevamente.'
-    alert(`Error: ${typeof errorMsg === 'object' ? JSON.stringify(errorMsg) : errorMsg}`)
+    showError(`Error: ${typeof errorMsg === 'object' ? JSON.stringify(errorMsg) : errorMsg}`)
   } finally {
     submittingOrder.value = false
   }

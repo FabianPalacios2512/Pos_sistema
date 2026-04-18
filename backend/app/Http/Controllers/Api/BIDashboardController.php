@@ -135,15 +135,35 @@ class BIDashboardController extends Controller
 
     private function periodExpenses($warehouseId, $from, $to)
     {
-        $q = DB::table('expenses')->whereBetween('date', [$from, $to]);
+        // expenses table (egresos manuales)
+        $q = DB::table('expenses')
+            ->whereBetween(DB::raw('DATE(date)'), [$from, $to]);
 
         if ($warehouseId) {
-            $q->whereIn('cash_session_id', function ($sub) use ($warehouseId) {
+            $q->where(function ($sub) use ($warehouseId) {
+                $sub->whereNull('cash_session_id')
+                    ->orWhereIn('cash_session_id', function ($s) use ($warehouseId) {
+                        $s->select('id')->from('cash_sessions')->where('warehouse_id', $warehouseId);
+                    });
+            });
+        }
+
+        $expensesTotal = (float) $q->sum('amount');
+
+        // cash_movements (egresos desde Movimiento de Caja)
+        $movQ = DB::table('cash_movements')
+            ->where('type', 'egreso')
+            ->whereBetween(DB::raw('DATE(created_at)'), [$from, $to]);
+
+        if ($warehouseId) {
+            $movQ->whereIn('cash_session_id', function ($sub) use ($warehouseId) {
                 $sub->select('id')->from('cash_sessions')->where('warehouse_id', $warehouseId);
             });
         }
 
-        return (float) $q->sum('amount');
+        $movementsTotal = (float) $movQ->sum('amount');
+
+        return $expensesTotal + $movementsTotal;
     }
 
     private function inventoryValue($warehouseId)
@@ -201,16 +221,37 @@ class BIDashboardController extends Controller
             ->pluck('total', 'day')
             ->toArray();
 
-        // Daily expenses
-        $expQ = DB::table('expenses')->whereBetween('date', [$dateFrom, $dateTo]);
+        // Daily expenses from expenses table
+        $expQ = DB::table('expenses')
+            ->whereBetween(DB::raw('DATE(date)'), [$dateFrom, $dateTo]);
 
         if ($warehouseId) {
-            $expQ->whereIn('cash_session_id', function ($sub) use ($warehouseId) {
-                $sub->select('id')->from('cash_sessions')->where('warehouse_id', $warehouseId);
+            $expQ->where(function ($sub) use ($warehouseId) {
+                $sub->whereNull('cash_session_id')
+                    ->orWhereIn('cash_session_id', function ($s) use ($warehouseId) {
+                        $s->select('id')->from('cash_sessions')->where('warehouse_id', $warehouseId);
+                    });
             });
         }
 
         $dailyExpenses = $expQ->selectRaw('DATE(date) as day, COALESCE(SUM(amount), 0) as total')
+            ->groupBy('day')
+            ->orderBy('day')
+            ->pluck('total', 'day')
+            ->toArray();
+
+        // Daily egresos from cash_movements (Movimiento de Caja)
+        $movQ = DB::table('cash_movements')
+            ->where('type', 'egreso')
+            ->whereBetween(DB::raw('DATE(created_at)'), [$dateFrom, $dateTo]);
+
+        if ($warehouseId) {
+            $movQ->whereIn('cash_session_id', function ($sub) use ($warehouseId) {
+                $sub->select('id')->from('cash_sessions')->where('warehouse_id', $warehouseId);
+            });
+        }
+
+        $dailyMovements = $movQ->selectRaw('DATE(created_at) as day, COALESCE(SUM(amount), 0) as total')
             ->groupBy('day')
             ->orderBy('day')
             ->pluck('total', 'day')
@@ -226,7 +267,7 @@ class BIDashboardController extends Controller
                 'date'     => $d,
                 'label'    => $current->format('d M'),
                 'sales'    => (float) ($dailySales[$d] ?? 0),
-                'expenses' => (float) ($dailyExpenses[$d] ?? 0),
+                'expenses' => (float) ($dailyExpenses[$d] ?? 0) + (float) ($dailyMovements[$d] ?? 0),
             ];
             $current->addDay();
         }
@@ -348,6 +389,26 @@ class BIDashboardController extends Controller
             ->orderBy('stock')
             ->limit(15)
             ->get()
+            ->map(function ($item) {
+                if ($item->type === 'variant' && $item->variant_label) {
+                    try {
+                        $opts = json_decode($item->variant_label, true);
+                        if (is_array($opts)) {
+                            $item->variant_label = implode(' / ', array_map(function ($o) {
+                                $val = $o['value'] ?? '';
+                                // Replace hex colors with a readable symbol
+                                if (preg_match('/^#[0-9a-fA-F]{3,6}$/', $val)) {
+                                    $val = 'Color';
+                                }
+                                return ($o['name'] ?? '') . ': ' . $val;
+                            }, $opts));
+                        }
+                    } catch (\Throwable $e) {
+                        $item->variant_label = null;
+                    }
+                }
+                return $item;
+            })
             ->toArray();
     }
 

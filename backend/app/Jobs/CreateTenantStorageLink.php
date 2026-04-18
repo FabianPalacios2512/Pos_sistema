@@ -91,9 +91,27 @@ class CreateTenantStorageLink implements ShouldQueue
                 }
             }
             
-            $publicStoragePath = public_path('storage');
-            if (!is_link($publicStoragePath)) {
-                Log::warning("[Tenant Storage] public/storage no es un symlink. Ejecutar: php artisan storage:link");
+            // También crear symlink directamente en public/storage/tenants/
+            // (para cuando public/storage es un directorio real, no symlink)
+            $publicTenantsDir = public_path('storage/tenants');
+            if (!is_dir($publicTenantsDir)) {
+                File::makeDirectory($publicTenantsDir, 0755, true);
+            }
+            
+            $publicSymlinkPath = "{$publicTenantsDir}/{$tenantId}";
+            
+            if (is_dir($publicSymlinkPath) && !is_link($publicSymlinkPath)) {
+                File::deleteDirectory($publicSymlinkPath);
+            }
+            
+            if (is_link($publicSymlinkPath) && !file_exists($publicSymlinkPath)) {
+                unlink($publicSymlinkPath);
+            }
+            
+            if (!is_link($publicSymlinkPath)) {
+                if (!@symlink($tenantStoragePath, $publicSymlinkPath)) {
+                    Log::warning("[Tenant Storage] No se pudo crear symlink público: {$publicSymlinkPath}");
+                }
             }
             
         } catch (\Exception $e) {

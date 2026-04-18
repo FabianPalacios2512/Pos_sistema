@@ -1688,12 +1688,38 @@ EOT;
     private function obtenerEstadisticasDB()
     {
         try {
-            // Estadísticas de inventario
+            // Estadísticas de inventario (con soporte correcto para variantes)
             $totalProductos = Product::where('active', true)->count();
             $productosInactivos = Product::where('active', false)->count();
-            $valorInventario = Product::where('active', true)->sum(DB::raw('sale_price * current_stock'));
-            $costoInventario = Product::where('active', true)->sum(DB::raw('cost_price * current_stock'));
-            $bajoStock = Product::where('active', true)->whereColumn('current_stock', '<=', 'min_stock')->count();
+
+            // Valor de venta (simple + variable)
+            $simpleSaleVal = (float) DB::table('products')->where('active', true)
+                ->where(function ($q) { $q->whereNull('product_type')->orWhere('product_type', 'simple'); })
+                ->selectRaw('COALESCE(SUM(sale_price * current_stock), 0) as val')->value('val');
+            $variableSaleVal = (float) DB::table('product_variants as pv')
+                ->join('products as p', 'pv.product_id', '=', 'p.id')
+                ->where('p.active', true)->where('p.product_type', 'variable')->where('pv.active', true)
+                ->selectRaw('COALESCE(SUM(pv.stock * COALESCE(pv.price, p.sale_price, 0)), 0) as val')->value('val');
+            $valorInventario = $simpleSaleVal + $variableSaleVal;
+
+            // Valor de costo (simple + variable)
+            $simpleCostVal = (float) DB::table('products')->where('active', true)
+                ->where(function ($q) { $q->whereNull('product_type')->orWhere('product_type', 'simple'); })
+                ->selectRaw('COALESCE(SUM(cost_price * current_stock), 0) as val')->value('val');
+            $variableCostVal = (float) DB::table('product_variants as pv')
+                ->join('products as p', 'pv.product_id', '=', 'p.id')
+                ->where('p.active', true)->where('p.product_type', 'variable')->where('pv.active', true)
+                ->selectRaw('COALESCE(SUM(pv.stock * COALESCE(pv.cost_price, p.cost_price, 0)), 0) as val')->value('val');
+            $costoInventario = $simpleCostVal + $variableCostVal;
+
+            // Stock bajo (variantes + simples)
+            $bajoStockSimple = Product::where('active', true)
+                ->where(function ($q) { $q->whereNull('product_type')->orWhere('product_type', 'simple'); })
+                ->whereColumn('current_stock', '<=', 'min_stock')->count();
+            $bajoStockVariantes = \App\Models\ProductVariant::join('products', 'products.id', '=', 'product_variants.product_id')
+                ->where('products.active', true)->where('product_variants.active', true)
+                ->whereColumn('product_variants.stock', '<=', 'products.min_stock')->count();
+            $bajoStock = $bajoStockSimple + $bajoStockVariantes;
             $sinStock = Product::where('active', true)->where('current_stock', '<=', 0)->count();
 
             // Ventas de hoy

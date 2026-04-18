@@ -70,7 +70,7 @@ class AuthController extends Controller
         }
 
         // SEGUNDO: Si no es super admin, buscar en tenant
-        $user = User::with('role')->where('email', $request->email)->first();
+        $user = User::with(['role', 'warehouse'])->where('email', $request->email)->first();
         $security = new SecurityService();
         $ip = $request->ip();
         $ua = $request->userAgent() ?? '';
@@ -177,6 +177,11 @@ class AuthController extends Controller
                         'name' => $user->role->name,
                         'permissions' => $user->role->permissions
                     ] : null,
+                    'warehouse_id' => $user->warehouse_id,
+                    'warehouse' => $user->warehouse ? [
+                        'id' => $user->warehouse->id,
+                        'name' => $user->warehouse->name
+                    ] : null,
                     'is_super_admin' => false,
                     'last_login' => $user->last_login
                 ],
@@ -263,7 +268,7 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
-        $user = $request->user()->load('role');
+        $user = $request->user()->load(['role', 'warehouse']);
 
         return response()->json([
             'success' => true,
@@ -278,6 +283,11 @@ class AuthController extends Controller
                         'id' => $user->role->id,
                         'name' => $user->role->name,
                         'permissions' => $user->role->permissions
+                    ] : null,
+                    'warehouse_id' => $user->warehouse_id,
+                    'warehouse' => $user->warehouse ? [
+                        'id' => $user->warehouse->id,
+                        'name' => $user->warehouse->name
                     ] : null,
                     'last_login' => $user->last_login
                 ]

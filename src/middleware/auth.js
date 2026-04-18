@@ -41,6 +41,7 @@ export const requireRole = (allowedRoles) => {
     // Mapear roles del backend a roles esperados
     const roleMapping = {
       'Administrador': 'admin',
+      'Administrador POS': 'admin_pos',
       'Cajero': 'cajero',
       'Vendedor': 'vendedor',
       'Gerente': 'admin'
@@ -58,13 +59,13 @@ export const requireRole = (allowedRoles) => {
 }
 
 // Middleware para admins únicamente
-export const requireAdmin = requireRole(['admin'])
+export const requireAdmin = requireRole(['admin', 'admin_pos'])
 
 // Middleware para cajeros y admins
-export const requireCashier = requireRole(['admin', 'cajero'])
+export const requireCashier = requireRole(['admin', 'admin_pos', 'cajero'])
 
 // Middleware para vendedores, cajeros y admins
-export const requireSeller = requireRole(['admin', 'cajero', 'vendedor'])
+export const requireSeller = requireRole(['admin', 'admin_pos', 'cajero', 'vendedor'])
 
 // Middleware para redirigir si ya está autenticado
 export const redirectIfAuth = (to, from, next) => {
@@ -99,60 +100,61 @@ export const redirectIfAuth = (to, from, next) => {
 // Roles y permisos del sistema
 export const ROLES = {
   ADMIN: 'admin',
+  ADMIN_POS: 'admin_pos',
   CAJERO: 'cajero',
   VENDEDOR: 'vendedor'
 }
 
 export const PERMISSIONS = {
   // Administración general
-  ADMIN_PANEL: ['admin'],
+  ADMIN_PANEL: ['admin', 'admin_pos'],
   
   // Punto de Venta
-  POS_ACCESS: ['admin', 'cajero', 'vendedor'],
-  POS_DISCOUNTS: ['admin', 'cajero'],
-  POS_RETURNS: ['admin', 'cajero'],
+  POS_ACCESS: ['admin', 'admin_pos', 'cajero', 'vendedor'],
+  POS_DISCOUNTS: ['admin', 'admin_pos', 'cajero'],
+  POS_RETURNS: ['admin', 'admin_pos', 'cajero'],
   
   // Productos
-  PRODUCTS_VIEW: ['admin', 'cajero', 'vendedor'],
-  PRODUCTS_CREATE: ['admin'],
-  PRODUCTS_EDIT: ['admin'],
-  PRODUCTS_DELETE: ['admin'],
+  PRODUCTS_VIEW: ['admin', 'admin_pos', 'cajero', 'vendedor'],
+  PRODUCTS_CREATE: ['admin', 'admin_pos'],
+  PRODUCTS_EDIT: ['admin', 'admin_pos'],
+  PRODUCTS_DELETE: ['admin', 'admin_pos'],
   
   // Categorías
-  CATEGORIES_VIEW: ['admin', 'cajero'],
-  CATEGORIES_MANAGE: ['admin'],
+  CATEGORIES_VIEW: ['admin', 'admin_pos', 'cajero'],
+  CATEGORIES_MANAGE: ['admin', 'admin_pos'],
   
   // Clientes
-  CUSTOMERS_VIEW: ['admin', 'cajero', 'vendedor'],
-  CUSTOMERS_CREATE: ['admin', 'cajero', 'vendedor'],
-  CUSTOMERS_EDIT: ['admin', 'cajero'],
-  CUSTOMERS_DELETE: ['admin'],
+  CUSTOMERS_VIEW: ['admin', 'admin_pos', 'cajero', 'vendedor'],
+  CUSTOMERS_CREATE: ['admin', 'admin_pos', 'cajero', 'vendedor'],
+  CUSTOMERS_EDIT: ['admin', 'admin_pos', 'cajero'],
+  CUSTOMERS_DELETE: ['admin', 'admin_pos'],
   
   // Proveedores
-  SUPPLIERS_VIEW: ['admin'],
-  SUPPLIERS_MANAGE: ['admin'],
+  SUPPLIERS_VIEW: ['admin', 'admin_pos'],
+  SUPPLIERS_MANAGE: ['admin', 'admin_pos'],
   
   // Inventario
-  INVENTORY_VIEW: ['admin', 'cajero'],
-  INVENTORY_MANAGE: ['admin'],
+  INVENTORY_VIEW: ['admin', 'admin_pos', 'cajero'],
+  INVENTORY_MANAGE: ['admin', 'admin_pos'],
   
   // Reportes
-  REPORTS_BASIC: ['admin', 'cajero'],
+  REPORTS_BASIC: ['admin', 'admin_pos', 'cajero'],
   REPORTS_ADVANCED: ['admin'],
   REPORTS_FINANCIAL: ['admin'],
   
   // Configuración
-  SETTINGS_VIEW: ['admin'],
+  SETTINGS_VIEW: ['admin', 'admin_pos'],
   SETTINGS_MANAGE: ['admin'],
   
   // Usuarios y Roles
-  USERS_VIEW: ['admin'],
-  USERS_MANAGE: ['admin'],
+  USERS_VIEW: ['admin', 'admin_pos'],
+  USERS_MANAGE: ['admin', 'admin_pos'],
   ROLES_VIEW: ['admin'],
   ROLES_MANAGE: ['admin'],
   
   // Dashboard
-  DASHBOARD_ACCESS: ['admin', 'cajero', 'vendedor'],
+  DASHBOARD_ACCESS: ['admin', 'admin_pos', 'cajero', 'vendedor'],
   
   // Ventas
   SALES_VIEW: ['admin', 'cajero'],

@@ -203,6 +203,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import apiClient from '@/services/apiClient.js'
+import { useToast } from '@/composables/useToast.js'
+
+const { showInfo } = useToast()
 
 // Estado del trial
 const trialInfo = ref({
@@ -227,7 +230,7 @@ const loadTrialStatus = async () => {
 
 // Seleccionar plan (placeholder - aquí iría integración con pasarela de pago)
 const selectPlan = (plan) => {
-  alert(`Plan seleccionado: ${plan}\n\nIntegración con pasarela de pago pendiente.`)
+  showInfo(`Plan seleccionado: ${plan}. Integración con pasarela de pago pendiente.`)
   // TODO: Integrar con Stripe, PayU, Wompi, etc.
 }
 

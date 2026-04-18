@@ -285,6 +285,7 @@ const handleComplete = async () => {
       try {
         await stockTransferService.complete(props.transfer.id);
         closeConfirmModal();
+        emit('close');
         showSuccess('Traslado completado exitosamente');
         emit('updated');
       } catch (error) {
@@ -313,6 +314,7 @@ const handleCancel = async () => {
       try {
         await stockTransferService.cancel(props.transfer.id);
         closeConfirmModal();
+        emit('close');
         showSuccess('Traslado cancelado exitosamente');
         emit('updated');
       } catch (error) {

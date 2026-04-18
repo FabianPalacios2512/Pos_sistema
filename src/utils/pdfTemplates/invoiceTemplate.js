@@ -8,6 +8,47 @@ import jsPDF from 'jspdf'
 import QRCode from 'qrcode'
 import { getTemplateStyle, applyHeaderStyle, applyBorderStyle, applyTotalStyle } from './templateStyles.js'
 
+// Convierte hex de color a nombre legible en español para impresión
+const hexToColorName = (hex) => {
+  const colors = {
+    '#FF0000': 'Rojo', '#DC2626': 'Rojo', '#EF4444': 'Rojo', '#DB0A0A': 'Rojo',
+    '#B91C1C': 'Rojo Oscuro', '#7F1D1D': 'Vino', '#FF4500': 'Naranja Rojo',
+    '#FF6600': 'Naranja', '#F97316': 'Naranja', '#EA580C': 'Naranja',
+    '#FFD700': 'Dorado', '#FFFF00': 'Amarillo', '#EAB308': 'Amarillo',
+    '#00FF00': 'Verde', '#008000': 'Verde', '#22C55E': 'Verde', '#16A34A': 'Verde',
+    '#166534': 'Verde Oscuro', '#10B981': 'Esmeralda',
+    '#06B6D4': 'Cyan', '#0891B2': 'Cyan',
+    '#0000FF': 'Azul', '#2563EB': 'Azul', '#3B82F6': 'Azul', '#1D4ED8': 'Azul',
+    '#000080': 'Azul Marino', '#6366F1': 'Índigo', '#4F46E5': 'Índigo',
+    '#8B5CF6': 'Violeta', '#A855F7': 'Púrpura', '#800080': 'Morado',
+    '#EC4899': 'Rosa', '#DB2777': 'Rosa', '#FF69B4': 'Rosa', '#FFC0CB': 'Rosa Pastel',
+    '#FFFFFF': 'Blanco', '#F5F5F5': 'Blanco', '#FAFAFA': 'Blanco',
+    '#000000': 'Negro', '#1A1A1A': 'Negro', '#171717': 'Negro',
+    '#808080': 'Gris', '#6B7280': 'Gris', '#9CA3AF': 'Gris Claro',
+    '#A52A2A': 'Marrón', '#92400E': 'Marrón', '#D2691E': 'Caramelo',
+    '#F5F5DC': 'Beige', '#FEF3C7': 'Crema',
+  }
+  const upper = hex.toUpperCase()
+  if (colors[upper]) return colors[upper]
+  const r = parseInt(upper.slice(1,3), 16), g = parseInt(upper.slice(3,5), 16), b = parseInt(upper.slice(5,7), 16)
+  if (r > 200 && g < 80 && b < 80) return 'Rojo'
+  if (r > 200 && g > 100 && g < 180 && b < 80) return 'Naranja'
+  if (r > 200 && g > 200 && b < 100) return 'Amarillo'
+  if (r < 80 && g > 150 && b < 80) return 'Verde'
+  if (r < 80 && g < 80 && b > 150) return 'Azul'
+  if (r > 180 && g < 100 && b > 150) return 'Rosa'
+  if (r > 220 && g > 220 && b > 220) return 'Blanco'
+  if (r < 50 && g < 50 && b < 50) return 'Negro'
+  if (Math.abs(r - g) < 30 && Math.abs(g - b) < 30) return 'Gris'
+  if (r > 120 && g < 100 && b < 60) return 'Marrón'
+  return hex
+}
+
+const formatItemNameForPrint = (name) => {
+  if (!name) return 'Producto'
+  return name.replace(/#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})\b/g, (match) => hexToColorName(match))
+}
+
 /**
  * Crear PDF de factura con diseño tipo ticket térmico (80mm)
  * @param {Object} invoiceData - Datos de la factura
@@ -375,7 +416,7 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
     pdf.setFontSize(7)
 
     items.forEach((item, index) => {
-      const itemName = item.name || item.product_name || 'Producto'
+      const itemName = formatItemNameForPrint(item.name || item.product_name || 'Producto')
       const quantity = item.quantity || 0
       const price = item.price || item.unit_price || 0
       const itemTotal = quantity * price

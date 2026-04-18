@@ -608,6 +608,9 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 import QuantityModal from './QuantityModal.vue'
+import { useToast } from '../../composables/useToast.js'
+
+const { showError } = useToast()
 
 const props = defineProps({
   storeConfig: {
@@ -878,7 +881,7 @@ const handleCheckoutSubmit = async () => {
     }
   } catch (error) {
     console.error('Error al crear pedido:', error)
-    alert('Error al crear el pedido. Por favor intenta nuevamente.')
+    showError('Error al crear el pedido. Por favor intenta nuevamente.')
   } finally {
     submittingOrder.value = false
   }

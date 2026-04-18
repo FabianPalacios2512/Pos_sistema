@@ -275,7 +275,7 @@ const fetchTransfers = async () => {
   } catch (error) {
     console.error('Error al cargar traslados:', error);
     transfers.value = [];
-    alert('Error al cargar los traslados');
+    showError('Error al cargar los traslados');
   } finally {
     loading.value = false;
   }

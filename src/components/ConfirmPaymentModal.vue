@@ -59,8 +59,12 @@
               </div>
               
               <div class="text-right">
-                <p class="text-base font-bold text-gray-900 dark:text-white">${{ paymentAmount.toLocaleString() }}</p>
-                <p v-if="change > 0" class="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">
+                <p v-if="showCashInput && cashReceivedInternal && Number(cashReceivedInternal) >= props.total" class="text-base font-bold text-emerald-600 dark:text-emerald-400">${{ Number(cashReceivedInternal).toLocaleString() }}</p>
+                <p v-else-if="!isCashPayment || !showCashInputToggle" class="text-base font-bold text-gray-900 dark:text-white">${{ total.toLocaleString() }}</p>
+                <p v-if="showCashInput && internalChange > 0" class="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">
+                  Cambio: ${{ internalChange.toLocaleString() }}
+                </p>
+                <p v-else-if="!showCashInput && change > 0" class="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">
                   Cambio: ${{ change.toLocaleString() }}
                 </p>
               </div>
@@ -85,12 +89,68 @@
           </div>
         </div>
 
-        <!-- Footer: Botones -->
+          <!-- Toggle + Input Monto Recibido (solo moda/restaurante + efectivo) -->
+          <div v-if="canShowCashToggle" class="mx-4 mb-2">
+            <!-- Toggle calcular cambio -->
+            <label class="flex items-center justify-between cursor-pointer mb-3 px-1">
+              <span class="text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Calcular cambio</span>
+              <button type="button" @click="showCashInputToggle = !showCashInputToggle"
+                      :class="showCashInputToggle ? 'bg-gray-900 dark:bg-white' : 'bg-gray-300 dark:bg-zinc-600'"
+                      class="relative inline-flex h-5 w-9 flex-shrink-0 rounded-full transition-colors duration-200 ease-in-out focus:outline-none">
+                <span :class="showCashInputToggle ? 'translate-x-4' : 'translate-x-0.5'"
+                      class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white dark:bg-zinc-900 shadow transition duration-200 ease-in-out mt-0.5"></span>
+              </button>
+            </label>
+            
+            <template v-if="showCashInputToggle">
+            <p class="px-1 pb-2 text-xs font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Monto recibido</p>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-bold text-gray-400 dark:text-zinc-500">$</span>
+              <input
+                v-model="cashReceivedInternal"
+                type="number"
+                min="0"
+                step="1000"
+                placeholder="0"
+                class="w-full pl-8 pr-4 py-4 text-2xl font-bold rounded-xl border-2 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-300 dark:placeholder-zinc-600 focus:outline-none transition-all"
+                :class="cashReceivedInternal && Number(cashReceivedInternal) < props.total
+                  ? 'border-rose-300 dark:border-rose-700'
+                  : cashReceivedInternal && Number(cashReceivedInternal) >= props.total
+                    ? 'border-emerald-400 dark:border-emerald-600'
+                    : 'border-gray-200 dark:border-zinc-700 focus:border-gray-400 dark:focus:border-zinc-500'"
+                autofocus
+              />
+            </div>
+            <!-- Fila de accesos rápidos -->
+            <div class="flex gap-2 mt-2">
+              <button
+                v-for="mult in [1, 2, 5, 10]" :key="mult"
+                type="button"
+                @click="cashReceivedInternal = Math.ceil(props.total / (mult * 10000)) * mult * 10000"
+                class="flex-1 py-1.5 text-xs font-semibold rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all"
+              >
+                ${{ (Math.ceil(props.total / (mult * 10000)) * mult * 10000).toLocaleString() }}
+              </button>
+            </div>
+            <!-- Cambio / Falta -->
+            <div v-if="cashReceivedInternal" class="mt-3 flex items-center justify-between px-4 py-3 rounded-xl transition-all"
+                 :class="Number(cashReceivedInternal) >= props.total ? 'bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800' : 'bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800'">
+              <span class="text-sm font-semibold" :class="Number(cashReceivedInternal) >= props.total ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'">
+                {{ Number(cashReceivedInternal) >= props.total ? 'Devolver' : 'Falta' }}
+              </span>
+              <span class="text-2xl font-black tabular-nums" :class="Number(cashReceivedInternal) >= props.total ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'">
+                ${{ Math.abs(Number(cashReceivedInternal) - props.total).toLocaleString() }}
+              </span>
+            </div>
+            </template>
+          </div>
+
+          <!-- Footer: Botones -->
         <div class="px-4 pb-4 pt-2 space-y-3">
           <button
             @click="confirmPayment"
-            :disabled="processing"
-            class="w-full py-4 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 disabled:bg-gray-300 dark:disabled:bg-zinc-700 text-white dark:text-zinc-900 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+            :disabled="processing || !cashIsValid"
+            class="w-full py-4 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 disabled:bg-gray-300 dark:disabled:bg-zinc-700 text-white dark:text-zinc-900 disabled:text-gray-400 dark:disabled:text-zinc-500 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2"
           >
             <svg v-if="processing" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -124,7 +184,7 @@
           </div>
           
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            Registrando en la DIAN
+            Procesando venta
           </h3>
           <p class="text-sm text-gray-500 dark:text-zinc-400 max-w-xs mx-auto mb-4">
             Esto puede tomar unos segundos...
@@ -139,7 +199,7 @@
           
           <!-- Tip amigable -->
           <p class="text-xs text-gray-400 dark:text-zinc-500 mt-6">
-            Puedes desactivar esto en el toggle de arriba
+            No cierres esta ventana
           </p>
         </div>
       </template>
@@ -282,6 +342,7 @@ const props = defineProps({
   customer: { type: Object, default: null },
   systemSettings: { type: Object, default: null },
   invoiceNumber: { type: String, default: 'FACT-000000' },
+  storeType: { type: String, default: 'general' },
   // Estado de procesamiento del backend (para sincronización)
   backendProcessing: { type: Boolean, default: false },
   backendSuccess: { type: Boolean, default: false }
@@ -293,6 +354,29 @@ const currentState = ref('confirm')
 const processing = ref(false)
 const paymentData = ref(null)
 const fixedTotal = ref(0)
+const cashReceivedInternal = ref('')
+const showCashInputToggle = ref(true)
+
+// Solo mostrar input de efectivo recibido para moda/restaurante (general ya lo tiene en el POS)
+const isCashPayment = computed(() => {
+  const code = (props.paymentMethod.code || props.paymentMethod.id || '').toLowerCase()
+  return code === 'cash' || code === 'efectivo'
+})
+const canShowCashToggle = computed(() => {
+  return (props.storeType === 'fashion' || props.storeType === 'restaurant') && isCashPayment.value
+})
+const showCashInput = computed(() => {
+  return canShowCashToggle.value && showCashInputToggle.value
+})
+const internalChange = computed(() => {
+  const received = Number(cashReceivedInternal.value)
+  if (!received || received < props.total) return 0
+  return received - props.total
+})
+const cashIsValid = computed(() => {
+  if (!showCashInput.value) return true
+  return Number(cashReceivedInternal.value) >= props.total
+})
 
 // Observar cuando el backend termine de procesar exitosamente
 watch(() => props.backendSuccess, (success) => {
@@ -321,12 +405,15 @@ const confirmPayment = async () => {
   fixedTotal.value = props.total
   
   await new Promise(resolve => setTimeout(resolve, 300))
+
+  const effectiveReceived = showCashInput.value ? Number(cashReceivedInternal.value) : props.paymentAmount
+  const effectiveChange = showCashInput.value ? internalChange.value : props.change
   
   paymentData.value = {
     method: props.paymentMethod.code || props.paymentMethod.id,
     methodName: props.paymentMethod.name,
-    amount: props.paymentAmount,
-    change: props.change,
+    amount: effectiveReceived,
+    change: effectiveChange,
     fee: paymentFee.value,
     timestamp: new Date().toISOString(),
     invoiceNumber: props.invoiceNumber

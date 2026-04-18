@@ -558,7 +558,7 @@ const printReceipt = async () => {
     
   } catch (error) {
     console.error('Error al imprimir factura:', error)
-    alert('Error al imprimir la factura')
+    showToast('Error al imprimir la factura', 'error')
   }
 }
 

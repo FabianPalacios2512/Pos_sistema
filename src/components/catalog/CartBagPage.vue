@@ -292,9 +292,11 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import apiClient from '../../services/apiClient.js'
 import { useCatalogCart } from '../../stores/catalogCart.js'
+import { useToast } from '../../composables/useToast.js'
 
 const router = useRouter()
 const { cartItems, cartTotal, removeItem, clearCart } = useCatalogCart()
+const { showError } = useToast()
 
 const storeConfig = ref(null)
 const showCheckoutForm = ref(false)
@@ -437,7 +439,7 @@ const handleCheckoutSubmit = async () => {
       router.push('/catalog')
     }
   } catch (e) {
-    alert('Error al crear el pedido. Por favor intenta nuevamente.')
+    showError('Error al crear el pedido. Por favor intenta nuevamente.')
   } finally {
     submittingOrder.value = false
   }

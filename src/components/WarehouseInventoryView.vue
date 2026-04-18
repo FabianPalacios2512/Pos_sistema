@@ -298,6 +298,9 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { warehouseService } from '@/services/warehouseService';
+import { useToast } from '@/composables/useToast.js';
+
+const { showError } = useToast();
 
 const route = useRoute();
 const loading = ref(false);
@@ -325,7 +328,7 @@ const loadInventory = async () => {
     inventory.value = data.products || [];
   } catch (error) {
     console.error('Error al cargar inventario:', error);
-    alert('Error al cargar el inventario');
+    showError('Error al cargar el inventario');
   } finally {
     loading.value = false;
   }

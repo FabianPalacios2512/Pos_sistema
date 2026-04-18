@@ -674,9 +674,8 @@ class AIController extends Controller
         }
         if ($user && $user->role) {
             $roleName = $user->role->name ?? '';
-            $permissions = is_array($user->role->permissions) ? $user->role->permissions : [];
-            $isAllPerms = in_array('*', $permissions) || in_array('ALL', $permissions) || in_array('admin', $permissions);
-            $isVendedor = !$isAllPerms && (stripos($roleName, 'vendedor') !== false || stripos($roleName, 'cajero') !== false);
+            $isVendedor = $user->isVendedor();
+            $isAdminPos = $user->isAdminPos();
             
             if ($isVendedor) {
                 $moduleNameMap = [
@@ -702,6 +701,15 @@ Módulos permitidos: {$listaModulos}
 - No le muestres datos financieros globales (ganancias netas, márgenes, gastos del negocio).
 - Si pregunta por algo restringido, dile amablemente que eso lo maneja el administrador.
 - Sus ventas/facturas son solo las suyas, no las del negocio completo.
+ROLE;
+            } elseif ($isAdminPos) {
+                $sedeName = $user->warehouse?->name ?? 'su sede asignada';
+                $roleBlock = <<<ROLE
+
+👤 ROL DEL USUARIO: {$roleName} (ADMINISTRADOR DE SEDE - {$sedeName})
+- Tiene acceso completo pero SOLO a datos de su sede "{$sedeName}".
+- Puede gestionar productos, inventario, ventas, usuarios de su sede.
+- NO puede ver datos de otras sedes ni configuraciones globales del sistema.
 ROLE;
             } else {
                 $roleBlock = "\n👤 ROL DEL USUARIO: {$roleName} (ADMINISTRADOR - ACCESO COMPLETO)\n";

@@ -355,6 +355,9 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
+import { useToast } from '../../composables/useToast.js'
+
+const { showSuccess, showError, showWarning } = useToast()
 
 const props = defineProps({
   tenant: {
@@ -416,7 +419,7 @@ const extendDays = (days) => {
 // Guardar fechas de suscripción
 const updateSubscriptionDates = async () => {
   if (!editSubscription.value.start || !editSubscription.value.end) {
-    alert('Por favor selecciona ambas fechas')
+    showWarning('Por favor selecciona ambas fechas')
     return
   }
   
@@ -428,13 +431,13 @@ const updateSubscriptionDates = async () => {
     })
     
     if (res.data.success) {
-      alert('Fechas actualizadas correctamente')
+      showSuccess('Fechas actualizadas correctamente')
       emit('refresh')
     } else {
-      alert('Error: ' + (res.data.message || 'No se pudo actualizar'))
+      showError('Error: ' + (res.data.message || 'No se pudo actualizar'))
     }
   } catch (error) {
-    alert('Error al actualizar fechas: ' + (error.response?.data?.message || error.message))
+    showError('Error al actualizar fechas: ' + (error.response?.data?.message || error.message))
   }
   savingDates.value = false
 }
@@ -455,14 +458,14 @@ const toggleTenantStatus = async () => {
     })
     
     if (res.data.success) {
-      alert(`Tienda ${newStatus === 'active' ? 'activada' : 'pausada'} correctamente`)
+      showSuccess(`Tienda ${newStatus === 'active' ? 'activada' : 'pausada'} correctamente`)
       emit('refresh')
       emit('close')
     } else {
-      alert('Error: ' + (res.data.message || 'No se pudo cambiar el estado'))
+      showError('Error: ' + (res.data.message || 'No se pudo cambiar el estado'))
     }
   } catch (error) {
-    alert('Error: ' + (error.response?.data?.message || error.message))
+    showError('Error: ' + (error.response?.data?.message || error.message))
   }
   togglingStatus.value = false
 }
@@ -476,7 +479,7 @@ const loadUsers = async () => {
       users.value = res.data.data
     }
   } catch (error) {
-    alert('Error al cargar usuarios')
+    showError('Error al cargar usuarios')
   }
   loadingUsers.value = false
 }
@@ -490,7 +493,7 @@ const loadProducts = async () => {
       products.value = res.data.data
     }
   } catch (error) {
-    alert('Error al cargar productos')
+    showError('Error al cargar productos')
   }
   loadingProducts.value = false
 }
@@ -504,7 +507,7 @@ const resetPassword = (user) => {
 
 const confirmResetPassword = async () => {
   if (!newPassword.value) {
-    alert('Por favor ingresa una contraseña')
+    showWarning('Por favor ingresa una contraseña')
     return
   }
   
@@ -514,13 +517,13 @@ const confirmResetPassword = async () => {
     })
     
     if (res.data.success) {
-      alert(`Contraseña actualizada exitosamente.\n\nUsuario: ${selectedUser.value.email}`)
+      showSuccess(`Contraseña actualizada exitosamente. Usuario: ${selectedUser.value.email}`)
       showResetPasswordModal.value = false
       selectedUser.value = null
       newPassword.value = ''
     }
   } catch (error) {
-    alert('Error al resetear contraseña: ' + (error.response?.data?.message || error.message))
+    showError('Error al resetear contraseña: ' + (error.response?.data?.message || error.message))
   }
 }
 

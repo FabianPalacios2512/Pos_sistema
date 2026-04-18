@@ -136,7 +136,7 @@ export function usePermissions() {
   }
   
   /**
-   * Verifica si el usuario es administrador
+   * Verifica si el usuario es administrador (full o POS)
    * @returns {boolean}
    */
   const isAdmin = () => {
@@ -149,6 +149,31 @@ export function usePermissions() {
            userPermissions.value.includes('ALL') || 
            userPermissions.value.includes('admin')
   }
+
+  /**
+   * Verifica si el usuario es Admin POS (admin de sede)
+   * @returns {boolean}
+   */
+  const isAdminPos = () => {
+    if (!currentUser.value || !currentUser.value.role) {
+      return false
+    }
+    const roleName = currentUser.value.role.name?.toLowerCase() || ''
+    return roleName === 'administrador pos'
+  }
+
+  /**
+   * Verifica si el usuario es Full Admin (ve todas las sedes)
+   * @returns {boolean}
+   */
+  const isFullAdmin = () => {
+    if (!currentUser.value || !currentUser.value.role) {
+      return false
+    }
+    const roleName = currentUser.value.role.name?.toLowerCase() || ''
+    return (roleName === 'administrador' || roleName === 'admin' || roleName === 'superadmin') &&
+           roleName !== 'administrador pos'
+  }
   
   return {
     currentUser,
@@ -158,6 +183,8 @@ export function usePermissions() {
     hasAllPermissions,
     hasAnyPermission,
     getAccessibleModules,
-    isAdmin
+    isAdmin,
+    isAdminPos,
+    isFullAdmin
   }
 }

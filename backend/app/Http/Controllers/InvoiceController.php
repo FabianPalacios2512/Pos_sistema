@@ -59,8 +59,17 @@ class InvoiceController extends Controller
     {
         $user = Auth::user();
         if (!$user) return false;
-        $user->load('role');
-        return $user->role && strtolower($user->role->name) === 'vendedor';
+        return $user->isVendedor();
+    }
+
+    /**
+     * Check if current user is Admin POS (scoped to their warehouse)
+     */
+    private function isAdminPos(): bool
+    {
+        $user = Auth::user();
+        if (!$user) return false;
+        return $user->isAdminPos();
     }
 
     /**
@@ -69,7 +78,7 @@ class InvoiceController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $query = Invoice::with(['customer', 'items.product', 'cashSession.user'])
+            $query = Invoice::with(['customer', 'items.product', 'cashSession.user', 'cashSession.warehouse'])
                 ->orderBy('created_at', 'desc');
 
             // Vendedor: solo sus facturas de hoy
@@ -87,6 +96,15 @@ class InvoiceController extends Controller
                             ->where('seller_name', $userName);
                     });
                 })->whereDate('date', now()->format('Y-m-d'));
+            }
+            // Admin POS: solo facturas de su sede
+            elseif ($this->isAdminPos()) {
+                $warehouseId = Auth::user()->warehouse_id;
+                if ($warehouseId) {
+                    $query->whereHas('cashSession', function ($sub) use ($warehouseId) {
+                        $sub->where('warehouse_id', $warehouseId);
+                    });
+                }
             }
 
             // Filter by customer_id if provided
@@ -122,6 +140,7 @@ class InvoiceController extends Controller
                         'customer_email' => $invoice->customer->email,
                         'customer_phone' => $invoice->customer->phone,
                         'seller_name' => $invoice->seller_name ?? ($invoice->cashSession?->user?->name ?? 'Vendedor'),
+                        'warehouse_name' => $invoice->cashSession?->warehouse?->name ?? null,
                         'date' => $invoice->date->format('Y-m-d'),
                         'due_date' => $invoice->due_date?->format('Y-m-d'),
                         'subtotal' => (float) $invoice->subtotal,
@@ -540,7 +559,7 @@ class InvoiceController extends Controller
     public function show(string $id): JsonResponse
     {
         try {
-            $invoice = Invoice::with(['customer', 'cashSession.user'])->findOrFail($id);
+            $invoice = Invoice::with(['customer', 'cashSession.user', 'cashSession.warehouse'])->findOrFail($id);
             // Cargar items manualmente para debug
             $invoice->load(['items']);
 
@@ -554,6 +573,7 @@ class InvoiceController extends Controller
                 'customer_email' => $invoice->customer->email,
                 'customer_phone' => $invoice->customer->phone,
                 'seller_name' => $invoice->seller_name ?? ($invoice->cashSession?->user?->name ?? 'Vendedor'),
+                'warehouse_name' => $invoice->cashSession?->warehouse?->name ?? null,
                 'date' => $invoice->date->format('Y-m-d'),
                 'due_date' => $invoice->due_date?->format('Y-m-d'),
                 'subtotal' => (float) $invoice->subtotal,
@@ -735,6 +755,7 @@ class InvoiceController extends Controller
         try {
             $currentMonth = now()->format('Y-m');
             $isVendedor = $this->isVendedor();
+            $isAdminPos = $this->isAdminPos();
             $userId = Auth::id();
 
             $baseQuery = Invoice::query();
@@ -742,6 +763,13 @@ class InvoiceController extends Controller
                 $baseQuery->whereHas('cashSession', function ($q) use ($userId) {
                     $q->where('user_id', $userId);
                 })->whereDate('date', now()->format('Y-m-d'));
+            } elseif ($isAdminPos) {
+                $warehouseId = Auth::user()->warehouse_id;
+                if ($warehouseId) {
+                    $baseQuery->whereHas('cashSession', function ($q) use ($warehouseId) {
+                        $q->where('warehouse_id', $warehouseId);
+                    });
+                }
             }
 
             $stats = [

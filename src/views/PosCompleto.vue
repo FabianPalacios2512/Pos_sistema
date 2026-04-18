@@ -79,7 +79,7 @@
         </div>
 
         <!-- Módulos restantes se cargan dinámicamente -->
-        <div v-if="currentModule !== 'dashboard' && currentModule !== 'pos'" style="height: 100%; overflow: hidden;">
+        <div v-if="currentModule !== 'dashboard' && currentModule !== 'pos'" style="height: 100%; overflow-y: auto;">
           <component
             :is="currentModuleComponent"
             v-bind="getModuleProps()"
@@ -237,6 +237,7 @@ import { useRouteState } from '../composables/useRouteState.js'
 import { appStore } from '../store/appStore.js'
 import { aiChatStore } from '../store/aiChatStore.js'
 import { useUIContextStore } from '../store/uiContextStore.js'
+import { useToast } from '../composables/useToast.js'
 
 // Importar componente Sidebar
 import Sidebar from '../components/Sidebar.vue'
@@ -253,6 +254,7 @@ import SubscriptionExpiredModal from '../components/SubscriptionExpiredModal.vue
 // Router
 const router = useRouter()
 const route = useRoute()
+const { showSuccess, showWarning } = useToast()
 
 // Navegación global de módulos (para chat AI y otros componentes)
 const { onModuleChange } = useModuleNavigation()
@@ -728,7 +730,7 @@ const handleCreateQuote = async (quoteData) => {
         
         // Mostrar el modal directamente aquí (no necesitamos emit)
         // Simulamos el showQuotationModal del PosView
-        alert(`Cotización creada exitosamente\n\nCódigo: ${modalQuotationData.code}\nCliente: ${modalQuotationData.customer}\nTotal: $${modalQuotationData.total.toLocaleString()}`)
+        showSuccess(`Cotización creada exitosamente. Código: ${modalQuotationData.code}, Cliente: ${modalQuotationData.customer}, Total: $${modalQuotationData.total.toLocaleString()}`)
       }
       
       return { success: true, data: result.data }
@@ -1330,7 +1332,7 @@ const setCurrentModule = (module, options = {}) => {
     
     // Solo mostrar alert si NO viene de navegación por IA (options.fromAI)
     if (!options.fromAI) {
-      alert('No tienes permisos para acceder a este módulo')
+      showWarning('No tienes permisos para acceder a este módulo')
     }
     return false
   }

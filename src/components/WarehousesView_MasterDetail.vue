@@ -899,6 +899,9 @@ import StockTransfersView from './StockTransfersView.vue'
 import StockDistributionMatrix from './warehouses/StockDistributionMatrix.vue'
 import ToastContainer from './ToastContainer.vue'
 import { useUIContextStore } from '@/store/uiContextStore'
+import { useToast } from '@/composables/useToast.js'
+
+const { showSuccess, showError, showInfo } = useToast()
 
 // Props y Emits para evitar warnings de Vue
 defineProps({
@@ -1040,13 +1043,10 @@ const viewInventory = async (warehouse) => {
     const data = await warehouseService.getInventory(warehouse.id)
     const totalProducts = data.summary?.total_products || 0
     const totalStock = data.summary?.total_stock || 0
-    alert(`Inventario de ${warehouse.name}\n\n` +
-          `Total de productos: ${totalProducts}\n` +
-          `Stock total: ${totalStock} unidades\n\n` +
-          `(Vista detallada en desarrollo)`)
+    showInfo(`Inventario de ${warehouse.name}: Total de productos: ${totalProducts}, Stock total: ${totalStock} unidades (Vista detallada en desarrollo)`)
   } catch (error) {
     console.error('Error al cargar inventario:', error)
-    alert('Error al cargar el inventario')
+    showError('Error al cargar el inventario')
   }
 }
 
@@ -1063,10 +1063,10 @@ const deleteWarehouse = async (warehouse) => {
       warehouseDetails.value = null
     }
     
-    alert('Sede eliminada exitosamente')
+    showSuccess('Sede eliminada exitosamente')
   } catch (error) {
     console.error('Error al eliminar sede:', error)
-    alert(error?.message || 'Error al eliminar la sede')
+    showError(error?.message || 'Error al eliminar la sede')
   }
 }
 
@@ -1192,14 +1192,14 @@ const executeStaffTransfer = async () => {
       })
     })
     if (result?.success) {
-      alert(result.message || 'Traslado exitoso')
+      showSuccess(result.message || 'Traslado exitoso')
       closeStaffTransferModal()
       await loadStaffData()
     } else {
-      alert(result?.message || 'Error al trasladar')
+      showError(result?.message || 'Error al trasladar')
     }
   } catch (error) {
-    alert(error?.message || 'Error al ejecutar el traslado')
+    showError(error?.message || 'Error al ejecutar el traslado')
   } finally {
     transferringStaff.value = false
   }

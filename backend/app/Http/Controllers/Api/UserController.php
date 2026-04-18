@@ -43,7 +43,7 @@ class UserController extends Controller
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
-                'cc' => 'required|string|max:20|unique:users',
+                'cc' => 'nullable|string|max:20|unique:users',
                 'password' => 'required|string|min:6',
                 'role_id' => 'nullable|exists:roles,id',
                 'warehouse_id' => 'nullable|exists:warehouses,id',
@@ -124,7 +124,7 @@ class UserController extends Controller
             $validator = Validator::make($request->all(), [
                 'name' => 'sometimes|required|string|max:255',
                 'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $id,
-                'cc' => 'sometimes|required|string|max:20|unique:users,cc,' . $id,
+                'cc' => 'nullable|string|max:20|unique:users,cc,' . $id,
                 'password' => 'sometimes|nullable|string|min:6',
                 'role_id' => 'sometimes|nullable|exists:roles,id',
                 'warehouse_id' => 'sometimes|nullable|exists:warehouses,id',

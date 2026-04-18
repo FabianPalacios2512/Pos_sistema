@@ -315,6 +315,9 @@
 import { ref, onMounted, watch, onUnmounted } from 'vue'
 import { appStore } from '../store/appStore'
 import apiClient from '../services/apiClient'
+import { useToast } from '../composables/useToast.js'
+
+const { showSuccess, showError, showWarning } = useToast()
 
 const showModal = ref(false)
 const selectedPlan = ref('premium') // Plan más popular por defecto
@@ -463,7 +466,7 @@ watch(() => appStore.isSubscriptionExpired, (newVal) => {
 
 const proceedToPayment = async () => {
   if (!selectedPlan.value || !tenantId.value) {
-    alert('Error: No se pudo identificar tu cuenta.')
+    showError('Error: No se pudo identificar tu cuenta.')
     return
   }
 
@@ -541,7 +544,7 @@ const proceedToPayment = async () => {
     
   } catch (error) {
     console.error('Error al abrir pasarela de pago:', error)
-    alert('Error al procesar el pago. Por favor intenta de nuevo.')
+    showError('Error al procesar el pago. Por favor intenta de nuevo.')
   } finally {
     isProcessing.value = false
   }
@@ -576,12 +579,12 @@ const startPaymentVerification = () => {
           clearInterval(verificationInterval)
           appStore.isSubscriptionExpired = false
           showModal.value = false
-          alert('Pago aprobado correctamente. Tu suscripción ha sido renovada.')
+          showSuccess('Pago aprobado correctamente. Tu suscripción ha sido renovada.')
           window.location.reload()
         } else if (status === 'rejected' || status === 'failed') {
           // Pago rechazado
           clearInterval(verificationInterval)
-          alert('El pago fue rechazado. Por favor intenta de nuevo con otro método de pago.')
+          showError('El pago fue rechazado. Por favor intenta de nuevo con otro método de pago.')
         }
         // Si está 'pending', seguimos esperando
       }
@@ -592,7 +595,7 @@ const startPaymentVerification = () => {
     // Detener después de max intentos
     if (attempts >= maxAttempts) {
       clearInterval(verificationInterval)
-      alert('⏱️ El tiempo de verificación expiró. Por favor contacta a soporte si ya realizaste el pago.')
+      showWarning('El tiempo de verificación expiró. Por favor contacta a soporte si ya realizaste el pago.')
     }
   }, 5000) // Verificar cada 5 segundos
 }

@@ -173,6 +173,9 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import offlineSyncManager from '../utils/offlineSync.js'
 import { getSyncStatus, forceSyncNow } from '../utils/offlineInterceptor.js'
+import { useToast } from '../composables/useToast.js'
+
+const { showError } = useToast()
 
 // Estado
 const pendingCount = ref(0)
@@ -231,7 +234,7 @@ async function manualSync() {
     await refreshData()
   } catch (error) {
     console.error('Error en sincronización manual:', error)
-    alert('Error al sincronizar. Por favor verifica tu conexión.')
+    showError('Error al sincronizar. Por favor verifica tu conexión.')
   } finally {
     syncStatus.value = 'idle'
   }

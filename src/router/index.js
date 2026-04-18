@@ -635,6 +635,8 @@ router.beforeEach((to, from, next) => {
     const roleEquivalents = {
       'administrador': ['admin', 'administrador'],
       'admin': ['admin', 'administrador'],
+      'administrador pos': ['admin_pos', 'administrador pos', 'admin', 'administrador'],
+      'admin_pos': ['admin_pos', 'administrador pos', 'admin', 'administrador'],
       'superadmin': ['superadmin', 'super admin', 'admin', 'administrador']
     }
     
@@ -650,7 +652,7 @@ router.beforeEach((to, from, next) => {
 
     if (!hasAccess) {
       // Redirigir según el rol del usuario
-      if (normalizedUserRole === 'admin' || normalizedUserRole === 'administrador') {
+      if (normalizedUserRole === 'admin' || normalizedUserRole === 'administrador' || normalizedUserRole === 'admin_pos' || normalizedUserRole === 'administrador pos') {
         next('/dashboard')
       } else {
         next('/pos')

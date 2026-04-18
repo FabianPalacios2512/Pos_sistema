@@ -457,6 +457,9 @@ import ThermalModernPreview from '@/components/invoiceTemplates/ThermalModernPre
 import ThermalMinimalPreview from '@/components/invoiceTemplates/ThermalMinimalPreview.vue'
 // Modal de importación de Excel
 import ExcelImportModal from '@/components/ExcelImportModal.vue'
+import { useToast } from '@/composables/useToast.js'
+
+const { showError, showWarning } = useToast()
 
 const router = useRouter()
 const currentStep = ref(1)
@@ -543,7 +546,7 @@ const handleLogoUpload = (event) => {
   const file = event.target.files[0]
   if (file) {
     if (file.size > 2 * 1024 * 1024) { // 2MB máximo
-      alert('La imagen es demasiado grande. Máximo 2MB.')
+      showWarning('La imagen es demasiado grande. Máximo 2MB.')
       return
     }
     const reader = new FileReader()
@@ -735,7 +738,7 @@ const nextStep = async () => {
       if (error.response && (error.response.status === 404 || error.response.status === 401)) {
         // Es normal que no esté autenticado durante el onboarding inicial
       } else {
-        alert('Por favor verifica los datos ingresados.')
+        showWarning('Por favor verifica los datos ingresados.')
         return
       }
     }
@@ -895,7 +898,7 @@ const finishOnboarding = async () => {
     console.error('Error finalizando onboarding:', error)
     // Revertir el flag si hay error real
     localStorage.removeItem('onboarding_completed')
-    alert('Error al guardar la configuración. Por favor intenta de nuevo.')
+    showError('Error al guardar la configuración. Por favor intenta de nuevo.')
   }
 }
 </script>

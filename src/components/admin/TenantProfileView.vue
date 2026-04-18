@@ -630,6 +630,9 @@
 <script setup>
 import { ref, computed, onMounted, h } from 'vue'
 import axios from 'axios'
+import { useToast } from '../../composables/useToast.js'
+
+const { showError } = useToast()
 
 const props = defineProps({
   tenant: { type: Object, required: true }
@@ -803,7 +806,7 @@ const confirmResetPassword = async () => {
       newPassword.value = ''
     }
   } catch (error) {
-    alert('Error: ' + (error.response?.data?.message || error.message))
+    showError('Error: ' + (error.response?.data?.message || error.message))
   }
 }
 
@@ -844,10 +847,10 @@ const updateSubscriptionDates = async () => {
     if (res.data.success) {
       emit('refresh')
     } else {
-      alert('Error: ' + (res.data.message || 'No se pudo actualizar'))
+      showError('Error: ' + (res.data.message || 'No se pudo actualizar'))
     }
   } catch (error) {
-    alert('Error: ' + (error.response?.data?.message || error.message))
+    showError('Error: ' + (error.response?.data?.message || error.message))
   }
   savingDates.value = false
 }
@@ -862,10 +865,10 @@ const saveLimits = async () => {
     if (res.data.success) {
       emit('refresh')
     } else {
-      alert('Error: ' + (res.data.message || 'No se pudo actualizar'))
+      showError('Error: ' + (res.data.message || 'No se pudo actualizar'))
     }
   } catch (error) {
-    alert('Error: ' + (error.response?.data?.message || error.message))
+    showError('Error: ' + (error.response?.data?.message || error.message))
   }
   savingLimits.value = false
 }

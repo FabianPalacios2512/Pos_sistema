@@ -493,6 +493,9 @@ import ChartDataLabels from 'chartjs-plugin-datalabels'
 import { Doughnut, Bar, Line } from 'vue-chartjs'
 import api from '@/services/api.js'
 import { useUIContextStore } from '@/store/uiContextStore'
+import { useToast } from '@/composables/useToast.js'
+
+const { showInfo } = useToast()
 
 // Registrar componentes de Chart.js
 ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend, Filler, ChartDataLabels)
@@ -962,7 +965,7 @@ const processMovementsTrend = (trend) => {
 // Exportar reporte
 const exportReport = () => {
   // Por ahora solo muestra alerta, se puede implementar jsPDF
-  alert('Función de exportar PDF disponible próximamente')
+  showInfo('Función de exportar PDF disponible próximamente')
 }
 
 // ═══════════════════════════════════════════════════════════════

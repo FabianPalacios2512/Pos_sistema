@@ -20,19 +20,29 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         if (!$user) return false;
-        $user->load('role');
-        return $user->role && strtolower($user->role->name) === 'vendedor';
+        return $user->isVendedor();
     }
 
     /**
-     * Apply vendedor scope to invoice query
+     * Apply role-based scope to invoice query
+     * - Vendedor: only their own invoices
+     * - Admin POS: only invoices from their warehouse
+     * - Full Admin: all invoices
      */
-    private function applyVendedorScope($query)
+    private function applyRoleScope($query)
     {
-        if ($this->isVendedor()) {
+        $user = Auth::user();
+        if (!$user) return $query;
+
+        if ($user->isVendedor()) {
             $userId = Auth::id();
             $query->whereHas('cashSession', function ($q) use ($userId) {
                 $q->where('user_id', $userId);
+            });
+        } elseif ($user->isAdminPos() && $user->warehouse_id) {
+            $warehouseId = $user->warehouse_id;
+            $query->whereHas('cashSession', function ($q) use ($warehouseId) {
+                $q->where('warehouse_id', $warehouseId);
             });
         }
         return $query;
@@ -47,14 +57,14 @@ class DashboardController extends Controller
             // Ventas de hoy
             $todaySalesQuery = Invoice::whereDate('date', $today)
                 ->where('status', 'paid');
-            $this->applyVendedorScope($todaySalesQuery);
+            $this->applyRoleScope($todaySalesQuery);
             $todaySales = (clone $todaySalesQuery)->sum('total');
             $todaySalesCount = (clone $todaySalesQuery)->count();
 
             // Ventas del mes
             $monthSalesQuery = Invoice::where('date', '>=', $thisMonth)
                 ->where('status', 'paid');
-            $this->applyVendedorScope($monthSalesQuery);
+            $this->applyRoleScope($monthSalesQuery);
             $monthSales = (clone $monthSalesQuery)->sum('total');
             $monthSalesCount = (clone $monthSalesQuery)->count();
 

@@ -148,6 +148,9 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import offlineTimeValidator from '../utils/offlineTimeValidator.js'
+import { useToast } from '../composables/useToast.js'
+
+const { showError } = useToast()
 
 // Estado
 const showModal = ref(false)
@@ -192,10 +195,10 @@ async function checkConnection() {
     } catch (error) {
       console.error('Sin conexión real al servidor:', error)
       isOnline.value = false
-      alert('No se pudo conectar al servidor. Verifica tu conexión a internet.')
+      showError('No se pudo conectar al servidor. Verifica tu conexión a internet.')
     }
   } else {
-    alert('Aún no hay conexión a internet. Por favor activa tu WiFi o datos móviles.')
+    showError('Aún no hay conexión a internet. Por favor activa tu WiFi o datos móviles.')
   }
   
   checking.value = false

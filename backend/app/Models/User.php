@@ -106,4 +106,52 @@ class User extends Authenticatable
         $this->last_login = now();
         $this->save();
     }
+
+    /**
+     * Check if user is a full administrator (sees all sedes)
+     */
+    public function isFullAdmin(): bool
+    {
+        $this->loadMissing('role');
+        $roleName = strtolower($this->role->name ?? '');
+        return in_array($roleName, ['administrador', 'admin', 'superadmin']);
+    }
+
+    /**
+     * Check if user is admin POS (admin scoped to their sede)
+     */
+    public function isAdminPos(): bool
+    {
+        $this->loadMissing('role');
+        $roleName = strtolower($this->role->name ?? '');
+        return $roleName === 'administrador pos';
+    }
+
+    /**
+     * Check if user has any admin-level role (full admin OR admin POS)
+     * Use this for permission checks (can edit, can manage, etc.)
+     */
+    public function isAnyAdmin(): bool
+    {
+        return $this->isFullAdmin() || $this->isAdminPos();
+    }
+
+    /**
+     * Check if user is a vendedor/cajero (limited role)
+     */
+    public function isVendedor(): bool
+    {
+        $this->loadMissing('role');
+        $roleName = strtolower($this->role->name ?? '');
+        return in_array($roleName, ['vendedor', 'cajero']);
+    }
+
+    /**
+     * Check if this user's data should be scoped to their warehouse
+     * Full admins see all, everyone else is scoped to their warehouse_id
+     */
+    public function isWarehouseScoped(): bool
+    {
+        return !$this->isFullAdmin();
+    }
 }

@@ -46,8 +46,8 @@ class AuthController extends Controller
                 ], 401);
             }
 
-            // Verificar que sea administrador
-            if (!$user->role || $user->role->name !== 'Administrador') {
+            // Verificar que sea administrador (full admin o admin POS)
+            if (!$user->role || !$user->isAnyAdmin()) {
                 return response()->json([
                     'valid' => false,
                     'message' => 'No tiene permisos de administrador'

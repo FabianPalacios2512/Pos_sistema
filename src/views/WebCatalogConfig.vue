@@ -898,6 +898,9 @@ import { ref, reactive, onMounted, computed, watch, nextTick } from 'vue'
 import { appStore } from '../store/appStore.js'
 import apiClient from '../services/apiClient.js'
 import axios from 'axios'
+import { useToast } from '../composables/useToast.js'
+
+const { showError, showWarning } = useToast()
 
 // Props & Emits
 const props = defineProps({
@@ -1235,7 +1238,7 @@ const copyStoreLink = async () => {
       }, 3000)
     } catch (err) {
       console.error('Error en fallback de copia:', err)
-      alert('No se pudo copiar el enlace. Por favor, cópialo manualmente.')
+      showError('No se pudo copiar el enlace. Por favor, cópialo manualmente.')
     }
     document.body.removeChild(textArea)
   }
@@ -1267,7 +1270,7 @@ const handleFileUpload = (event, type) => {
 
 
   if (file.size > 2 * 1024 * 1024) {
-    alert('El archivo es muy grande. Máximo 2MB.')
+    showWarning('El archivo es muy grande. Máximo 2MB.')
     return
   }
 
@@ -1379,7 +1382,7 @@ const saveConfiguration = async () => {
     }
   } catch (error) {
     console.error('Error saving configuration:', error)
-    alert('Error al guardar la configuración.')
+    showError('Error al guardar la configuración.')
   } finally {
     isSaving.value = false
   }

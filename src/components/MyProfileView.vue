@@ -180,9 +180,11 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useAuth } from '../store/auth.js'
 import { appStore } from '../store/appStore.js'
 import usersService from '../services/usersService.js'
+import { useToast } from '../composables/useToast.js'
 
 // Usar el composable de autenticación
 const auth = useAuth()
+const { showSuccess, showError } = useToast()
 
 // Estado
 const loading = ref(true)
@@ -315,10 +317,10 @@ const saveProfile = async () => {
     })
     
     await auth.updateUser()
-    alert('Perfil actualizado correctamente')
+    showSuccess('Perfil actualizado correctamente')
   } catch (error) {
     console.error('Error guardando perfil:', error)
-    alert('Error al guardar el perfil')
+    showError('Error al guardar el perfil')
   } finally {
     savingProfile.value = false
   }
@@ -340,13 +342,13 @@ const changePassword = async () => {
     passwordData.new_password = ''
     passwordData.confirm_password = ''
     
-    alert('Contraseña actualizada correctamente')
+    showSuccess('Contraseña actualizada correctamente')
   } catch (error) {
     console.error('Error cambiando contraseña:', error)
     if (error.response?.status === 401) {
-      alert('La contraseña actual es incorrecta')
+      showError('La contraseña actual es incorrecta')
     } else {
-      alert('Error al cambiar la contraseña')
+      showError('Error al cambiar la contraseña')
     }
   } finally {
     savingPassword.value = false

@@ -30,10 +30,17 @@ class InventoryController extends Controller
             $lowStockProducts = Product::lowStock()->count();
             $outOfStockProducts = Product::where('current_stock', '<=', 0)->where('manage_stock', true)->count();
 
-            // Valor total del inventario
-            $totalInventoryValue = Product::active()
-                ->selectRaw('SUM(current_stock * cost_price) as total')
-                ->value('total') ?? 0;
+            // Valor total del inventario - separar simple y variable para precisión con variantes
+            $simpleCostValue = (float) Product::active()
+                ->where(function ($q) { $q->whereNull('product_type')->orWhere('product_type', 'simple'); })
+                ->selectRaw('COALESCE(SUM(current_stock * cost_price), 0) as total')
+                ->value('total');
+            $variableCostValue = (float) DB::table('product_variants as pv')
+                ->join('products as p', 'pv.product_id', '=', 'p.id')
+                ->where('p.active', true)->where('p.product_type', 'variable')->where('pv.active', true)
+                ->selectRaw('COALESCE(SUM(pv.stock * COALESCE(pv.cost_price, p.cost_price, 0)), 0) as val')
+                ->value('val');
+            $totalInventoryValue = $simpleCostValue + $variableCostValue;
 
             // Movimientos recientes (últimos 7 días)
             $recentMovements = InventoryMovement::with(['product', 'user'])

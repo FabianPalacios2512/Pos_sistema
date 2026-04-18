@@ -49,11 +49,31 @@ class InventoryTestController extends Controller
             $variantOutOfStockCount = \App\Models\ProductVariant::join('products', 'products.id', '=', 'product_variants.product_id')->where('products.active', 1)->where('product_variants.active', 1)->where('product_variants.stock', '<=', 0)->count();
             $outOfStockProducts = $simpleOutOfStockCount + $variantOutOfStockCount;
 
-            // Valor de COSTO (inventario)
-            $totalInventoryValue = DB::selectOne('SELECT SUM(current_stock * cost_price) as total FROM products WHERE active = 1 AND current_stock > 0')->total ?? 0;
+            // Valor de COSTO (inventario) - separar simple y variable para precisión
+            $simpleCostValue = (float) DB::table('products')
+                ->where('active', true)
+                ->where(function ($q) { $q->whereNull('product_type')->orWhere('product_type', 'simple'); })
+                ->selectRaw('COALESCE(SUM(current_stock * cost_price), 0) as val')
+                ->value('val');
+            $variableCostValue = (float) DB::table('product_variants as pv')
+                ->join('products as p', 'pv.product_id', '=', 'p.id')
+                ->where('p.active', true)->where('p.product_type', 'variable')->where('pv.active', true)
+                ->selectRaw('COALESCE(SUM(pv.stock * COALESCE(pv.cost_price, p.cost_price, 0)), 0) as val')
+                ->value('val');
+            $totalInventoryValue = $simpleCostValue + $variableCostValue;
 
-            // Valor de VENTA (potencial)
-            $totalSaleValue = DB::selectOne('SELECT SUM(current_stock * sale_price) as total FROM products WHERE active = 1 AND current_stock > 0')->total ?? 0;
+            // Valor de VENTA (potencial) - separar simple y variable para precisión
+            $simpleSaleValue = (float) DB::table('products')
+                ->where('active', true)
+                ->where(function ($q) { $q->whereNull('product_type')->orWhere('product_type', 'simple'); })
+                ->selectRaw('COALESCE(SUM(current_stock * sale_price), 0) as val')
+                ->value('val');
+            $variableSaleValue = (float) DB::table('product_variants as pv')
+                ->join('products as p', 'pv.product_id', '=', 'p.id')
+                ->where('p.active', true)->where('p.product_type', 'variable')->where('pv.active', true)
+                ->selectRaw('COALESCE(SUM(pv.stock * COALESCE(pv.price, p.sale_price, 0)), 0) as val')
+                ->value('val');
+            $totalSaleValue = $simpleSaleValue + $variableSaleValue;
 
             // Ganancia potencial
             $potentialProfit = $totalSaleValue - $totalInventoryValue;

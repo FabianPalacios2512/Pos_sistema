@@ -44,7 +44,29 @@ class ProductController extends Controller
                 // Si apunta a un target incorrecto (path duplicado), eliminarlo
                 @unlink($symlinkPath);
             } elseif (is_dir($symlinkPath)) {
-                return;
+                // Es un directorio real, no un symlink - reemplazar con symlink
+                // Primero asegurar que el storage real existe
+                if (!is_dir($tenantStoragePath)) {
+                    @mkdir($tenantStoragePath, 0755, true);
+                }
+                // Mover contenido existente al storage real si hay archivos
+                $files = @scandir($symlinkPath);
+                if ($files) {
+                    foreach ($files as $file) {
+                        if ($file === '.' || $file === '..') continue;
+                        $src = "{$symlinkPath}/{$file}";
+                        $dst = "{$tenantStoragePath}/{$file}";
+                        if (!file_exists($dst)) {
+                            @rename($src, $dst);
+                        }
+                    }
+                }
+                // Eliminar directorio real y crear symlink
+                @rmdir($symlinkPath);
+                if (is_dir($symlinkPath)) {
+                    // Si rmdir falló (directorio no vacío), usar rm -rf
+                    @exec("rm -rf " . escapeshellarg($symlinkPath));
+                }
             }
 
             if (!is_dir($tenantStoragePath)) {

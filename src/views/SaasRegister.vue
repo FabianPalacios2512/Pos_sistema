@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <!-- SPLIT SCREEN ENTERPRISE LAYOUT -->
   <div class="font-['Inter',sans-serif] bg-white selection:bg-cyan-500/20 relative" style="height: 100%; min-height: 100%;">
     
@@ -770,6 +770,9 @@ import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 import googleAuthService from '../services/googleAuthService'
 import RadioPlayerModal from '../components/RadioPlayerModal.vue'
+import { useToast } from '../composables/useToast.js'
+
+const { showError, showWarning, showInfo } = useToast()
 
 // Dominios de correo conocidos
 const KNOWN_EMAIL_DOMAINS = [
@@ -949,7 +952,7 @@ const signInWithGoogle = async () => {
       errorMessage = error.response.data.message
     }
     
-    alert(errorMessage)
+    showError(errorMessage)
   }
 }
 
@@ -1069,70 +1072,70 @@ const validateStep1 = async () => {
   isSubmitting.value = true
 
   if (!form.owner_name || !form.company_name || !form.subdomain || !form.cedula) {
-    alert('Por favor completa todos los campos')
+    showWarning('Por favor completa todos los campos')
     isSubmitting.value = false
     return
   }
   
   // Validar nombre del propietario
   if (!validateOwnerName(form.owner_name)) {
-    alert('El nombre debe contener al menos 3 caracteres (se permiten letras, níºmeros, espacios y guiones)')
+    showWarning('El nombre debe contener al menos 3 caracteres (se permiten letras, números, espacios y guiones)')
     isSubmitting.value = false
     return
   }
   
   if (!form.email) {
-    alert('Por favor ingresa tu correo Electrónico')
+    showWarning('Por favor ingresa tu correo electrónico')
     isSubmitting.value = false
     return
   }
   
   // Validar formato y dominio del correo
   if (!validateEmail(form.email)) {
-    alert('Por favor ingresa un correo v\u00e1lido (gmail.com, hotmail.com, yahoo.com, etc.)')
+    showWarning('Por favor ingresa un correo v\u00e1lido (gmail.com, hotmail.com, yahoo.com, etc.)')
     isSubmitting.value = false
     return
   }
   
   // Validar NIT/Cédula
   if (!validateCedula(form.cedula)) {
-    alert('Por favor completa el NIT/Cédula')
+    showWarning('Por favor completa el NIT/Cédula')
     isSubmitting.value = false
     return
   }
   
   if (!acceptedTerms.value) {
-    alert('Debes aceptar los Términos y Condiciones y la Polí­tica de Privacidad para continuar')
+    showWarning('Debes aceptar los Términos y Condiciones y la Polí­tica de Privacidad para continuar')
     isSubmitting.value = false
     return
   }
   
   if (availabilityStatus.value === 'checking') {
-    alert('Esperando verificación de disponibilidad del sitio web...')
+    showInfo('Esperando verificación de disponibilidad del sitio web...')
     isSubmitting.value = false
     return
   }
   
   if (availabilityStatus.value === 'taken') {
-    alert('El sitio web no est\u00e1 disponible. Por favor elige otro nombre.')
+    showWarning('El sitio web no est\u00e1 disponible. Por favor elige otro nombre.')
     isSubmitting.value = false
     return
   }
   
   if (availabilityStatus.value === 'invalid') {
-    alert('El sitio web solo puede contener letras miníºsculas, níºmeros y guiones.')
+    showWarning('El sitio web solo puede contener letras miníºsculas, níºmeros y guiones.')
     isSubmitting.value = false
     return
   }
   
   if (availabilityStatus.value === 'error') {
-    alert('Hubo un error al verificar la disponibilidad. Por favor verifica tu conexión y la consola del navegador.')
+    showError('Hubo un error al verificar la disponibilidad. Por favor verifica tu conexión y la consola del navegador.')
     isSubmitting.value = false
     return
   }
   
   if (availabilityStatus.value !== 'available') {
-    alert('Por favor espera a que se verifique la disponibilidad del sitio web')
+    showInfo('Por favor espera a que se verifique la disponibilidad del sitio web')
     isSubmitting.value = false
     return
   }
@@ -1315,7 +1318,7 @@ const registerTenant = async () => {
       return
     }
 
-    alert(errorMessage)
+    showError(errorMessage)
   }
 }
 
@@ -1436,7 +1439,7 @@ onMounted(async () => {
       
     } catch (error) {
       console.error('âŒ Error al obtener datos de Google:', error)
-      alert('Error al procesar datos de Google. El token pudo haber expirado. Intenta nuevamente.')
+      showError('Error al procesar datos de Google. El token pudo haber expirado. Intenta nuevamente.')
       isGoogleLoading.value = false
       window.history.replaceState({}, document.title, '/register')
     }

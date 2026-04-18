@@ -24,8 +24,7 @@ class ReturnsController extends Controller
     {
         $user = Auth::user();
         if (!$user) return false;
-        $user->load('role');
-        return $user->role && strtolower($user->role->name) === 'vendedor';
+        return $user->isVendedor();
     }
 
     /**
@@ -35,12 +34,21 @@ class ReturnsController extends Controller
     {
         try {
             // No incluir returnItems.product ya que no existe la tabla return_items
-            $query = ProductReturn::with(['originalInvoice', 'customer', 'user', 'cashSession'])
+            $query = ProductReturn::with(['originalInvoice', 'customer', 'user', 'cashSession.warehouse'])
                 ->orderBy('created_at', 'desc');
 
             // Vendedor: solo sus devoluciones
             if ($this->isVendedor()) {
                 $query->where('user_id', Auth::id());
+            }
+            // Admin POS: solo devoluciones de su sede
+            elseif (Auth::user()->isAdminPos()) {
+                $warehouseId = Auth::user()->warehouse_id;
+                if ($warehouseId) {
+                    $query->whereHas('cashSession', function ($sub) use ($warehouseId) {
+                        $sub->where('warehouse_id', $warehouseId);
+                    });
+                }
             }
 
             // Filtros
@@ -623,7 +631,7 @@ class ReturnsController extends Controller
                 'originalInvoice',
                 'customer',
                 'user',
-                'cashSession'
+                'cashSession.warehouse'
             ])->findOrFail($id);
 
             // Asegurar que items es un array

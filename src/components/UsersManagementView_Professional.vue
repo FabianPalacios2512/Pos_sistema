@@ -909,9 +909,11 @@ import { useUIContextStore } from '../store/uiContextStore.js'
 import UserModal from './UserModal.vue'
 import PasswordModal from './PasswordModal.vue'
 import biometricService from '../services/biometricService.js'
+import { useToast } from '../composables/useToast.js'
 
 // ===== CONTEXTO AI =====
 const uiContextStore = useUIContextStore()
+const { showSuccess, showError, showWarning } = useToast()
 
 // ===== REFS A MODALES =====
 const userModalRef = ref(null)
@@ -1461,7 +1463,7 @@ const openCreateUserModal = () => {
                      currentPlan.value === 'basic' ? 'Básico' :
                      currentPlan.value === 'pro' || currentPlan.value === 'premium' ? 'Premium' : 
                      'Enterprise'
-    alert(`Has alcanzado el límite de ${maxUsersAllowed.value} usuarios para el plan ${planName}.\n\nActualiza tu plan para agregar más usuarios.`)
+    showWarning(`Has alcanzado el límite de ${maxUsersAllowed.value} usuarios para el plan ${planName}. Actualiza tu plan para agregar más usuarios.`)
     return
   }
   
@@ -1472,7 +1474,7 @@ const openCreateUserModal = () => {
 const openEditUserModal = (user) => {
   // PROTECCIÓN: No permitir editar el usuario administrador inicial
   if (user.role_id === 1) {
-    alert('El usuario Administrador principal no puede ser editado por seguridad del sistema')
+    showWarning('El usuario Administrador principal no puede ser editado por seguridad del sistema')
     return
   }
   
@@ -1492,18 +1494,18 @@ const saveUser = async (userData) => {
     if (selectedUser.value) {
       // Editar usuario existente
       await usersService.updateUser(selectedUser.value.id, userData)
-      alert('Usuario actualizado exitosamente')
+      showSuccess('Usuario actualizado exitosamente')
     } else {
       // Crear nuevo usuario
       await usersService.createUser(userData)
-      alert('Usuario creado exitosamente')
+      showSuccess('Usuario creado exitosamente')
     }
     
     await loadUsers()
     closeUserModal()
   } catch (error) {
     console.error('Error guardando usuario:', error)
-    alert('Error al guardar el usuario')
+    showError('Error al guardar el usuario')
   } finally {
     loading.value = false
   }
@@ -1512,7 +1514,7 @@ const saveUser = async (userData) => {
 const deleteUser = async (user) => {
   // PROTECCIÓN: No permitir eliminar el usuario administrador inicial
   if (user.role_id === 1) {
-    alert('El usuario Administrador principal no puede ser eliminado por seguridad del sistema')
+    showWarning('El usuario Administrador principal no puede ser eliminado por seguridad del sistema')
     return
   }
   
@@ -1523,11 +1525,11 @@ const deleteUser = async (user) => {
   try {
     loading.value = true
     await usersService.deleteUser(user.id)
-    alert('Usuario eliminado exitosamente')
+    showSuccess('Usuario eliminado exitosamente')
     await loadUsers()
   } catch (error) {
     console.error('Error eliminando usuario:', error)
-    alert('Error al eliminar el usuario')
+    showError('Error al eliminar el usuario')
   } finally {
     loading.value = false
   }
@@ -1536,18 +1538,18 @@ const deleteUser = async (user) => {
 const toggleUserStatus = async (user) => {
   // PROTECCIÓN: No permitir desactivar el usuario administrador inicial
   if (user.role_id === 1) {
-    alert('El usuario Administrador principal no puede ser desactivado por seguridad del sistema')
+    showWarning('El usuario Administrador principal no puede ser desactivado por seguridad del sistema')
     return
   }
   
   try {
     loading.value = true
     await usersService.toggleStatus(user.id)
-    alert(`Usuario ${user.active ? 'desactivado' : 'activado'} exitosamente`)
+    showSuccess(`Usuario ${user.active ? 'desactivado' : 'activado'} exitosamente`)
     await loadUsers()
   } catch (error) {
     console.error('Error cambiando estado del usuario:', error)
-    alert('Error al cambiar el estado')
+    showError('Error al cambiar el estado')
   } finally {
     loading.value = false
   }
@@ -1569,11 +1571,11 @@ const savePassword = async (passwordData) => {
   try {
     loading.value = true
     await usersService.changePassword(selectedUser.value.id, passwordData)
-    alert('Contraseña actualizada exitosamente')
+    showSuccess('Contraseña actualizada exitosamente')
     closePasswordModal()
   } catch (error) {
     console.error('Error cambiando contraseña:', error)
-    alert('Error al cambiar la contraseña')
+    showError('Error al cambiar la contraseña')
   } finally {
     loading.value = false
   }

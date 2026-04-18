@@ -36,8 +36,8 @@
         <span class="text-[9px] font-bold text-white uppercase tracking-wide">Bajo stock</span>
       </div>
       
-      <!-- Botón Editar (Solo visible en hover, flotante) -->
-      <button @click.stop="$emit('edit', product)"
+      <!-- Botón Editar (Solo visible en hover, flotante, oculto en readOnly) -->
+      <button v-if="!readOnly" @click.stop="$emit('edit', product)"
               class="absolute bottom-3 right-3 w-10 h-10 bg-white/95 dark:bg-zinc-800/95  rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white dark:hover:bg-zinc-700 shadow-lg dark:shadow-black/50 ring-1 ring-black/5 dark:ring-white/10">
         <svg class="w-4 h-4 text-gray-700 dark:text-zinc-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
@@ -113,6 +113,10 @@ const props = defineProps({
   product: {
     type: Object,
     required: true
+  },
+  readOnly: {
+    type: Boolean,
+    default: false
   }
 })
 

@@ -415,6 +415,9 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import api from '@/services/api'
+import { useToast } from '@/composables/useToast.js'
+
+const { showWarning } = useToast()
 
 // Estado
 const loading = ref(true)
@@ -557,7 +560,7 @@ const loadFinancialData = async () => {
 
 const exportReport = () => {
   if (!reportData.value) {
-    alert('No hay datos para exportar')
+    showWarning('No hay datos para exportar')
     return
   }
   const data = reportData.value
