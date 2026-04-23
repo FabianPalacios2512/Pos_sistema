@@ -370,13 +370,27 @@ const performAutoLogin = async () => {
     const data = JSON.parse(registrationData)
     const { email, temp_password, is_google, subdomain } = data
 
+    const buildTenantWelcomeUrl = () => {
+      const baseUrl = subdomain
+        ? (window.location.hostname === 'localhost'
+            ? `http://${subdomain}.localhost:3000`
+            : `https://${subdomain}.105pos.pro`)
+        : ''
+
+      const token = localStorage.getItem('authToken')
+      const user = localStorage.getItem('user')
+
+      if (!baseUrl) return '/welcome'
+      if (!token) return `${baseUrl}/welcome`
+
+      const tokenParam = encodeURIComponent(token)
+      const userParam = user ? encodeURIComponent(user) : ''
+      return `${baseUrl}/welcome?auth_token=${tokenParam}&user_data=${userParam}`
+    }
+
     // Si es registro con Google, redirigir al welcome directamente
     if (is_google) {
-      const targetUrl = subdomain 
-        ? (window.location.hostname === 'localhost' 
-            ? `http://${subdomain}.localhost:3000/welcome` 
-            : `https://${subdomain}.105pos.pro/welcome`)
-        : '/welcome'
+      const targetUrl = buildTenantWelcomeUrl()
       
       // Limpiar credenciales temporales
       localStorage.removeItem('registration_data')

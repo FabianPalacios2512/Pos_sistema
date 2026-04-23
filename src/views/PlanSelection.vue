@@ -561,6 +561,20 @@ const getTenantBaseUrl = (subdomain, path = '') => {
   return `${base}${path ? '/' + path : ''}`
 }
 
+const buildTenantWelcomeUrl = (subdomain) => {
+  const baseUrl = getTenantBaseUrl(subdomain)
+  const token = localStorage.getItem('authToken')
+  const user = localStorage.getItem('user')
+
+  if (!token) {
+    return `${baseUrl}/welcome`
+  }
+
+  const tokenParam = encodeURIComponent(token)
+  const userParam = user ? encodeURIComponent(user) : ''
+  return `${baseUrl}/welcome?auth_token=${tokenParam}&user_data=${userParam}`
+}
+
 // Estado
 const selectedPlan = ref(null)
 const paymentFrequency = ref('monthly')
@@ -933,7 +947,7 @@ const performAutoLogin = async () => {
       localStorage.removeItem('registration_data')
       
       // Redirigir al welcome del tenant
-      const targetUrl = getTenantBaseUrl(subdomain, 'welcome')
+      const targetUrl = buildTenantWelcomeUrl(subdomain)
       
       window.location.href = targetUrl
       return
@@ -941,7 +955,7 @@ const performAutoLogin = async () => {
 
     // Si es registro con Google, redirigir al welcome directamente (ya tiene sesión de Google)
     if (is_google) {
-      const targetUrl = getTenantBaseUrl(subdomain, 'welcome')
+      const targetUrl = buildTenantWelcomeUrl(subdomain)
       
       // Limpiar credenciales temporales
       delete data.temp_password

@@ -55,8 +55,24 @@ class GoogleAuthController extends Controller
                 return redirect($frontendUrl . '/register?error=no_code');
             }
 
+            $googleHttp = Http::timeout(30);
+            $caBundle = config('services.google.ca_bundle')
+                ?: ini_get('curl.cainfo')
+                ?: ini_get('openssl.cafile');
+
+            if (empty($caBundle)) {
+                $phpCaBundle = dirname(PHP_BINARY) . DIRECTORY_SEPARATOR . 'cacert.pem';
+                if (is_file($phpCaBundle)) {
+                    $caBundle = $phpCaBundle;
+                }
+            }
+
+            if (!empty($caBundle) && is_file($caBundle)) {
+                $googleHttp = $googleHttp->withOptions(['verify' => $caBundle]);
+            }
+
             // Intercambiar código por token de acceso (con timeout extendido)
-            $tokenResponse = Http::timeout(30)
+            $tokenResponse = $googleHttp
                 ->asForm()
                 ->post('https://oauth2.googleapis.com/token', [
                     'code' => $code,
@@ -77,7 +93,7 @@ class GoogleAuthController extends Controller
             $accessToken = $tokenResponse->json()['access_token'];
 
             // Obtener información del usuario de Google (con timeout extendido)
-            $userResponse = Http::timeout(30) // Aumentar timeout a 30 segundos
+            $userResponse = $googleHttp
                 ->withToken($accessToken)
                 ->get('https://www.googleapis.com/oauth2/v2/userinfo');
 

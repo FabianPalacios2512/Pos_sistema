@@ -228,9 +228,13 @@ class TenantRegisterController extends Controller
 
             $tenant->run(function () use ($request, &$authToken, &$adminUserData) {
                 try {
-                    // El seeder ya creó un usuario admin con role_id 1
-                    // Vamos a actualizarlo con los datos del registro
-                    $adminUser = \App\Models\User::where('role_id', 1)->first();
+                    // El seeder ya creó un usuario admin con el rol 'Administrador'
+                    // Buscamos por nombre del rol (el ID puede variar según auto-increment)
+                    $adminRole = \DB::table('roles')->where('name', 'Administrador')->first();
+                    $adminUser = $adminRole
+                        ? \App\Models\User::where('role_id', $adminRole->id)->first()
+                        : \App\Models\User::where('email', 'admin@pos.com')->first()
+                            ?? \App\Models\User::orderBy('id')->first();
 
                     if ($adminUser) {
                         // 🔐 Usar owner_name o google_name como fallback

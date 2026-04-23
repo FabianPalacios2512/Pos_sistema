@@ -364,8 +364,17 @@ router.beforeEach((to, from, next) => {
   const userData = to.query.user_data
   
   if (authToken) {
-    // Decodificar y guardar token
-    const decodedToken = decodeURIComponent(authToken)
+    // Decodificar token de forma robusta (soporta valores doblemente codificados)
+    let decodedToken = String(authToken)
+    for (let i = 0; i < 2; i++) {
+      try {
+        const nextDecoded = decodeURIComponent(decodedToken)
+        if (nextDecoded === decodedToken) break
+        decodedToken = nextDecoded
+      } catch (_e) {
+        break
+      }
+    }
     localStorage.setItem('authToken', decodedToken)
     localStorage.setItem('loginTimestamp', Date.now().toString())
     
@@ -476,7 +485,7 @@ router.beforeEach(async (to, from, next) => {
       // CRÍTICO: Pasar el token para que PlanSelection pueda usarlo después
       const currentToken = localStorage.getItem('authToken')
       if (currentToken) {
-        params.append('auth_token', encodeURIComponent(currentToken))
+        params.append('auth_token', currentToken)
       }
       
       // Redirigir al dominio central para seleccionar plan
