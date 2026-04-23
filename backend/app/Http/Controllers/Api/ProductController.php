@@ -213,13 +213,13 @@ class ProductController extends Controller
                     ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
                     ->where('invoice_items.product_id', $product->id)
                     ->where('invoices.status', 'paid');
-                
+
                 // Filtrar ventas por warehouse (a través de cash_sessions)
                 if ($warehouseId) {
                     $salesQuery->join('cash_sessions', 'invoices.cash_session_id', '=', 'cash_sessions.id')
                         ->where('cash_sessions.warehouse_id', $warehouseId);
                 }
-                
+
                 $salesData = $salesQuery->selectRaw('
                         COALESCE(SUM(invoice_items.quantity), 0) as total_sold,
                         COALESCE(SUM(invoice_items.quantity * invoice_items.unit_price), 0) as total_revenue
@@ -237,12 +237,12 @@ class ProductController extends Controller
                         ->where('invoice_items.product_id', $product->id)
                         ->whereNotNull('invoice_items.product_variant_id')
                         ->where('invoices.status', 'paid');
-                    
+
                     if ($warehouseId) {
                         $variantSalesQuery->join('cash_sessions', 'invoices.cash_session_id', '=', 'cash_sessions.id')
                             ->where('cash_sessions.warehouse_id', $warehouseId);
                     }
-                    
+
                     $variantSales = $variantSalesQuery->groupBy('invoice_items.product_variant_id')
                         ->selectRaw('
                             invoice_items.product_variant_id,
@@ -258,12 +258,12 @@ class ProductController extends Controller
                         ->where('invoice_items.product_id', $product->id)
                         ->whereNull('invoice_items.product_variant_id')
                         ->where('invoices.status', 'paid');
-                    
+
                     if ($warehouseId) {
                         $salesByPriceQuery->join('cash_sessions', 'invoices.cash_session_id', '=', 'cash_sessions.id')
                             ->where('cash_sessions.warehouse_id', $warehouseId);
                     }
-                    
+
                     $salesByPrice = $salesByPriceQuery->groupBy('invoice_items.unit_price')
                         ->selectRaw('
                             invoice_items.unit_price,
@@ -322,9 +322,9 @@ class ProductController extends Controller
         $searchScope = $request->query('scope', 'local'); // 'local' o 'global'
 
         $query = Product::select([
-                'id', 'name', 'sku', 'barcode', 
+                'id', 'name', 'sku', 'barcode',
                 'cost_price',              // 💰 Precio de costo para calcular valor invertido
-                'sale_price', 
+                'sale_price',
                 'sale_price as price',     // Alias para compatibilidad
                 'current_stock', // ✅ Mantener current_stock sin alias
                 'category_id', 'image_url as image',
@@ -598,7 +598,9 @@ class ProductController extends Controller
             }
 
             // 4. Lógica Híbrida
-            $warehouseId = $request->warehouse_id ?? 1; // Default warehouse
+            // Obtener el warehouse real del tenant (nunca hardcodear 1)
+            $defaultWarehouse = \App\Models\Warehouse::orderBy('id')->first();
+            $warehouseId = $request->warehouse_id ?? ($defaultWarehouse ? $defaultWarehouse->id : null);
 
             if ($request->product_type === 'simple') {
                 // --- LÓGICA SIMPLE ---
@@ -619,18 +621,22 @@ class ProductController extends Controller
                     ]);
 
                     // Guardar stock en bodega vinculado a la variante
-                    $product->warehouses()->attach($warehouseId, [
-                        'stock' => $variantData['stock'] ?? 0,
-                        'product_variant_id' => $variant->id
-                    ]);
+                    if ($warehouseId) {
+                        $product->warehouses()->attach($warehouseId, [
+                            'stock' => $variantData['stock'] ?? 0,
+                            'product_variant_id' => $variant->id
+                        ]);
+                    }
                 } else {
                     $stock = $request->current_stock ?? 0;
 
                     // Guardar en product_warehouse
-                    $product->warehouses()->attach($warehouseId, [
-                        'stock' => $stock,
-                        'product_variant_id' => null
-                    ]);
+                    if ($warehouseId) {
+                        $product->warehouses()->attach($warehouseId, [
+                            'stock' => $stock,
+                            'product_variant_id' => null
+                        ]);
+                    }
                 }
 
                 // Soporte para warehouse_stocks (Multi-sede explícito)
@@ -728,10 +734,12 @@ class ProductController extends Controller
 
                         // Guardar Stock en Bodega (product_warehouse)
                         // Asumimos que el stock inicial va a la bodega seleccionada
-                        $product->warehouses()->attach($warehouseId, [
-                            'product_variant_id' => $variant->id,
-                            'stock' => $variantData['stock'] ?? 0
-                        ]);
+                        if ($warehouseId) {
+                            $product->warehouses()->attach($warehouseId, [
+                                'product_variant_id' => $variant->id,
+                                'stock' => $variantData['stock'] ?? 0
+                            ]);
+                        }
                     }
                 }
 
@@ -1234,7 +1242,7 @@ class ProductController extends Controller
             ->map(function($variant) {
                 $variantName = $variant->parent_name;
                 $summary = is_string($variant->options_summary) ? json_decode($variant->options_summary, true) : $variant->options_summary;
-                
+
                 if (is_array($summary) && count($summary) > 0) {
                     $optsStr = collect($summary)->map(function($o) { return $o['value'] ?? ''; })->filter()->join(', ');
                     $variantName .= ' (' . $optsStr . ')';
@@ -1243,7 +1251,7 @@ class ProductController extends Controller
                 } else {
                     $variantName .= ' (Variante)';
                 }
-                
+
                 return [
                     'id' => 'v-' . $variant->id,
                     'name' => $variantName,

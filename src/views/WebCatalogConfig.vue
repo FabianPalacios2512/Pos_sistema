@@ -288,7 +288,7 @@
                     <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Plantilla Recomendada</h3>
                     <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">
                       La IA recomienda: <span class="font-medium text-[#1a73e8] dark:text-[#8ab4f8]">
-                        {{ aiBrandData.recommended_template === 'visual-story' ? 'Historia Visual' : aiBrandData.recommended_template === 'speed-market' ? 'Mercado Rápido' : 'Cuadrícula Moderna' }}
+                        {{ aiBrandData.recommended_template === 'visual-story' ? 'Historia Visual' : aiBrandData.recommended_template === 'speed-market' ? 'Mercado Rápido' : aiBrandData.recommended_template === 'urban-street' ? 'Urban Streetwear' : 'Cuadrícula Moderna' }}
                       </span>
                     </p>
                   </div>
@@ -563,6 +563,34 @@
                         <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-1">Clásico / Versátil</div>
                       </div>
                       <div v-if="config.brandIdentity.template === 'modern-grid'" class="absolute top-3 right-3 w-5 h-5 rounded-full bg-[#1a73e8] dark:bg-[#8ab4f8] flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-white dark:text-[#1e1f20]" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                  </button>
+
+                  <!-- Urban Street - PlantillaUrbana01 -->
+                  <button 
+                    @click="config.brandIdentity.template = 'urban-street'"
+                    class="group relative p-5 rounded-2xl border transition-all text-left"
+                    :class="config.brandIdentity.template === 'urban-street' 
+                      ? 'border-[#1a73e8] dark:border-[#8ab4f8] bg-[#e8f0fe] dark:bg-[#1a73e8]/15' 
+                      : 'border-[#e8eaed] dark:border-[#3a3a3f] hover:border-[#1a73e8]/50 dark:hover:border-[#8ab4f8]/50 bg-white dark:bg-[#282a2c]'"
+                  >
+                    <div class="flex flex-col items-center text-center space-y-3">
+                      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1e1f20] to-[#3a3a3f] dark:from-[#0a0a0a] dark:to-[#282a2c] flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div class="text-sm font-medium" :class="config.brandIdentity.template === 'urban-street' ? 'text-[#1a73e8] dark:text-[#8ab4f8]' : 'text-[#1e1f20] dark:text-[#e3e3e3]'">
+                          Urban Streetwear
+                        </div>
+                        <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-1">Urbano / Premium</div>
+                      </div>
+                      <div v-if="config.brandIdentity.template === 'urban-street'" class="absolute top-3 right-3 w-5 h-5 rounded-full bg-[#1a73e8] dark:bg-[#8ab4f8] flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-white dark:text-[#1e1f20]" viewBox="0 0 20 20" fill="currentColor">
                           <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                         </svg>

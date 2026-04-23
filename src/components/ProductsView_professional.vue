@@ -1276,8 +1276,8 @@
                     </div>
                   </div>
 
-                  <!-- Stock Inicial (Solo si hay 1 bodega) -->
-                  <div v-if="availableWarehouses.length === 1">
+                  <!-- Stock Inicial (Si hay 0 o 1 bodega) -->
+                  <div v-if="availableWarehouses.length <= 1">
                     <label class="block text-[13px] font-medium text-[#374151] dark:text-zinc-300 mb-1.5">
                       Stock disponible ({{ getUnitAbbreviation(productForm.measurement_unit) }}) <span class="text-rose-500">*</span>
                     </label>
@@ -5251,8 +5251,8 @@ const saveSupplier = async () => {
 
 // Calcular stock total sumando todas las tiendas
 const calculateTotalStock = () => {
-  // Si hay solo 1 bodega, usar el campo stock directamente
-  if (availableWarehouses.value.length === 1) {
+  // Si hay 0 o 1 bodega, usar el campo stock directamente
+  if (availableWarehouses.value.length <= 1) {
     return parseInt(productForm.value.stock) || 0
   }
   

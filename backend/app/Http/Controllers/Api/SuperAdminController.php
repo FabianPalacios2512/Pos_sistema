@@ -131,6 +131,18 @@ class SuperAdminController extends Controller
                     $status = 'suspended'; // Expirado
                 }
 
+                // Fetch owner details directly from the tenant's user table
+                $adminUser = null;
+                try {
+                    $dbName = $tenant->tenancy_db_name ?? 'tenant' . $tenant->id;
+                    $adminUser = \DB::connection('mysql')->table($dbName . '.users')
+                        ->where('id', 1) // Typically ID 1 is the main admin from Seeder
+                        ->select('name as owner_name', 'email as admin_email', 'phone as admin_phone', 'cc as cedula')
+                        ->first();
+                } catch (\Throwable $e) {
+                    // Ignores missing DB or table
+                }
+
                 return [
                     'id' => $tenant->id,
                     'name' => $tenant->business_name ?? $tenant->id,
@@ -141,6 +153,10 @@ class SuperAdminController extends Controller
                     'subscription_start' => $subscriptionStart,
                     'subscription_end' => $subscriptionEnd ? (is_string($subscriptionEnd) ? $subscriptionEnd : $subscriptionEnd->format('Y-m-d')) : null,
                     'error_count' => (int)($errorCounts[$tenant->id] ?? 0),
+                    'owner_name' => $adminUser->owner_name ?? $tenant->owner_name ?? null,
+                    'cedula' => $adminUser->cedula ?? $tenant->cedula ?? $tenant->nit ?? null,
+                    'admin_email' => $adminUser->admin_email ?? $tenant->admin_email ?? $tenant->email ?? $tenant->company_email ?? null,
+                    'admin_phone' => $adminUser->admin_phone ?? $tenant->admin_phone ?? $tenant->phone ?? null,
                 ];
             });
 

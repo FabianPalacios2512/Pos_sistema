@@ -173,7 +173,7 @@
 
     <!-- ========== CONTENIDO PRINCIPAL ========== -->
     <main class="lg:ml-64 flex-1 bg-[#f9fafb] dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 min-h-screen">
-      <div class="p-4 lg:p-6 xl:p-8 space-y-4 lg:space-y-5 animate-fade-in max-w-[1400px]">
+      <div class="p-4 lg:p-6 xl:p-8 space-y-4 lg:space-y-5 animate-fade-in max-w-full">
         
         <!-- Header Ejecutivo -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
