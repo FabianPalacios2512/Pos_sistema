@@ -12,12 +12,13 @@ import { computed } from 'vue'
 import CatalogTemplateA from './CatalogTemplateA.vue'
 import CatalogTemplateB from './CatalogTemplateB.vue'
 import CatalogTemplateC from './CatalogTemplateC.vue'
+import CatalogTemplateD from './CatalogTemplateD.vue'
 
 const props = defineProps({
   template: {
     type: String,
     default: 'speed-market', // Default seguro para todas las tiendas
-    validator: (value) => ['visual-story', 'speed-market', 'modern-grid'].includes(value)
+    validator: (value) => ['visual-story', 'speed-market', 'modern-grid', 'urban-street'].includes(value)
   },
   storeConfig: {
     type: Object,
@@ -41,6 +42,8 @@ const currentTemplate = computed(() => {
       return CatalogTemplateB
     case 'modern-grid':
       return CatalogTemplateC
+    case 'urban-street':
+      return CatalogTemplateD
     default:
       return CatalogTemplateB // Default seguro (speed-market) para todas las tiendas
   }

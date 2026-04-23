@@ -20,6 +20,8 @@ const GodModeAdminPanel = () => import('../components/admin/GodModeAdminPanel.vu
 const PublicCatalog = () => import('../views/PublicCatalog.vue')
 const ProductDetailPage = () => import('../components/catalog/ProductDetailPage.vue')
 const CartBagPage = () => import('../components/catalog/CartBagPage.vue')
+const TemplateShowcase = () => import('../views/TemplateShowcase.vue')
+const TemplatePreview = () => import('../views/TemplatePreview.vue')
 
 const routes = [
   // Ruta de Pantalla de Bienvenida (Intro)
@@ -73,6 +75,28 @@ const routes = [
     component: CartBagPage,
     meta: {
       title: 'Tu Bolsa - Tienda',
+      requiresAuth: false,
+      public: true
+    }
+  },
+  // Ruta Pública: Showcase de Plantillas (Portafolio)
+  {
+    path: '/catalog/plantillas',
+    name: 'TemplateShowcase',
+    component: TemplateShowcase,
+    meta: {
+      title: 'Plantillas E-commerce - 105 POS',
+      requiresAuth: false,
+      public: true
+    }
+  },
+  // Ruta Pública: Preview individual de plantilla con mock data
+  {
+    path: '/catalog/preview/:templateId',
+    name: 'TemplatePreview',
+    component: TemplatePreview,
+    meta: {
+      title: 'Vista Previa - Plantilla',
       requiresAuth: false,
       public: true
     }

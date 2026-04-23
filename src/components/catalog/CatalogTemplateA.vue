@@ -1107,7 +1107,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import QuantityModal from './QuantityModal.vue'
@@ -1116,6 +1116,7 @@ import { useCatalogCart } from '../../stores/catalogCart.js'
 import { productUrl } from '../../utils/slugify.js'
 
 const router = useRouter()
+const isPreviewMode = inject('isPreviewMode', false)
 const { cartItems, cartCount, addItem, removeItem, toast } = useCatalogCart()
 
 const props = defineProps({
@@ -1615,6 +1616,7 @@ const scrollToProducts = () => {
 }
 
 const openProductDetails = (product) => {
+  if (isPreviewMode) return
   router.push(productUrl(product))
 }
 

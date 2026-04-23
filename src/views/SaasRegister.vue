@@ -837,9 +837,9 @@ const validateEmail = (email) => {
 }
 
 const validateOwnerName = (name) => {
-  // Permite letras, níºmeros, espacios, acentos y guiones
-  const nameRegex = /^[a-zA-Z0-9í¡éí­óíºíí‰íí“íší±í‘\s'-]+$/
-  return nameRegex.test(name) && name.trim().length >= 3
+  // Permite letras, números, espacios, acentos y guiones
+  const nameRegex = /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s'-]+$/;
+  return nameRegex.test(name) && name.trim().length >= 3;
 }
 
 const validateCedula = (cedula) => {

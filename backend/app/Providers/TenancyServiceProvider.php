@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Jobs\CreateTenantStorageLink;
+use App\Jobs\MigrateTenantFromTemplate;
 use App\Listeners\EnsureTenantStorageLink;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
@@ -28,7 +29,8 @@ class TenancyServiceProvider extends ServiceProvider
             Events\TenantCreated::class => [
                 JobPipeline::make([
                     Jobs\CreateDatabase::class,
-                    Jobs\MigrateDatabase::class,
+                    MigrateTenantFromTemplate::class, // ⚡ Fast: imports pre-built SQL template (~1s vs ~24s)
+                    // Jobs\MigrateDatabase::class,   // Slow: runs 60+ migrations one by one
                     Jobs\SeedDatabase::class, // ✅ HABILITADO: Ejecuta seeders automáticamente
                     CreateTenantStorageLink::class, // ✅ Crea symlinks para storage del tenant
 
