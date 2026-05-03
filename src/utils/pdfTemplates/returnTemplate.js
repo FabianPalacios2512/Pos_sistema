@@ -1,6 +1,6 @@
 /**
  * Plantilla Profesional de Nota de Devolución para PDF
- * Diseño moderno tipo ticket térmico (80mm)
+ * Diseño térmico (80mm) clásico, alineado con factura POS
  * Genera PDF vectorial con jsPDF
  */
 import jsPDF from 'jspdf'
@@ -37,7 +37,7 @@ export const createReturnTemplate = async (returnData, systemSettings = {}) => {
 
     // Número de devolución
     const returnNumber = number || 'SIN-NUMERO'
-    // Buscar factura en múltiples lugares (puede venir como 'number' o 'invoice_number')
+    // Buscar factura
     const invoiceRef = invoice_number || 
       returnData.original_invoice?.number || 
       returnData.original_invoice?.invoice_number || 
@@ -45,24 +45,16 @@ export const createReturnTemplate = async (returnData, systemSettings = {}) => {
       returnData.invoice_number ||
       'N/A'
     
-    // Mapeo de métodos de reembolso a español
+    // Mapeo de métodos de reembolso
     const refundMethodLabels = {
-      'cash': 'Efectivo',
-      'CASH': 'Efectivo',
-      'efectivo': 'Efectivo',
-      'card': 'Tarjeta',
-      'CARD': 'Tarjeta',
-      'tarjeta': 'Tarjeta',
-      'transfer': 'Transferencia',
-      'TRANSFER': 'Transferencia',
-      'transferencia': 'Transferencia',
-      'store_credit': 'Crédito Tienda',
-      'STORE_CREDIT': 'Crédito Tienda',
-      'credit': 'Crédito',
-      'CREDIT': 'Crédito'
+      'cash': 'Efectivo', 'CASH': 'Efectivo', 'efectivo': 'Efectivo',
+      'card': 'Tarjeta', 'CARD': 'Tarjeta', 'tarjeta': 'Tarjeta',
+      'transfer': 'Transferencia', 'TRANSFER': 'Transferencia', 'transferencia': 'Transferencia',
+      'store_credit': 'Crédito Tienda', 'STORE_CREDIT': 'Crédito Tienda',
+      'credit': 'Crédito', 'CREDIT': 'Crédito'
     }
     
-    // Extraer nombre del cliente (puede venir como objeto o string)
+    // Cliente
     let customerName = 'Consumidor Final'
     if (customer_name && typeof customer_name === 'string') {
       customerName = customer_name
@@ -74,7 +66,7 @@ export const createReturnTemplate = async (returnData, systemSettings = {}) => {
       customerName = returnData.original_invoice.customer_name
     }
     
-    // Extraer cajero/vendedor
+    // Vendedor
     let cashierName = ''
     if (cashier && typeof cashier === 'string' && cashier.trim()) {
       cashierName = cashier
@@ -84,7 +76,7 @@ export const createReturnTemplate = async (returnData, systemSettings = {}) => {
       cashierName = returnData.user.name
     }
     
-    // Asegurar que items sea un array válido
+    // Items
     let itemsList = []
     if (Array.isArray(items) && items.length > 0) {
       itemsList = items
@@ -96,16 +88,10 @@ export const createReturnTemplate = async (returnData, systemSettings = {}) => {
       itemsList = returnData.items
     }
     
-    if (!Array.isArray(itemsList)) {
-      itemsList = []
-    }
+    if (!Array.isArray(itemsList)) itemsList = []
 
     // ==================== CONFIGURACIÓN EMPRESA ====================
-    // company_name puede estar en múltiples lugares
-    const companyName = systemSettings.company_name || 
-                        systemSettings.business_name || 
-                        systemSettings.store_name ||
-                        'MI EMPRESA'  // Este es el último fallback, raramente se usará
+    const companyName = systemSettings.company_name || systemSettings.business_name || systemSettings.store_name || 'MI EMPRESA'
     const companyAddress = systemSettings.company_address || systemSettings.address || ''
     const companyPhone = systemSettings.company_phone || systemSettings.phone || ''
     const companyEmail = systemSettings.company_email || systemSettings.email || ''
@@ -116,23 +102,22 @@ export const createReturnTemplate = async (returnData, systemSettings = {}) => {
     // ==================== GENERAR QR ====================
     const qrDataURL = await QRCode.toDataURL(`DEV:${returnNumber}`, {
       width: 100,
-      margin: 0,
-      color: { dark: '#374151', light: '#FFFFFF' }  // Gris oscuro para QR
+      margin: 1,
+      color: { dark: '#000000', light: '#FFFFFF' }
     })
 
     // ==================== CALCULAR ALTURA DINÁMICA ====================
-    // Cálculo preciso basado en cada sección del PDF - Optimizado para evitar desperdicio
-    const headerHeight = companyLogo ? 45 : 30  // Logo o solo nombre + info (reducido)
-    const bannerHeight = 16  // Banner + número (compacto)
-    const infoHeight = 24 + (cashierName ? 4 : 0) + ((reason && reason.trim()) ? 8 : 0) // Info compacta
-    const tableHeaderHeight = 8  // Encabezado de tabla (reducido)
-    const itemHeight = 6  // Por cada producto (más compacto)
+    const headerHeight = companyLogo ? 45 : 30
+    const bannerHeight = 15
+    const infoHeight = 24 + (cashierName ? 4 : 0) + ((reason && reason.trim()) ? 8 : 0)
+    const tableHeaderHeight = 8
+    const itemHeight = 6
     const itemsHeight = Math.max(itemsList.length * itemHeight, 10)
-    const totalsHeight = 24  // Subtotal, IVA, Total banner (ajustado)
-    const refundMethodHeight = 12  // Método de reembolso box (ajustado)
+    const totalsHeight = 24
+    const refundMethodHeight = 12
     const notesHeight = (notes && typeof notes === 'string' && notes.trim()) ? 10 : 0
-    const footerHeight = 40  // Mensaje + QR + número + línea + Powered by (compacto)
-    const marginBottom = 2  // Margen mínimo al final - PDF termina justo después de Powered by
+    const footerHeight = 40
+    const marginBottom = 5
     
     const dynamicHeight = headerHeight + bannerHeight + infoHeight + tableHeaderHeight + 
                          itemsHeight + totalsHeight + refundMethodHeight + notesHeight + 
@@ -145,348 +130,305 @@ export const createReturnTemplate = async (returnData, systemSettings = {}) => {
       format: [80, dynamicHeight]
     })
 
-    // Configuración base
-    let yPos = 6
+    let yPos = 8
     const pageWidth = 80
     const leftMargin = 4
     const rightMargin = pageWidth - 4
     const centerX = pageWidth / 2
     const contentWidth = rightMargin - leftMargin
 
-    // ==================== COLORES ====================
-    // Diseño profesional con tonos sobrios - menos rojo, más elegante
-    const colors = {
-      primary: [55, 65, 81],       // Gris oscuro profesional (reemplaza rojo)
-      accent: [99, 102, 241],      // Indigo para acentos
-      dark: [17, 24, 39],          // Gris muy oscuro para títulos
-      medium: [75, 85, 99],        // Gris medio para labels
-      light: [156, 163, 175],      // Gris claro
-      success: [16, 185, 129],     // Verde para confirmaciones
-      warning: [234, 88, 12],      // Naranja para alertas
-      background: [249, 250, 251], // Fondo
-      returnBadge: [220, 38, 38]   // Rojo solo para badge "DEVOLUCIÓN"
-    }
-
     // ==================== HEADER EMPRESA ====================
-    
-    // Logo (si existe)
     if (companyLogo) {
       try {
-        pdf.addImage(companyLogo, 'PNG', centerX - 10, yPos, 20, 12, '', 'FAST')
-        yPos += 15
-      } catch (err) {
-      }
+        await new Promise((resolve, reject) => {
+          const img = new Image()
+          img.onload = () => {
+            try {
+              const imgAspectRatio = img.width / img.height
+              let logoWidth = 14
+              let logoHeight = logoWidth / imgAspectRatio
+              if (logoHeight > 10) {
+                logoHeight = 10
+                logoWidth = logoHeight * imgAspectRatio
+              }
+              pdf.addImage(companyLogo, 'PNG', centerX - (logoWidth / 2), yPos, logoWidth, logoHeight, '', 'FAST')
+              yPos += logoHeight + 3
+              resolve()
+            } catch (err) { reject(err) }
+          }
+          img.onerror = reject
+          img.src = companyLogo
+        })
+      } catch (err) {}
     }
 
-    // Nombre de empresa
     pdf.setFont('helvetica', 'bold')
     pdf.setFontSize(14)
-    pdf.setTextColor(...colors.dark)
+    pdf.setTextColor(0, 0, 0)
     pdf.text(companyName.toUpperCase(), centerX, yPos, { align: 'center' })
     yPos += 5
 
-    // Info empresa (pequeño)
     pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(7)
-    pdf.setTextColor(...colors.medium)
+    pdf.setFontSize(8)
+    pdf.setTextColor(85, 85, 85)
 
     if (companyDocument) {
       pdf.text(`NIT: ${companyDocument}`, centerX, yPos, { align: 'center' })
       yPos += 3
     }
-
     if (companyAddress) {
-      const addressLines = pdf.splitTextToSize(companyAddress, 70)
-      pdf.text(addressLines, centerX, yPos, { align: 'center' })
-      yPos += addressLines.length * 3
+      pdf.text(companyAddress, centerX, yPos, { align: 'center', maxWidth: 72 })
+      yPos += 3
     }
-
     if (companyPhone || companyEmail) {
       const contact = [companyPhone, companyEmail].filter(Boolean).join(' • ')
-      pdf.text(contact, centerX, yPos, { align: 'center', maxWidth: 70 })
+      pdf.text(contact, centerX, yPos, { align: 'center' })
       yPos += 4
+    } else {
+      yPos += 2
     }
 
-    // ==================== BANNER DEVOLUCIÓN ====================
-    yPos += 2
-    
-    // Banner elegante gris oscuro con borde sutil
-    pdf.setFillColor(...colors.primary)
-    pdf.roundedRect(leftMargin, yPos, contentWidth, 10, 2, 2, 'F')
-    
-    // Texto del banner
-    pdf.setFont('helvetica', 'bold')
-    pdf.setFontSize(11)
-    pdf.setTextColor(255, 255, 255)
-    pdf.text('NOTA DE DEVOLUCIÓN', centerX, yPos + 6.5, { align: 'center' })
-    yPos += 14
+    // Doble línea
+    pdf.setLineWidth(0.3)
+    pdf.setDrawColor(0, 0, 0)
+    pdf.line(leftMargin, yPos, rightMargin, yPos)
+    yPos += 1
+    pdf.line(leftMargin, yPos, rightMargin, yPos)
+    yPos += 6
 
-    // ==================== INFO DEVOLUCIÓN ====================
-    
-    // Número de devolución (destacado)
+    // ==================== TÍTULO DEVOLUCIÓN ====================
+    pdf.setTextColor(0, 0, 0)
     pdf.setFont('helvetica', 'bold')
     pdf.setFontSize(10)
-    pdf.setTextColor(...colors.dark)
-    pdf.text(`N° ${returnNumber}`, centerX, yPos, { align: 'center' })
+    pdf.text('NOTA DE DEVOLUCIÓN', centerX, yPos, { align: 'center' })
     yPos += 5
+    
+    pdf.setFont('courier', 'bold')
+    pdf.setFontSize(12)
+    pdf.text(`No. ${returnNumber}`, centerX, yPos, { align: 'center' })
+    yPos += 8
 
-    // Línea divisora decorativa
-    pdf.setDrawColor(...colors.light)
-    pdf.setLineWidth(0.3)
-    pdf.line(leftMargin + 15, yPos, rightMargin - 15, yPos)
-    yPos += 4
-
-    // Info en dos columnas
+    // ==================== INFO DEVOLUCIÓN ====================
     pdf.setFont('helvetica', 'normal')
     pdf.setFontSize(7)
     
-    // Fecha
     const returnDate = new Date(created_at || date)
-    const dateStr = returnDate.toLocaleDateString('es-CO', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    })
-    const timeStr = returnDate.toLocaleTimeString('es-CO', {
-      hour: '2-digit',
-      minute: '2-digit'
-    })
+    const dateStr = returnDate.toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' })
+    const timeStr = returnDate.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true })
     
-    pdf.setTextColor(...colors.medium)
-    pdf.text('Fecha:', leftMargin, yPos)
-    pdf.setTextColor(...colors.dark)
-    pdf.text(`${dateStr} ${timeStr}`, leftMargin + 12, yPos)
+    pdf.text(`Fecha: ${dateStr}`, leftMargin, yPos)
+    yPos += 3
+    pdf.text(`Hora: ${timeStr}`, leftMargin, yPos)
     yPos += 4
 
-    // Factura referencia
-    pdf.setTextColor(...colors.medium)
-    pdf.text('Factura Ref:', leftMargin, yPos)
-    pdf.setTextColor(...colors.dark)
     pdf.setFont('helvetica', 'bold')
+    pdf.text('Factura Ref:', leftMargin, yPos)
+    pdf.setFont('courier', 'bold')
     pdf.text(invoiceRef, leftMargin + 18, yPos)
     pdf.setFont('helvetica', 'normal')
     yPos += 4
 
-    // Cliente
-    pdf.setTextColor(...colors.medium)
-    pdf.text('Cliente:', leftMargin, yPos)
-    pdf.setTextColor(...colors.dark)
-    pdf.text(customerName, leftMargin + 14, yPos)
+    pdf.text(`Cliente: ${customerName}`, leftMargin, yPos, { maxWidth: 72 })
     yPos += 4
 
-    // Atendió (si existe)
     if (cashierName) {
-      pdf.setTextColor(...colors.medium)
-      pdf.text('Atendió:', leftMargin, yPos)
-      pdf.setTextColor(...colors.dark)
-      pdf.text(cashierName, leftMargin + 14, yPos)
+      pdf.text(`Atendido por: ${cashierName}`, leftMargin, yPos)
       yPos += 4
     }
 
-    // Motivo (si existe)
     if (reason && typeof reason === 'string' && reason.trim()) {
-      pdf.setTextColor(...colors.medium)
       pdf.text('Motivo:', leftMargin, yPos)
-      pdf.setTextColor(...colors.dark)
       const reasonLines = pdf.splitTextToSize(reason, 55)
-      pdf.text(reasonLines, leftMargin + 14, yPos)
+      pdf.text(reasonLines, leftMargin + 10, yPos)
       yPos += reasonLines.length * 3 + 2
     }
 
+    // Línea separadora
     yPos += 2
+    pdf.setLineWidth(0.3)
+    pdf.setDrawColor(0, 0, 0)
+    pdf.line(leftMargin, yPos, rightMargin, yPos)
+    yPos += 4
 
     // ==================== TABLA DE PRODUCTOS ====================
-    
-    // Header de tabla con fondo
-    pdf.setFillColor(...colors.background)
-    pdf.rect(leftMargin, yPos - 1, contentWidth, 6, 'F')
-    
     pdf.setFont('helvetica', 'bold')
-    pdf.setFontSize(6)
-    pdf.setTextColor(...colors.medium)
-    pdf.text('DESCRIPCIÓN', leftMargin + 1, yPos + 3)
-    pdf.text('CANT', 50, yPos + 3, { align: 'center' })
-    pdf.text('PRECIO', 62, yPos + 3, { align: 'right' })
-    pdf.text('TOTAL', rightMargin - 1, yPos + 3, { align: 'right' })
-    yPos += 7
-
-    // Línea bajo header
-    pdf.setDrawColor(...colors.light)
-    pdf.setLineWidth(0.2)
+    pdf.setFontSize(7)
+    pdf.text('DESCRIPCIÓN', leftMargin + 1, yPos)
+    pdf.text('CANT.', leftMargin + 38, yPos, { align: 'center' })
+    pdf.text('PRECIO', leftMargin + 53, yPos, { align: 'right' })
+    pdf.text('TOTAL', rightMargin - 1, yPos, { align: 'right' })
+    
+    yPos += 3
+    pdf.setLineWidth(0.15)
+    pdf.setDrawColor(204, 204, 204)
     pdf.line(leftMargin, yPos, rightMargin, yPos)
     yPos += 3
 
-    // Items
-    pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(7)
-    pdf.setTextColor(...colors.dark)
-
     if (itemsList.length > 0) {
       itemsList.forEach((item, index) => {
-        // Extraer datos del item de forma segura
         let productName = 'Producto'
-        if (item.product_name && typeof item.product_name === 'string') {
-          productName = item.product_name
-        } else if (item.name && typeof item.name === 'string') {
-          productName = item.name
-        } else if (item.product && typeof item.product === 'object' && item.product.name) {
-          productName = item.product.name
-        }
+        if (item.product_name && typeof item.product_name === 'string') productName = item.product_name
+        else if (item.name && typeof item.name === 'string') productName = item.name
+        else if (item.product && typeof item.product === 'object' && item.product.name) productName = item.product.name
         
         const quantity = parseInt(item.quantity || item.qty || 1)
         const unitPrice = parseFloat(item.unit_price || item.price || 0)
         const totalPrice = quantity * unitPrice
 
-        // Nombre (truncar si es necesario)
-        const truncatedName = productName.length > 28 ? productName.substring(0, 26) + '...' : productName
-        pdf.text(truncatedName, leftMargin + 1, yPos)
+        const nameLines = pdf.splitTextToSize(productName, 32)
         
-        // Cantidad
-        pdf.text(quantity.toString(), 50, yPos, { align: 'center' })
-        
-        // Precio unitario
-        pdf.text(`$${formatNumber(unitPrice)}`, 62, yPos, { align: 'right' })
-        
-        // Total
-        pdf.setFont('helvetica', 'bold')
-        pdf.text(`$${formatNumber(totalPrice)}`, rightMargin - 1, yPos, { align: 'right' })
         pdf.setFont('helvetica', 'normal')
+        pdf.setFontSize(7)
+        pdf.text(nameLines[0], leftMargin + 1, yPos)
+        
+        pdf.setFont('courier', 'normal')
+        pdf.text(quantity.toString(), leftMargin + 38, yPos, { align: 'center' })
+        
+        pdf.setTextColor(102, 102, 102)
+        pdf.setFontSize(6)
+        pdf.text(`$${formatNumber(unitPrice)}`, leftMargin + 53, yPos, { align: 'right' })
+        
+        pdf.setFont('courier', 'bold')
+        pdf.setFontSize(7)
+        pdf.setTextColor(0, 0, 0)
+        pdf.text(`$${formatNumber(totalPrice)}`, rightMargin - 1, yPos, { align: 'right' })
+        
+        yPos += 4
 
-        yPos += 5
-
-        // Línea punteada entre items (excepto el último)
         if (index < itemsList.length - 1) {
-          pdf.setDrawColor(220, 220, 220)
-          pdf.setLineDashPattern([1, 1], 0)
-          pdf.line(leftMargin, yPos - 1, rightMargin, yPos - 1)
-          pdf.setLineDashPattern([], 0)
+          pdf.setLineWidth(0.1)
+          pdf.setDrawColor(238, 238, 238)
+          pdf.line(leftMargin, yPos, rightMargin, yPos)
+          yPos += 2
         }
       })
     } else {
-      pdf.setTextColor(...colors.medium)
+      pdf.setFont('helvetica', 'normal')
+      pdf.setTextColor(102, 102, 102)
       pdf.text('Sin productos registrados', centerX, yPos, { align: 'center' })
-      yPos += 5
+      yPos += 4
+      pdf.setTextColor(0, 0, 0)
     }
 
-    yPos += 3
-
     // ==================== TOTALES ====================
-    
-    // Línea doble
-    pdf.setDrawColor(...colors.dark)
-    pdf.setLineWidth(0.4)
+    yPos += 2
+    pdf.setLineWidth(0.3)
+    pdf.setDrawColor(0, 0, 0)
+    pdf.setLineDashPattern([2, 2], 0)
     pdf.line(leftMargin, yPos, rightMargin, yPos)
-    yPos += 1
-    pdf.setLineWidth(0.2)
-    pdf.line(leftMargin, yPos, rightMargin, yPos)
-    yPos += 4
-
-    // Subtotal
-    pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(8)
-    pdf.setTextColor(...colors.medium)
-    pdf.text('Subtotal:', leftMargin, yPos)
-    pdf.setTextColor(...colors.dark)
-    pdf.text(`$${formatNumber(subtotal || 0)}`, rightMargin, yPos, { align: 'right' })
-    yPos += 4
-
-    // IVA
-    const taxAmount = parseFloat(tax_amount || tax || 0)
-    pdf.setTextColor(...colors.medium)
-    pdf.text(`${taxLabel}:`, leftMargin, yPos)
-    pdf.setTextColor(...colors.dark)
-    pdf.text(`$${formatNumber(taxAmount)}`, rightMargin, yPos, { align: 'right' })
+    pdf.setLineDashPattern([], 0)
     yPos += 5
 
-    // Total a reembolsar (destacado) - Diseño profesional gris oscuro
-    pdf.setFillColor(...colors.dark)
-    pdf.roundedRect(leftMargin, yPos - 1, contentWidth, 10, 1.5, 1.5, 'F')
-    
-    pdf.setFont('helvetica', 'bold')
+    pdf.setFont('helvetica', 'normal')
     pdf.setFontSize(9)
-    pdf.setTextColor(255, 255, 255)
-    pdf.text('TOTAL A REEMBOLSAR:', leftMargin + 2, yPos + 5)
-    pdf.setFontSize(11)
-    pdf.text(`$${formatNumber(total || 0)}`, rightMargin - 2, yPos + 5.5, { align: 'right' })
-    yPos += 14
+
+    pdf.text('Subtotal:', rightMargin - 25, yPos, { align: 'right' })
+    pdf.text(`$${formatNumber(subtotal || 0)}`, rightMargin - 1, yPos, { align: 'right' })
+    yPos += 4
+
+    const taxAmount = parseFloat(tax_amount || tax || 0)
+    if (taxAmount > 0) {
+      pdf.text(`${taxLabel}:`, rightMargin - 25, yPos, { align: 'right' })
+      pdf.text(`$${formatNumber(taxAmount)}`, rightMargin - 1, yPos, { align: 'right' })
+      yPos += 4
+    }
+
+    // Línea doble antes del total
+    yPos += 1
+    pdf.setLineWidth(0.3)
+    pdf.line(leftMargin, yPos, rightMargin, yPos)
+    yPos += 1
+    pdf.line(leftMargin, yPos, rightMargin, yPos)
+    yPos += 5
+
+    pdf.setFont('helvetica', 'bold')
+    pdf.setFontSize(10)
+    pdf.text('TOTAL DEVOLUCIÓN', leftMargin + 1, yPos + 3)
+    
+    pdf.setFont('courier', 'bold')
+    pdf.setFontSize(18)
+    pdf.text(`$${formatNumber(total || 0)}`, rightMargin - 1, yPos + 3, { align: 'right' })
+    yPos += 10
 
     // ==================== MÉTODO DE REEMBOLSO ====================
-    
-    // Ícono y método - traducido a español
+    yPos += 2
+    pdf.setLineWidth(0.2)
+    pdf.setDrawColor(0, 0, 0)
+    pdf.setLineDashPattern([2, 2], 0)
+    pdf.line(leftMargin, yPos, rightMargin, yPos)
+    pdf.setLineDashPattern([], 0)
+    yPos += 5
+
     const rawMethod = (typeof refund_method === 'string' ? refund_method : 'cash') || 'cash'
     const refundMethodText = refundMethodLabels[rawMethod] || refundMethodLabels[rawMethod.toLowerCase()] || rawMethod || 'Efectivo'
     
-    pdf.setFillColor(243, 244, 246)
-    pdf.roundedRect(leftMargin, yPos - 1, contentWidth, 8, 1, 1, 'F')
-    
-    pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(7)
-    pdf.setTextColor(...colors.medium)
-    pdf.text('Método de reembolso:', leftMargin + 2, yPos + 4)
-    
     pdf.setFont('helvetica', 'bold')
-    pdf.setFontSize(8)
-    pdf.setTextColor(...colors.success)
-    pdf.text(refundMethodText.toUpperCase(), rightMargin - 2, yPos + 4, { align: 'right' })
-    yPos += 10
+    pdf.setFontSize(7)
+    pdf.text('FORMA DE REEMBOLSO', leftMargin, yPos)
+    yPos += 4
 
-    // ==================== NOTAS (si existen) ====================
+    pdf.setFont('helvetica', 'normal')
+    pdf.setFontSize(8)
+    pdf.text(`• ${refundMethodText}`, leftMargin, yPos)
+    pdf.text(`$${formatNumber(total || 0)}`, rightMargin - 1, yPos, { align: 'right' })
+    yPos += 5
+
+    // ==================== NOTAS ====================
     if (notes && typeof notes === 'string' && notes.trim()) {
-      pdf.setFont('helvetica', 'italic')
-      pdf.setFontSize(6)
-      pdf.setTextColor(...colors.light)
-      const notesLines = pdf.splitTextToSize(`Nota: ${notes}`, contentWidth - 4)
-      pdf.text(notesLines, centerX, yPos, { align: 'center' })
-      yPos += notesLines.length * 3 + 2
+      pdf.setFont('helvetica', 'bold')
+      pdf.setFontSize(8)
+      pdf.text('OBSERVACIONES:', leftMargin, yPos)
+      yPos += 4
+      
+      pdf.setFont('helvetica', 'normal')
+      pdf.setFontSize(7)
+      const notesLines = pdf.splitTextToSize(notes, contentWidth - 4)
+      notesLines.forEach(line => {
+        pdf.text(line, leftMargin, yPos)
+        yPos += 3
+      })
+      yPos += 2
     }
 
     // ==================== QR Y PIE DE PÁGINA ====================
-    
-    // Mensaje compacto
-    pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(6)
-    pdf.setTextColor(...colors.medium)
-    pdf.text('Conserve este documento como', centerX, yPos, { align: 'center' })
-    yPos += 2.5
-    pdf.text('comprobante de su devolución', centerX, yPos, { align: 'center' })
+    yPos += 4
+    pdf.setLineWidth(0.2)
+    pdf.setDrawColor(0, 0, 0)
+    pdf.setLineDashPattern([2, 2], 0)
+    pdf.line(leftMargin, yPos, rightMargin, yPos)
+    pdf.setLineDashPattern([], 0)
+    yPos += 5
+
+    pdf.setFont('helvetica', 'bold')
+    pdf.setFontSize(8)
+    pdf.text('COMPROBANTE DE DEVOLUCIÓN', centerX, yPos, { align: 'center' })
     yPos += 4
 
-    // QR Code centrado - tamaño optimizado
-    const qrSize = 20
+    pdf.setFont('helvetica', 'normal')
+    pdf.setFontSize(7)
+    pdf.text('Conserve este documento', centerX, yPos, { align: 'center' })
+    yPos += 6
+
+    const qrSize = 22
     pdf.addImage(qrDataURL, 'PNG', centerX - qrSize/2, yPos, qrSize, qrSize, '', 'FAST')
     yPos += qrSize + 2
 
-    // Número bajo QR
-    pdf.setFont('helvetica', 'bold')
     pdf.setFontSize(6)
-    pdf.setTextColor(...colors.dark)
     pdf.text(returnNumber, centerX, yPos, { align: 'center' })
-    yPos += 4
+    yPos += 6
 
-    // Línea final sutil
-    pdf.setDrawColor(...colors.light)
-    pdf.setLineWidth(0.1)
-    pdf.line(leftMargin + 15, yPos, rightMargin - 15, yPos)
-    yPos += 3
-
-    // Footer - Powered by (compacto)
     pdf.setFont('helvetica', 'normal')
     pdf.setFontSize(5)
-    pdf.setTextColor(...colors.light)
+    pdf.setTextColor(150, 150, 150)
     pdf.text('Powered by 105POS', centerX, yPos, { align: 'center' })
-    // PDF termina exactamente aquí - altura dinámica calculada para ajustar perfectamente
 
     return pdf
-
   } catch (error) {
     console.error('Error generando PDF de devolución:', error)
     throw error
   }
 }
 
-/**
- * Formatear número con separador de miles
- */
 function formatNumber(value) {
   const num = parseFloat(value) || 0
   return num.toLocaleString('es-CO', { 

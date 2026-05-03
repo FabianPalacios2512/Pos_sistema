@@ -92,79 +92,47 @@
         </div>
       </div>
       
-      <!-- KPIs Standard - Inline metrics (Stripe-style) -->
-      <div v-else class="flex items-center gap-8 mb-2 flex-wrap">
-        <!-- Total Productos -->
-        <div class="flex items-center gap-2.5 group">
-          <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-blue-50 dark:bg-blue-500/10">
-            <svg class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-            </svg>
+      <!-- KPIs Standard - Metrics Ribbon (Unificado con InvoicesView) -->
+      <div v-else class="bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 grid grid-cols-2 lg:grid-cols-5 divide-x divide-gray-100 dark:divide-zinc-800 mb-5">
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Total Productos</p>
+            <svg class="w-4 h-4 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
           </div>
-          <div>
-            <p class="text-[13px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider leading-none">Total Productos</p>
-            <p class="text-base font-semibold text-[#374151] dark:text-zinc-300 leading-tight">{{ products.length }}</p>
-          </div>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ products.length }}</p>
+          <p class="text-xs text-gray-400 dark:text-zinc-500">En el catálogo</p>
         </div>
-
-        <div class="w-px h-8 bg-gray-200 dark:bg-zinc-800 hidden md:block"></div>
-
-        <!-- Productos Activos -->
-        <div class="flex items-center gap-2.5 group">
-          <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-emerald-50 dark:bg-emerald-500/10">
-            <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Activos</p>
+            <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
-          <div>
-            <p class="text-[13px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider leading-none">Activos</p>
-            <p class="text-base font-semibold text-[#374151] dark:text-zinc-300 leading-tight">{{ activeProducts }}</p>
-          </div>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ activeProducts }}</p>
+          <p class="text-xs text-emerald-500 dark:text-emerald-400">Disponibles</p>
         </div>
-
-        <div class="w-px h-8 bg-gray-200 dark:bg-zinc-800 hidden md:block"></div>
-
-        <!-- Stock Bajo -->
-        <div class="flex items-center gap-2.5 group">
-          <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-amber-50 dark:bg-amber-500/10">
-            <svg class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-            </svg>
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Stock Bajo</p>
+            <svg class="w-4 h-4 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
           </div>
-          <div>
-            <p class="text-[13px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider leading-none">Stock Bajo</p>
-            <p class="text-base font-semibold text-[#374151] dark:text-zinc-300 leading-tight">{{ lowStockProducts }}</p>
-          </div>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ lowStockProducts }}</p>
+          <p class="text-xs" :class="lowStockProducts > 0 ? 'text-amber-500 dark:text-amber-400' : 'text-gray-400 dark:text-zinc-500'">{{ lowStockProducts === 0 ? 'Todo en orden' : 'Requieren atención' }}</p>
         </div>
-
-        <div class="w-px h-8 bg-gray-200 dark:bg-zinc-800 hidden md:block"></div>
-
-        <!-- Valor Total -->
-        <div class="flex items-center gap-2.5 group">
-          <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-blue-50 dark:bg-blue-500/10">
-            <svg class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-            </svg>
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Valor Potencial</p>
+            <svg class="w-4 h-4 text-violet-500 dark:text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
-          <div>
-            <p class="text-[13px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider leading-none">Valor Potencial</p>
-            <p class="text-base font-semibold text-[#374151] dark:text-zinc-300 leading-tight">${{ formatCurrency(totalValue) }}</p>
-          </div>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">${{ formatCurrency(totalValue) }}</p>
+          <p class="text-xs text-gray-400 dark:text-zinc-500">Precio × stock</p>
         </div>
-
-        <div class="w-px h-8 bg-gray-200 dark:bg-zinc-800 hidden md:block"></div>
-
-        <!-- Categorías -->
-        <div class="flex items-center gap-2.5 group">
-          <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-indigo-50 dark:bg-indigo-500/10">
-            <svg class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-            </svg>
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Categorías</p>
+            <svg class="w-4 h-4 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
           </div>
-          <div>
-            <p class="text-[13px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider leading-none">Categorías</p>
-            <p class="text-base font-semibold text-[#374151] dark:text-zinc-300 leading-tight">{{ uniqueCategories }}</p>
-          </div>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ uniqueCategories }}</p>
+          <p class="text-xs text-gray-400 dark:text-zinc-500">Registradas</p>
         </div>
       </div>
 

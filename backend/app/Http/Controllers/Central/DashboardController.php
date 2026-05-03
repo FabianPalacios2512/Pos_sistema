@@ -549,7 +549,7 @@ class DashboardController extends Controller
             // Obtener productos del tenant
             $products = DB::connection('mysql')
                 ->table($tenantDbName . '.products')
-                ->select('id', 'name', 'price', 'stock', 'created_at')
+                ->select('id', 'name', 'sale_price as price', 'current_stock as stock', 'created_at')
                 ->orderBy('name', 'asc')
                 ->get();
 

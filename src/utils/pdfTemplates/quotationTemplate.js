@@ -10,11 +10,11 @@ import QRCode from 'qrcode'
  * Crear PDF de cotización con diseño tipo ticket térmico (80mm)
  * @param {Object} quotationData - Datos de la cotización
  * @param {Object} systemSettings - Configuración del sistema (empresa, IVA, etc)
- * @returns {jsPDF} Objeto PDF listo para descargar o enviar
+ * @returns {Promise<jsPDF>} Objeto PDF listo para descargar o enviar
  */
 export const createQuotationTemplate = async (quotationData, systemSettings = {}) => {
   try {
-    // Extraer datos de la cotización
+    // Extraer datos
     const {
       quotation_number = '',
       quotationNumber = '',
@@ -33,45 +33,44 @@ export const createQuotationTemplate = async (quotationData, systemSettings = {}
       validity_days = 15
     } = quotationData
 
-    // Número de cotización
     const quotationCode = quotation_number || quotationNumber || 'SIN-NUMERO'
 
-    // Configuración de la empresa
+    // Configuración empresa
     const companyName = systemSettings.company_name || 'MI EMPRESA'
     const companyAddress = systemSettings.company_address || ''
     const companyPhone = systemSettings.company_phone || ''
     const companyEmail = systemSettings.company_email || ''
     const companyDocument = systemSettings.company_document || ''
+    const companyLogo = systemSettings.company_logo || systemSettings.logo || null
     const taxLabel = systemSettings.iva_display_name || 'IVA'
     const taxRate = systemSettings.iva_percentage || 19
 
     // Generar QR Code
     const qrDataURL = await QRCode.toDataURL(quotationCode, {
-      width: 80,
+      width: 100,
       margin: 1,
       color: { dark: '#000000', light: '#FFFFFF' }
     })
 
-    // Calcular altura dinámica ajustada al contenido
-    const baseHeight = 65 // Header empresa + título cotización + cliente
-    const itemHeight = 4.5 // Altura por cada producto
-    const itemCount = items.length
-    const totalsHeight = 28 // Subtotal + descuento + IVA + total
-    const notesHeight = notes && notes.trim() ? 20 : 0 // Observaciones (solo si existen)
-    const messageHeight = 15 // Mensaje "no válida como factura"
-    const qrSectionHeight = 53     // QR (25mm) + código (3mm) + contacto (12mm) + espacios (3mm)
-    const extraPadding = 5 // Margen mínimo de seguridad
+    // Calcular altura dinámica
+    const headerHeight = companyLogo ? 45 : 30
+    const infoHeight = 35
+    const itemHeight = 6
+    const itemCount = items.length || 1
+    const totalsHeight = 35
+    const notesHeight = notes && notes.trim() ? 20 : 0
+    const messageHeight = 20
+    const qrSectionHeight = 40
     
-    const dynamicHeight = baseHeight + (itemCount * itemHeight) + totalsHeight + notesHeight + messageHeight + qrSectionHeight + extraPadding
+    const dynamicHeight = headerHeight + infoHeight + (itemCount * itemHeight) + totalsHeight + notesHeight + messageHeight + qrSectionHeight
 
-    // Crear PDF con formato ticket (80mm ancho, altura dinámica)
+    // Crear PDF
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
       format: [80, dynamicHeight]
     })
 
-    // Configuración del ticket
     let yPos = 8
     const pageWidth = 80
     const leftMargin = 4
@@ -79,181 +78,222 @@ export const createQuotationTemplate = async (quotationData, systemSettings = {}
     const centerX = pageWidth / 2
 
     // ==================== HEADER EMPRESA ====================
+    if (companyLogo) {
+      try {
+        await new Promise((resolve, reject) => {
+          const img = new Image()
+          img.onload = () => {
+            try {
+              const imgAspectRatio = img.width / img.height
+              let logoWidth = 14
+              let logoHeight = logoWidth / imgAspectRatio
+              if (logoHeight > 10) {
+                logoHeight = 10
+                logoWidth = logoHeight * imgAspectRatio
+              }
+              pdf.addImage(companyLogo, 'PNG', centerX - (logoWidth / 2), yPos, logoWidth, logoHeight, '', 'FAST')
+              yPos += logoHeight + 3
+              resolve()
+            } catch (err) { reject(err) }
+          }
+          img.onerror = reject
+          img.src = companyLogo
+        })
+      } catch (err) {}
+    }
+
     pdf.setFont('helvetica', 'bold')
-    pdf.setFontSize(12)
+    pdf.setFontSize(14)
+    pdf.setTextColor(0, 0, 0)
     pdf.text(companyName.toUpperCase(), centerX, yPos, { align: 'center' })
     yPos += 5
 
-    if (companyAddress) {
-      pdf.setFontSize(8)
-      pdf.setFont('helvetica', 'normal')
-      pdf.text(companyAddress, centerX, yPos, { align: 'center', maxWidth: 72 })
-      yPos += 4
-    }
-
-    if (companyPhone) {
-      pdf.setFontSize(8)
-      pdf.text(`Tel: ${companyPhone}`, centerX, yPos, { align: 'center' })
-      yPos += 4
-    }
-
-    if (companyEmail) {
-      pdf.setFontSize(8)
-      pdf.text(companyEmail, centerX, yPos, { align: 'center' })
-      yPos += 4
-    }
+    pdf.setFont('helvetica', 'normal')
+    pdf.setFontSize(8)
+    pdf.setTextColor(85, 85, 85)
 
     if (companyDocument) {
-      pdf.setFontSize(8)
       pdf.text(`NIT: ${companyDocument}`, centerX, yPos, { align: 'center' })
-      yPos += 6
+      yPos += 3
+    }
+    if (companyAddress) {
+      pdf.text(companyAddress, centerX, yPos, { align: 'center', maxWidth: 72 })
+      yPos += 3
+    }
+    if (companyPhone || companyEmail) {
+      const contactLine = [companyPhone, companyEmail].filter(Boolean).join(' • ')
+      pdf.text(contactLine, centerX, yPos, { align: 'center' })
+      yPos += 4
     } else {
       yPos += 2
     }
 
-    // Línea separadora
+    // Línea doble
+    pdf.setLineWidth(0.3)
+    pdf.setDrawColor(0, 0, 0)
+    pdf.line(leftMargin, yPos, rightMargin, yPos)
+    yPos += 1
     pdf.line(leftMargin, yPos, rightMargin, yPos)
     yPos += 6
 
     // ==================== INFORMACIÓN DE COTIZACIÓN ====================
+    pdf.setTextColor(0, 0, 0)
     pdf.setFont('helvetica', 'bold')
     pdf.setFontSize(10)
     pdf.text('COTIZACIÓN', centerX, yPos, { align: 'center' })
     yPos += 5
 
+    pdf.setFont('courier', 'bold')
+    pdf.setFontSize(12)
+    pdf.text(`No. ${quotationCode}`, centerX, yPos, { align: 'center' })
+    yPos += 8
+
     pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(8)
-    pdf.text(`No: ${quotationCode}`, leftMargin, yPos)
-    yPos += 4
-
+    pdf.setFontSize(7)
+    
     const quotationDate = new Date(created_at || date)
-    pdf.text(`Fecha: ${quotationDate.toLocaleDateString('es-CO')}`, leftMargin, yPos)
+    const dateStr = quotationDate.toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' })
+    pdf.text(`Fecha: ${dateStr}`, leftMargin, yPos)
     yPos += 4
 
-    // Validez de la cotización
     const expiryDate = new Date(quotationDate)
     expiryDate.setDate(expiryDate.getDate() + (validity_days || 15))
-    pdf.text(`Válida hasta: ${expiryDate.toLocaleDateString('es-CO')}`, leftMargin, yPos)
+    const expDateStr = expiryDate.toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' })
+    pdf.text(`Válida hasta: ${expDateStr}`, leftMargin, yPos)
     yPos += 4
 
-    pdf.text(`Asesor: ${cashier}`, leftMargin, yPos)
-    yPos += 6
+    pdf.text(`Atendido por: ${cashier}`, leftMargin, yPos)
+    yPos += 5
 
-    // Línea punteada
-    pdf.setLineDashPattern([1, 1], 0)
+    // Separador
+    pdf.setLineWidth(0.2)
+    pdf.setLineDashPattern([2, 2], 0)
     pdf.line(leftMargin, yPos, rightMargin, yPos)
     pdf.setLineDashPattern([], 0)
-    yPos += 6
+    yPos += 4
 
     // ==================== INFORMACIÓN DEL CLIENTE ====================
+    const customerText = customer_name || customer || 'Cliente General'
     pdf.setFont('helvetica', 'bold')
     pdf.text('CLIENTE:', leftMargin, yPos)
-    yPos += 4
     pdf.setFont('helvetica', 'normal')
-    const customerText = customer_name || customer || 'Cliente'
-    pdf.text(customerText, leftMargin, yPos, { maxWidth: 72 })
-    yPos += 6
+    pdf.text(customerText, leftMargin + 14, yPos, { maxWidth: 60 })
+    yPos += 5
 
-    // Línea punteada
-    pdf.setLineDashPattern([1, 1], 0)
+    // Línea continua
+    pdf.setLineWidth(0.3)
+    pdf.setDrawColor(0, 0, 0)
     pdf.line(leftMargin, yPos, rightMargin, yPos)
-    pdf.setLineDashPattern([], 0)
-    yPos += 6
+    yPos += 4
 
     // ==================== TABLA DE PRODUCTOS ====================
     pdf.setFont('helvetica', 'bold')
     pdf.setFontSize(7)
-    pdf.text('Descripción', leftMargin, yPos)
-    pdf.text('Cant', leftMargin + 40, yPos)
-    pdf.text('Precio', leftMargin + 50, yPos)
-    pdf.text('Total', leftMargin + 65, yPos)
+    pdf.text('DESCRIPCIÓN', leftMargin + 1, yPos)
+    pdf.text('CANT.', leftMargin + 38, yPos, { align: 'center' })
+    pdf.text('PRECIO', leftMargin + 53, yPos, { align: 'right' })
+    pdf.text('TOTAL', rightMargin - 1, yPos, { align: 'right' })
+    
+    yPos += 3
+    pdf.setLineWidth(0.15)
+    pdf.setDrawColor(204, 204, 204)
+    pdf.line(leftMargin, yPos, rightMargin, yPos)
     yPos += 3
 
-    pdf.setLineDashPattern([1, 1], 0)
-    pdf.line(leftMargin, yPos, rightMargin, yPos)
-    pdf.setLineDashPattern([], 0)
-    yPos += 4
+    // Items
+    if (items.length > 0) {
+      items.forEach((item, index) => {
+        const itemName = item.name || item.product_name || 'Producto'
+        const quantity = item.quantity || 0
+        const price = item.price || item.unit_price || 0
+        const itemTotal = quantity * price
 
-    // Items de la cotización
-    pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(7)
+        const nameLines = pdf.splitTextToSize(itemName, 32)
+        
+        pdf.setFont('helvetica', 'normal')
+        pdf.setFontSize(7)
+        pdf.setTextColor(0, 0, 0)
+        pdf.text(nameLines[0], leftMargin + 1, yPos)
+        
+        pdf.setFont('courier', 'normal')
+        pdf.text(quantity.toString(), leftMargin + 38, yPos, { align: 'center' })
+        
+        pdf.setTextColor(102, 102, 102)
+        pdf.setFontSize(6)
+        pdf.text(`$${price.toLocaleString('es-CO')}`, leftMargin + 53, yPos, { align: 'right' })
+        
+        pdf.setFont('courier', 'bold')
+        pdf.setFontSize(7)
+        pdf.setTextColor(0, 0, 0)
+        pdf.text(`$${itemTotal.toLocaleString('es-CO')}`, rightMargin - 1, yPos, { align: 'right' })
+        
+        yPos += 4
 
-    items.forEach(item => {
-      const itemName = item.name || item.product_name || 'Producto'
-      const quantity = item.quantity || 0
-      const price = item.price || item.unit_price || 0
-      const itemTotal = quantity * price
-
-      // Nombre del producto (con wrapping si es muy largo)
-      const nameLines = pdf.splitTextToSize(itemName, 36)
-      nameLines.forEach((line, index) => {
-        if (index === 0) {
-          pdf.text(line, leftMargin, yPos)
-        } else {
-          yPos += 3
-          pdf.text(line, leftMargin, yPos)
+        if (index < items.length - 1) {
+          pdf.setLineWidth(0.1)
+          pdf.setDrawColor(238, 238, 238)
+          pdf.line(leftMargin, yPos, rightMargin, yPos)
+          yPos += 2
         }
       })
+    }
 
-      // Cantidad, precio y total en la primera línea
-      pdf.text(quantity.toString(), leftMargin + 42, yPos - (nameLines.length - 1) * 3)
-      pdf.text(`$${price.toLocaleString()}`, leftMargin + 50, yPos - (nameLines.length - 1) * 3)
-      pdf.text(`$${itemTotal.toLocaleString()}`, leftMargin + 65, yPos - (nameLines.length - 1) * 3)
-
-      yPos += 4
-    })
-
-    // Línea punteada
+    // ==================== TOTALES ====================
     yPos += 2
-    pdf.setLineDashPattern([1, 1], 0)
+    pdf.setLineWidth(0.3)
+    pdf.setDrawColor(0, 0, 0)
+    pdf.setLineDashPattern([2, 2], 0)
     pdf.line(leftMargin, yPos, rightMargin, yPos)
     pdf.setLineDashPattern([], 0)
     yPos += 5
 
-    // ==================== TOTALES ====================
     pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(8)
+    pdf.setFontSize(9)
 
-    // Subtotal
-    pdf.text('Subtotal:', leftMargin, yPos)
-    pdf.text(`$${subtotal.toLocaleString()}`, rightMargin, yPos, { align: 'right' })
+    pdf.text('Subtotal:', rightMargin - 25, yPos, { align: 'right' })
+    pdf.text(`$${subtotal.toLocaleString('es-CO')}`, rightMargin - 1, yPos, { align: 'right' })
     yPos += 4
 
-    // Descuento (si aplica)
     if (discount > 0) {
-      pdf.text('Descuento:', leftMargin, yPos)
-      pdf.text(`-$${discount.toLocaleString()}`, rightMargin, yPos, { align: 'right' })
+      pdf.text('Descuento:', rightMargin - 25, yPos, { align: 'right' })
+      pdf.text(`-$${discount.toLocaleString('es-CO')}`, rightMargin - 1, yPos, { align: 'right' })
       yPos += 4
     }
 
-    // IVA
     const taxAmount = tax_amount || tax || 0
     if (taxAmount > 0) {
-      pdf.text(`${taxLabel} (${taxRate}%):`, leftMargin, yPos)
-      pdf.text(`$${taxAmount.toLocaleString()}`, rightMargin, yPos, { align: 'right' })
+      pdf.text(`${taxLabel} (${taxRate}%):`, rightMargin - 25, yPos, { align: 'right' })
+      pdf.text(`$${taxAmount.toLocaleString('es-CO')}`, rightMargin - 1, yPos, { align: 'right' })
       yPos += 4
     }
 
-    // Línea de total
-    pdf.setLineWidth(0.5)
+    // Línea doble antes de total
+    yPos += 1
+    pdf.setLineWidth(0.3)
+    pdf.line(leftMargin, yPos, rightMargin, yPos)
+    yPos += 1
     pdf.line(leftMargin, yPos, rightMargin, yPos)
     yPos += 5
 
     // TOTAL FINAL
     pdf.setFont('helvetica', 'bold')
     pdf.setFontSize(10)
-    pdf.text('TOTAL:', leftMargin, yPos)
-    pdf.text(`$${total.toLocaleString()}`, rightMargin, yPos, { align: 'right' })
-    yPos += 6
+    pdf.text('TOTAL COTIZACIÓN', leftMargin + 1, yPos + 3)
+    
+    pdf.setFont('courier', 'bold')
+    pdf.setFontSize(18)
+    pdf.text(`$${total.toLocaleString('es-CO')}`, rightMargin - 1, yPos + 3, { align: 'right' })
+    yPos += 10
 
-    // Línea punteada
-    pdf.setLineDashPattern([1, 1], 0)
-    pdf.line(leftMargin, yPos, rightMargin, yPos)
-    pdf.setLineDashPattern([], 0)
-    yPos += 6
-
-    // ==================== NOTAS (si aplica) ====================
+    // ==================== NOTAS ====================
     if (notes && notes.trim()) {
+      yPos += 2
+      pdf.setLineWidth(0.2)
+      pdf.setLineDashPattern([2, 2], 0)
+      pdf.line(leftMargin, yPos, rightMargin, yPos)
+      pdf.setLineDashPattern([], 0)
+      yPos += 5
+
       pdf.setFont('helvetica', 'bold')
       pdf.setFontSize(8)
       pdf.text('OBSERVACIONES:', leftMargin, yPos)
@@ -266,49 +306,44 @@ export const createQuotationTemplate = async (quotationData, systemSettings = {}
         pdf.text(line, leftMargin, yPos)
         yPos += 3
       })
-      yPos += 3
-
-      // Línea punteada
-      pdf.setLineDashPattern([1, 1], 0)
-      pdf.line(leftMargin, yPos, rightMargin, yPos)
-      pdf.setLineDashPattern([], 0)
-      yPos += 6
+      yPos += 2
     }
 
     // ==================== MENSAJE ====================
+    yPos += 4
+    pdf.setLineWidth(0.2)
+    pdf.setDrawColor(0, 0, 0)
+    pdf.setLineDashPattern([2, 2], 0)
+    pdf.line(leftMargin, yPos, rightMargin, yPos)
+    pdf.setLineDashPattern([], 0)
+    yPos += 6
+
     pdf.setFont('helvetica', 'bold')
     pdf.setFontSize(8)
-    pdf.text('COTIZACIÓN NO VÁLIDA COMO FACTURA', centerX, yPos, { align: 'center' })
+    pdf.text('DOCUMENTO NO VÁLIDO COMO FACTURA', centerX, yPos, { align: 'center' })
     yPos += 4
 
     pdf.setFont('helvetica', 'normal')
     pdf.setFontSize(7)
-    pdf.text('Esta es una cotización sujeta a cambios', centerX, yPos, { align: 'center' })
+    pdf.text('Cotización informativa sujeta a cambios', centerX, yPos, { align: 'center' })
     yPos += 3
-    pdf.text('Los precios pueden variar sin previo aviso', centerX, yPos, { align: 'center' })
-    yPos += 8
+    pdf.text('Precios pueden variar sin previo aviso', centerX, yPos, { align: 'center' })
+    yPos += 6
 
     // ==================== QR CODE ====================
-    const qrSize = 25
-    const qrX = (pageWidth - qrSize) / 2
-    pdf.addImage(qrDataURL, 'PNG', qrX, yPos, qrSize, qrSize)
-    yPos += qrSize + 3
+    const qrSize = 22
+    pdf.addImage(qrDataURL, 'PNG', centerX - qrSize/2, yPos, qrSize, qrSize, '', 'FAST')
+    yPos += qrSize + 2
 
-    pdf.setFontSize(7)
+    pdf.setFontSize(6)
     pdf.text(quotationCode, centerX, yPos, { align: 'center' })
     yPos += 6
 
-    // ==================== INFORMACIÓN DE CONTACTO ====================
-    pdf.setFontSize(6)
+    // ==================== PIE DE PÁGINA ====================
     pdf.setFont('helvetica', 'normal')
-    if (companyPhone) {
-      pdf.text(`Contáctenos: ${companyPhone}`, centerX, yPos, { align: 'center' })
-      yPos += 3
-    }
-    if (companyEmail) {
-      pdf.text(companyEmail, centerX, yPos, { align: 'center' })
-      yPos += 3
-    }
+    pdf.setFontSize(5)
+    pdf.setTextColor(150, 150, 150)
+    pdf.text('Powered by 105POS', centerX, yPos, { align: 'center' })
 
     return pdf
 

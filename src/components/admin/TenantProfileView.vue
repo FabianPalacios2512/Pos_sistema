@@ -312,7 +312,7 @@
                 <th class="px-5 py-2.5 text-left text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Precio</th>
                 <th class="px-5 py-2.5 text-left text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Stock</th>
                 <th class="px-5 py-2.5 text-left text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Variantes</th>
-                <th class="px-5 py-2.5 text-left text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Categoría</th>
+                <th class="px-5 py-2.5 text-left text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Estado</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-50 dark:divide-zinc-800/50">
@@ -344,7 +344,9 @@
                   <span v-else class="text-xs text-gray-300 dark:text-zinc-600">—</span>
                 </td>
                 <td class="px-5 py-3">
-                  <span class="text-xs text-gray-400 dark:text-zinc-500">{{ product.category?.name || product.category_name || '—' }}</span>
+                  <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium" :class="product.active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400'">
+                    {{ product.active ? 'Activo' : 'Inactivo' }}
+                  </span>
                 </td>
               </tr>
               <!-- Variants expandable row -->
@@ -481,7 +483,7 @@
             <!-- Max Sedes inline -->
             <div class="flex items-center gap-3">
               <div class="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-950/50 flex items-center justify-center flex-shrink-0">
-                <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.15c0 .415.336.75.75.75z"/></svg>
+                <svg class="w-4 h-4 text-purple-600 dark:purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.15c0 .415.336.75.75.75z"/></svg>
               </div>
               <div class="flex-1 min-w-0">
                 <p class="text-xs font-semibold text-gray-900 dark:text-white">Máx. Sedes</p>
@@ -893,7 +895,7 @@ const formatCurrency = (n) => parseFloat(n || 0).toLocaleString()
 const loadUsers = async () => {
   loadingUsers.value = true
   try {
-    const res = await axios.get(`/admin/api/tenants/${props.tenant.id}/users`)
+    const res = await axios.get(`/api/admin/api/tenants/${props.tenant.id}/users`)
     if (res.data.success) users.value = res.data.data
   } catch { /* silently fail */ }
   loadingUsers.value = false
@@ -902,7 +904,7 @@ const loadUsers = async () => {
 const loadProducts = async () => {
   loadingProducts.value = true
   try {
-    const res = await axios.get(`/admin/api/tenants/${props.tenant.id}/products`)
+    const res = await axios.get(`/api/admin/api/tenants/${props.tenant.id}/products`)
     if (res.data.success) products.value = res.data.data
   } catch { /* silently fail */ }
   loadingProducts.value = false

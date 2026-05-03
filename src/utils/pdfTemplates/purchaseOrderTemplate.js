@@ -20,11 +20,7 @@ export const createPurchaseOrderTemplate = (orderData, systemSettings = {}) => {
       supplier_name = 'Sin proveedor',
       supplier_email = '',
       supplier_phone = '',
-      warehouse_name = '',
       items = [],
-      subtotal = 0,
-      tax = 0,
-      total = 0,
       notes = '',
       status = 'draft'
     } = orderData
@@ -51,15 +47,15 @@ export const createPurchaseOrderTemplate = (orderData, systemSettings = {}) => {
     // ==================== ENCABEZADO ====================
     // Nombre de la empresa
     pdf.setFont('helvetica', 'bold')
-    pdf.setFontSize(20)
-    pdf.setTextColor(17, 24, 39)
+    pdf.setFontSize(18)
+    pdf.setTextColor(0, 0, 0)
     pdf.text(companyName.toUpperCase(), leftMargin, yPos)
     yPos += 7
 
     // Información de la empresa
     pdf.setFont('helvetica', 'normal')
     pdf.setFontSize(9)
-    pdf.setTextColor(107, 114, 128)
+    pdf.setTextColor(85, 85, 85) // Gris oscuro
     
     if (companyDocument) {
       pdf.text(`NIT: ${companyDocument}`, leftMargin, yPos)
@@ -76,39 +72,37 @@ export const createPurchaseOrderTemplate = (orderData, systemSettings = {}) => {
 
     // TÍTULO Y NÚMERO DE ORDEN (lado derecho)
     pdf.setFont('helvetica', 'bold')
-    pdf.setFontSize(24)
-    pdf.setTextColor(30, 58, 138) // Blue-900
+    pdf.setFontSize(16)
+    pdf.setTextColor(0, 0, 0)
     pdf.text('ORDEN DE COMPRA', rightMargin, 20, { align: 'right' })
     
+    pdf.setFont('courier', 'bold')
     pdf.setFontSize(14)
-    pdf.setTextColor(17, 24, 39)
     pdf.text(order_number, rightMargin, 28, { align: 'right' })
 
-    // Estado de la orden
+    // Estado de la orden - Diseño simple con borde
     const statusText = status === 'draft' ? 'BORRADOR' : 
                       status === 'pending' ? 'PENDIENTE' : 
                       status === 'partial' ? 'PARCIAL' : 
                       status === 'received' ? 'RECIBIDA' : 
                       status === 'cancelled' ? 'CANCELADA' : status.toUpperCase()
     
-    const statusColor = status === 'draft' ? [156, 163, 175] : // Gray
-                       status === 'pending' ? [251, 191, 36] : // Amber
-                       status === 'partial' ? [59, 130, 246] : // Blue
-                       status === 'received' ? [34, 197, 94] : // Green
-                       status === 'cancelled' ? [239, 68, 68] : [107, 114, 128] // Red or gray
-
-    pdf.setFillColor(...statusColor)
-    pdf.roundedRect(rightMargin - 35, 30, 35, 7, 2, 2, 'F')
+    // Solo un contorno negro con texto para ser sobrio
+    pdf.setLineWidth(0.5)
+    pdf.setDrawColor(0, 0, 0)
+    pdf.setFillColor(255, 255, 255)
+    pdf.roundedRect(rightMargin - 35, 31, 35, 6, 1, 1, 'FD')
+    
     pdf.setFont('helvetica', 'bold')
     pdf.setFontSize(8)
-    pdf.setTextColor(255, 255, 255)
-    pdf.text(statusText, rightMargin - 17.5, 34.5, { align: 'center' })
+    pdf.setTextColor(0, 0, 0)
+    pdf.text(statusText, rightMargin - 17.5, 35, { align: 'center' })
 
     yPos = 50
 
     // ==================== INFORMACIÓN DE PROVEEDOR Y FECHAS ====================
-    // Línea divisoria
-    pdf.setDrawColor(229, 231, 235)
+    // Línea divisoria negra sutil
+    pdf.setDrawColor(200, 200, 200)
     pdf.setLineWidth(0.5)
     pdf.line(leftMargin, yPos, rightMargin, yPos)
     yPos += 8
@@ -116,13 +110,13 @@ export const createPurchaseOrderTemplate = (orderData, systemSettings = {}) => {
     // Información del proveedor (izquierda)
     pdf.setFont('helvetica', 'bold')
     pdf.setFontSize(10)
-    pdf.setTextColor(17, 24, 39)
+    pdf.setTextColor(0, 0, 0)
     pdf.text('PROVEEDOR:', leftMargin, yPos)
     yPos += 5
 
     pdf.setFont('helvetica', 'normal')
     pdf.setFontSize(9)
-    pdf.setTextColor(55, 65, 81)
+    pdf.setTextColor(51, 51, 51)
     pdf.text(supplier_name, leftMargin, yPos)
     yPos += 4
     
@@ -134,31 +128,31 @@ export const createPurchaseOrderTemplate = (orderData, systemSettings = {}) => {
       pdf.text(`Teléfono: ${supplier_phone}`, leftMargin, yPos)
     }
 
-    // Información de fechas y bodega (derecha)
+    // Información de fechas (derecha)
     let rightYPos = 63
     pdf.setFont('helvetica', 'bold')
     pdf.setFontSize(9)
-    pdf.setTextColor(107, 114, 128)
+    pdf.setTextColor(85, 85, 85)
     
     pdf.text('Fecha Orden:', rightMargin - 60, rightYPos, { align: 'left' })
     pdf.setFont('helvetica', 'normal')
+    pdf.setTextColor(0, 0, 0)
     pdf.text(formatDate(order_date), rightMargin, rightYPos, { align: 'right' })
     rightYPos += 5
 
     if (expected_date) {
       pdf.setFont('helvetica', 'bold')
+      pdf.setTextColor(85, 85, 85)
       pdf.text('Fecha Esperada:', rightMargin - 60, rightYPos, { align: 'left' })
       pdf.setFont('helvetica', 'normal')
+      pdf.setTextColor(0, 0, 0)
       pdf.text(formatDate(expected_date), rightMargin, rightYPos, { align: 'right' })
       rightYPos += 5
     }
 
-    // Bodega Destino removida - información interna del sistema
-
     yPos = Math.max(yPos, rightYPos) + 10
 
     // ==================== TABLA DE PRODUCTOS ====================
-    // Solo producto y cantidad - NO mostrar precios (información interna)
     const tableHeaders = [['PRODUCTO', 'CANTIDAD']]
     const tableData = items.map(item => [
       item.product_name || item.name || '',
@@ -171,7 +165,7 @@ export const createPurchaseOrderTemplate = (orderData, systemSettings = {}) => {
       body: tableData,
       theme: 'striped',
       headStyles: {
-        fillColor: [30, 58, 138], // Blue-900
+        fillColor: [17, 24, 39], // Gray-900
         textColor: [255, 255, 255],
         fontSize: 10,
         fontStyle: 'bold',
@@ -179,48 +173,44 @@ export const createPurchaseOrderTemplate = (orderData, systemSettings = {}) => {
       },
       bodyStyles: {
         fontSize: 10,
-        textColor: [55, 65, 81]
+        textColor: [51, 51, 51]
       },
       alternateRowStyles: {
-        fillColor: [249, 250, 251]
+        fillColor: [249, 250, 251] // Gray-50
       },
       columnStyles: {
-        0: { cellWidth: 130 }, // Producto (más ancho)
-        1: { cellWidth: 40, halign: 'center' } // Cantidad
+        0: { cellWidth: 130 },
+        1: { cellWidth: 40, halign: 'center', font: 'courier' }
       },
       margin: { left: leftMargin, right: leftMargin }
     })
 
     yPos = pdf.lastAutoTable.finalY + 10
 
-    // ==================== SIN TOTALES ====================
-    // Precios y totales removidos - son información interna del sistema
-    // El proveedor solo necesita ver qué productos y cantidades solicitar
-
     // ==================== NOTAS ====================
     if (notes) {
       pdf.setFont('helvetica', 'bold')
       pdf.setFontSize(9)
-      pdf.setTextColor(107, 114, 128)
-      pdf.text('NOTAS:', leftMargin, yPos)
+      pdf.setTextColor(85, 85, 85)
+      pdf.text('NOTAS / OBSERVACIONES:', leftMargin, yPos)
       yPos += 5
 
       pdf.setFont('helvetica', 'normal')
-      pdf.setTextColor(55, 65, 81)
+      pdf.setTextColor(0, 0, 0)
       const notesLines = pdf.splitTextToSize(notes, rightMargin - leftMargin)
       pdf.text(notesLines, leftMargin, yPos)
       yPos += notesLines.length * 4 + 10
     }
 
     // ==================== PIE DE PÁGINA ====================
-    const footerY = 280 // Posición fija en la parte inferior
+    const footerY = 280 
     
-    pdf.setDrawColor(229, 231, 235)
+    pdf.setDrawColor(200, 200, 200)
     pdf.line(leftMargin, footerY - 5, rightMargin, footerY - 5)
     
     pdf.setFont('helvetica', 'italic')
     pdf.setFontSize(8)
-    pdf.setTextColor(156, 163, 175)
+    pdf.setTextColor(120, 120, 120)
     pdf.text('Este es un documento generado automáticamente. No requiere firma para su validez.', pageWidth / 2, footerY, { align: 'center' })
     
     pdf.setFont('helvetica', 'normal')
@@ -244,16 +234,6 @@ function formatDate(date) {
     year: 'numeric', 
     month: '2-digit', 
     day: '2-digit' 
-  })
-}
-
-/**
- * Formatear número con separadores de miles
- */
-function formatNumber(num) {
-  return Number(num || 0).toLocaleString('es-ES', { 
-    minimumFractionDigits: 2, 
-    maximumFractionDigits: 2 
   })
 }
 

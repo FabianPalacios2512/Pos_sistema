@@ -229,8 +229,8 @@ class SuperAdminController extends Controller
                     'created_at' => $tenant->created_at->format('Y-m-d H:i:s'),
                     'subscription_start' => $subscriptionStart,
                     'subscription_end' => $subscriptionEnd,
-                    'owner_name' => $tenant->owner_name ?? null,
-                    'cedula' => $tenant->cedula ?? null,
+                    'owner_name' => $adminUser->name ?? $tenant->owner_name ?? null,
+                    'cedula' => $adminUser->cc ?? $tenant->cedula ?? null,
                     'admin_email' => $adminUser->email ?? null,
                     'admin_phone' => $adminUser->phone ?? null,
                     'max_users' => $tenant->max_users ?? null,
@@ -804,7 +804,7 @@ class SuperAdminController extends Controller
 
             $products = DB::connection('mysql')
                 ->table($tenantDbName . '.products')
-                ->select('id', 'name', 'price', 'stock', 'image_url', 'barcode', 'category_id', 'active', 'created_at')
+                ->select('id', 'name', 'sale_price as price', 'current_stock as stock', 'image_url', 'barcode', 'category_id', 'active', 'created_at')
                 ->orderBy('name', 'asc')
                 ->get();
 
@@ -863,8 +863,8 @@ class SuperAdminController extends Controller
 
             $updateData = [];
             if ($request->has('name')) $updateData['name'] = $request->input('name');
-            if ($request->has('price')) $updateData['price'] = $request->input('price');
-            if ($request->has('stock')) $updateData['stock'] = $request->input('stock');
+            if ($request->has('price')) $updateData['sale_price'] = $request->input('price');
+            if ($request->has('stock')) $updateData['current_stock'] = $request->input('stock');
             if ($request->has('active')) $updateData['active'] = $request->input('active');
 
             if (empty($updateData)) {
