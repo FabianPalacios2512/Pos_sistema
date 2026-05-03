@@ -25,6 +25,7 @@ class TenantRegisterController extends Controller
             'company_name' => 'required|string|max:255',
             'owner_name' => 'required|string|max:255',
             'cedula' => 'required|string|max:20',
+            'phone' => 'nullable|string|max:20',
             'subdomain' => [
                 'required',
                 'string',
@@ -176,6 +177,10 @@ class TenantRegisterController extends Controller
                     'trial_days' => $plan === 'free_trial' ? 7 : null,
                     'payment_status' => $plan === 'pending' ? 'pending_selection' : ($plan === 'free_trial' ? 'trial' : 'paid'),
                     'plan_pending' => $plan === 'pending',
+                    'owner_name' => $request->owner_name ?: $request->google_name ?: $request->email,
+                    'cedula' => $request->cedula,
+                    'admin_email' => $request->email,
+                    'admin_phone' => $request->phone ?? null,
                 ]),
             ]);
 
@@ -244,6 +249,7 @@ class TenantRegisterController extends Controller
                             'name' => $ownerName,
                             'email' => $request->email,
                             'cc' => $request->cedula,
+                            'phone' => $request->phone,
                         ];
 
                         // 🆕 Si viene de Google OAuth, usar password aleatorio y guardar google_id

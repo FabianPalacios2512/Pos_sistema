@@ -56,7 +56,12 @@ class CreateTenantStorageLink implements ShouldQueue
         $tenantId = $this->tenant->getTenantKey();
         
         try {
-            $tenantStoragePath = storage_path("tenant{$tenantId}/app/public");
+            // IMPORTANTE: usar base_path() en lugar de storage_path().
+            // Este job corre dentro del contexto del tenant (tenancy ya inicializado),
+            // por lo que storage_path() devuelve storage/tenant{id}/ con el prefijo
+            // del tenant. Usar storage_path("tenant{id}/...") causaría la ruta doble:
+            // storage/tenant{id}/tenant{id}/... — incorrecto.
+            $tenantStoragePath = base_path("storage/tenant{$tenantId}/app/public");
             
             if (!is_dir($tenantStoragePath)) {
                 File::makeDirectory($tenantStoragePath, 0755, true);
@@ -70,7 +75,8 @@ class CreateTenantStorageLink implements ShouldQueue
                 }
             }
             
-            $storageTenantsDir = storage_path('app/public/tenants');
+            // Igual: usar base_path() para el directorio de tenants en storage/
+            $storageTenantsDir = base_path('storage/app/public/tenants');
             if (!is_dir($storageTenantsDir)) {
                 File::makeDirectory($storageTenantsDir, 0755, true);
             }

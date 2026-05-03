@@ -424,7 +424,7 @@ const hourlyChartData = computed(() => {
 const fetchData = async () => {
   loading.value = true
   try {
-    const res = await axios.get(`/api/admin/ai-monitoring/dashboard?period=${period.value}`)
+    const res = await axios.get(`/admin/api/ai-monitoring/dashboard?period=${period.value}`)
     if (res.data?.success) {
       data.value = res.data
     }

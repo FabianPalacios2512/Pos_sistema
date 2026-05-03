@@ -1331,7 +1331,7 @@ const fetchAIMonitoring = async () => {
   loading.value = true
   try {
     // Super admin usa /api/admin/ prefix
-    const endpoint = `/api/admin/ai-monitoring/dashboard?period=${aiPeriod.value}`
+    const endpoint = `/api/admin/api/ai-monitoring/dashboard?period=${aiPeriod.value}`
     
     const res = await axios.get(endpoint)
     if (res.data) {

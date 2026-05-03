@@ -193,8 +193,16 @@ class SuperAdminController extends Controller
             // Obtener estadísticas del tenant ejecutando consultas en su base de datos
             $stats = [];
             $adminUser = null;
+            $dbName = $tenant->tenancy_db_name ?? 'tenant' . $tenant->id;
+            
             try {
-                $tenant->run(function() use (&$stats, &$adminUser) {
+                // Fetch owner details directly from the tenant's user table
+                $adminUser = DB::connection('mysql')->table($dbName . '.users')
+                    ->where('id', 1) // Typically ID 1 is the main admin from Seeder
+                    ->select('name as owner_name', 'email as admin_email', 'phone as admin_phone', 'cc as cedula')
+                    ->first();
+                
+                $tenant->run(function() use (&$stats) {
                     $stats = [
                         'total_users' => DB::table('users')->count(),
                         'total_products' => DB::table('products')->count(),
@@ -202,8 +210,6 @@ class SuperAdminController extends Controller
                         'total_customers' => DB::table('customers')->count(),
                         'total_revenue' => DB::table('sales')->sum('total') ?? 0
                     ];
-                    // Obtener el usuario admin (primer usuario creado)
-                    $adminUser = DB::table('users')->orderBy('id')->first();
                 });
             } catch (\Exception $e) {
                 $stats = ['error' => 'No se pudo conectar a la base de datos del tenant'];
@@ -229,10 +235,10 @@ class SuperAdminController extends Controller
                     'created_at' => $tenant->created_at->format('Y-m-d H:i:s'),
                     'subscription_start' => $subscriptionStart,
                     'subscription_end' => $subscriptionEnd,
-                    'owner_name' => $adminUser->name ?? $tenant->owner_name ?? null,
-                    'cedula' => $adminUser->cc ?? $tenant->cedula ?? null,
-                    'admin_email' => $adminUser->email ?? null,
-                    'admin_phone' => $adminUser->phone ?? null,
+                    'owner_name' => $adminUser->owner_name ?? $tenant->owner_name ?? null,
+                    'cedula' => $adminUser->cedula ?? $tenant->cedula ?? null,
+                    'admin_email' => $adminUser->admin_email ?? $tenant->admin_email ?? null,
+                    'admin_phone' => $adminUser->admin_phone ?? $tenant->admin_phone ?? null,
                     'max_users' => $tenant->max_users ?? null,
                     'max_warehouses' => $tenant->max_warehouses ?? null,
                     'stats' => $stats
@@ -770,6 +776,14 @@ class SuperAdminController extends Controller
             $tenant = Tenant::findOrFail($id);
             $tenantDbName = 'tenant' . $tenant->id;
 
+            $dbExists = DB::connection('mysql')->select(
+                "SELECT COUNT(*) as cnt FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = ?",
+                [$tenantDbName]
+            );
+            if (($dbExists[0]->cnt ?? 0) == 0) {
+                return response()->json(['success' => true, 'data' => [], 'warning' => 'Tenant database does not exist yet']);
+            }
+
             $users = DB::connection('mysql')
                 ->table($tenantDbName . '.users')
                 ->leftJoin($tenantDbName . '.roles', $tenantDbName . '.users.role_id', '=', $tenantDbName . '.roles.id')
@@ -801,6 +815,14 @@ class SuperAdminController extends Controller
         try {
             $tenant = Tenant::findOrFail($id);
             $tenantDbName = 'tenant' . $tenant->id;
+
+            $dbExists = DB::connection('mysql')->select(
+                "SELECT COUNT(*) as cnt FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = ?",
+                [$tenantDbName]
+            );
+            if (($dbExists[0]->cnt ?? 0) == 0) {
+                return response()->json(['success' => true, 'data' => [], 'warning' => 'Tenant database does not exist yet']);
+            }
 
             $products = DB::connection('mysql')
                 ->table($tenantDbName . '.products')

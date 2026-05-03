@@ -3601,6 +3601,14 @@ const getProductImage = (product) => {
   return generateAvatarSVG(product.name || 'Producto')
 }
 
+// Manejar error de carga de imagen: ocultar <img> y mostrar placeholder
+const handleImageError = (e, product) => {
+  const img = e?.target
+  if (img) {
+    img.style.display = 'none'
+  }
+}
+
 // Validar si una imagen es REAL (no placeholder SVG)
 const isRealProductImage = (imageUrl) => {
   if (!imageUrl || typeof imageUrl !== 'string') return false

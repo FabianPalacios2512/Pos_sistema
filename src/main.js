@@ -29,6 +29,10 @@ const updateSW = registerSW({
 import { setupOfflineInterceptor } from './utils/offlineInterceptor.js'
 setupOfflineInterceptor()
 
+// Capturar errores del navegador (imágenes rotas, etc.) y reportarlos al log del tenant
+import { initClientErrorReporter } from './services/clientErrorReporter.js'
+initClientErrorReporter()
+
 // Inicializar validador de tiempo offline
 import offlineTimeValidator from './utils/offlineTimeValidator.js'
 // El validador se inicializa automáticamente al importarse

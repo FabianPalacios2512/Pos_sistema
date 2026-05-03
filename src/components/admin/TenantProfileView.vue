@@ -316,56 +316,58 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-50 dark:divide-zinc-800/50">
-              <tr v-for="product in paginatedProducts" :key="product.id" class="hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition-colors">
-                <td class="px-5 py-3">
-                  <div class="flex items-center gap-3">
-                    <div v-if="product.image_url" class="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-zinc-800">
-                      <img :src="product.image_url" :alt="product.name" class="w-full h-full object-cover">
+              <template v-for="product in paginatedProducts" :key="product.id">
+                <tr class="hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition-colors">
+                  <td class="px-5 py-3">
+                    <div class="flex items-center gap-3">
+                      <div v-if="product.image_url" class="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-zinc-800">
+                        <img :src="product.image_url" :alt="product.name" class="w-full h-full object-cover">
+                      </div>
+                      <div v-else class="w-9 h-9 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-4 h-4 text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                      </div>
+                      <span class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ product.name }}</span>
                     </div>
-                    <div v-else class="w-9 h-9 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center flex-shrink-0">
-                      <svg class="w-4 h-4 text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                  </td>
+                  <td class="px-5 py-3">
+                    <span class="text-sm font-semibold text-emerald-600 dark:text-emerald-400">${{ parseFloat(product.price || 0).toLocaleString() }}</span>
+                  </td>
+                  <td class="px-5 py-3">
+                    <span class="text-sm" :class="(product.stock || 0) <= 5 ? 'text-rose-600 dark:text-rose-400 font-semibold' : 'text-gray-600 dark:text-zinc-400'">{{ product.stock || 0 }}</span>
+                  </td>
+                  <td class="px-5 py-3">
+                    <div v-if="product.variants && product.variants.length > 0">
+                      <button @click="toggleVariants(product.id)" class="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
+                        <svg class="w-3.5 h-3.5 transition-transform" :class="expandedVariants[product.id] ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        {{ product.variants.length }} variante{{ product.variants.length > 1 ? 's' : '' }}
+                      </button>
                     </div>
-                    <span class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ product.name }}</span>
-                  </div>
-                </td>
-                <td class="px-5 py-3">
-                  <span class="text-sm font-semibold text-emerald-600 dark:text-emerald-400">${{ parseFloat(product.price || 0).toLocaleString() }}</span>
-                </td>
-                <td class="px-5 py-3">
-                  <span class="text-sm" :class="(product.stock || 0) <= 5 ? 'text-rose-600 dark:text-rose-400 font-semibold' : 'text-gray-600 dark:text-zinc-400'">{{ product.stock || 0 }}</span>
-                </td>
-                <td class="px-5 py-3">
-                  <div v-if="product.variants && product.variants.length > 0">
-                    <button @click="toggleVariants(product.id)" class="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
-                      <svg class="w-3.5 h-3.5 transition-transform" :class="expandedVariants[product.id] ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                      {{ product.variants.length }} variante{{ product.variants.length > 1 ? 's' : '' }}
-                    </button>
-                  </div>
-                  <span v-else class="text-xs text-gray-300 dark:text-zinc-600">—</span>
-                </td>
-                <td class="px-5 py-3">
-                  <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium" :class="product.active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400'">
-                    {{ product.active ? 'Activo' : 'Inactivo' }}
-                  </span>
-                </td>
-              </tr>
-              <!-- Variants expandable row -->
-              <tr v-if="product.variants && product.variants.length > 0 && expandedVariants[product.id]" :key="'v-' + product.id" class="bg-gray-50/50 dark:bg-zinc-800/20">
-                <td :colspan="5" class="px-5 py-2">
-                  <div class="ml-12 space-y-1">
-                    <div v-for="variant in product.variants" :key="variant.id" class="flex items-center gap-4 py-1.5 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800/50 transition-colors">
-                      <span class="text-xs font-medium text-gray-700 dark:text-zinc-300 min-w-[120px]">{{ variant.name || variant.sku || 'Variante' }}</span>
-                      <span v-if="variant.color" class="inline-flex items-center gap-1 text-[10px] text-gray-500 dark:text-zinc-400">
-                        <span class="w-3 h-3 rounded-full border border-gray-200 dark:border-zinc-600" :style="{ backgroundColor: variant.color }"></span>
-                        {{ variant.color_name || variant.color }}
-                      </span>
-                      <span v-if="variant.size" class="px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-700 text-[10px] font-medium text-gray-600 dark:text-zinc-400 rounded">{{ variant.size }}</span>
-                      <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">${{ parseFloat(variant.price || product.price || 0).toLocaleString() }}</span>
-                      <span class="text-xs" :class="(variant.stock || 0) <= 5 ? 'text-rose-600 dark:text-rose-400 font-semibold' : 'text-gray-500 dark:text-zinc-400'">Stock: {{ variant.stock ?? 0 }}</span>
+                    <span v-else class="text-xs text-gray-300 dark:text-zinc-600">—</span>
+                  </td>
+                  <td class="px-5 py-3">
+                    <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium" :class="product.active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400'">
+                      {{ product.active ? 'Activo' : 'Inactivo' }}
+                    </span>
+                  </td>
+                </tr>
+                <!-- Variants expandable row -->
+                <tr v-if="product.variants && product.variants.length > 0 && expandedVariants[product.id]" :key="'v-' + product.id" class="bg-gray-50/50 dark:bg-zinc-800/20">
+                  <td :colspan="5" class="px-5 py-2">
+                    <div class="ml-12 space-y-1">
+                      <div v-for="variant in product.variants" :key="variant.id" class="flex items-center gap-4 py-1.5 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800/50 transition-colors">
+                        <span class="text-xs font-medium text-gray-700 dark:text-zinc-300 min-w-[120px]">{{ variant.name || variant.sku || 'Variante' }}</span>
+                        <span v-if="variant.color" class="inline-flex items-center gap-1 text-[10px] text-gray-500 dark:text-zinc-400">
+                          <span class="w-3 h-3 rounded-full border border-gray-200 dark:border-zinc-600" :style="{ backgroundColor: variant.color }"></span>
+                          {{ variant.color_name || variant.color }}
+                        </span>
+                        <span v-if="variant.size" class="px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-700 text-[10px] font-medium text-gray-600 dark:text-zinc-400 rounded">{{ variant.size }}</span>
+                        <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">${{ parseFloat(variant.price || product.price || 0).toLocaleString() }}</span>
+                        <span class="text-xs" :class="(variant.stock || 0) <= 5 ? 'text-rose-600 dark:text-rose-400 font-semibold' : 'text-gray-500 dark:text-zinc-400'">Stock: {{ variant.stock ?? 0 }}</span>
+                      </div>
                     </div>
-                  </div>
-                </td>
-              </tr>
+                  </td>
+                </tr>
+              </template>
             </tbody>
           </table>
           <div v-if="totalProductPages > 1" class="px-5 py-3 border-t border-gray-100 dark:border-zinc-800 flex items-center justify-between">

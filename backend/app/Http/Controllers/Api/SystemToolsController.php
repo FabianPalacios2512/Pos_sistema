@@ -45,10 +45,11 @@ class SystemToolsController extends Controller
             $memoryPeak = round(memory_get_peak_usage(true) / 1024 / 1024, 2);
 
             // ==================== Disk ====================
-            $diskFree = disk_free_space('/');
-            $diskTotal = disk_total_space('/');
+            $diskPath = PHP_OS_FAMILY === 'Windows' ? 'C:\\' : '/';
+            $diskFree = @disk_free_space($diskPath) ?: 0;
+            $diskTotal = @disk_total_space($diskPath) ?: 0;
             $diskUsed = $diskTotal - $diskFree;
-            $diskPercent = round(($diskUsed / $diskTotal) * 100, 1);
+            $diskPercent = $diskTotal > 0 ? round(($diskUsed / $diskTotal) * 100, 1) : 0;
 
             // ==================== Database check ====================
             $dbStatus = 'connected';
@@ -359,6 +360,10 @@ class SystemToolsController extends Controller
 
     private function getLoadAverage(): array
     {
+        // sys_getloadavg() only exists on Unix-like systems, not Windows
+        if (!function_exists('sys_getloadavg')) {
+            return ['1min' => 0, '5min' => 0, '15min' => 0];
+        }
         $load = sys_getloadavg();
         return [
             '1min' => round($load[0] ?? 0, 2),

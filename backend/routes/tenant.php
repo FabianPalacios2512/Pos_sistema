@@ -53,6 +53,28 @@ Route::middleware([
 
         return $response;
     })->where('path', '.*');
+
+    // Ruta de fallback para URLs con formato /storage/tenants/{id}/...
+    // Sirve los archivos directamente (sin depender de symlinks) para mayor resiliencia.
+    // Esta ruta solo es alcanzada cuando el symlink no existe o está roto.
+    Route::get('/storage/tenants/{tenantId}/{path}', function ($tenantId, $path) {
+        // Validar que el tenantId corresponde al tenant activo (seguridad)
+        if ((string) $tenantId !== (string) tenant('id')) {
+            abort(403);
+        }
+
+        $filePath = base_path("storage/tenant{$tenantId}/app/public/{$path}");
+
+        if (!file_exists($filePath)) {
+            abort(404);
+        }
+
+        $file = \Illuminate\Support\Facades\File::get($filePath);
+        $type = \Illuminate\Support\Facades\File::mimeType($filePath);
+
+        return \Illuminate\Support\Facades\Response::make($file, 200)
+            ->header('Content-Type', $type);
+    })->where(['tenantId' => '[^/]+', 'path' => '.*']);
 });
 
 // Rutas públicas del catálogo (sin autenticación)

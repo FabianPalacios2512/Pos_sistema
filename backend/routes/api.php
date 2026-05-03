@@ -204,6 +204,78 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/upgrade-plan', [PlanUpgradeController::class, 'upgrade']);
 });
 
+// ==================== REPORTE DE ERRORES DEL CLIENTE (FRONTEND) ====================
+// Fuera de auth:sanctum porque en contexto de subdominio de tenant, Sanctum no puede
+// validar el token del tenant (la DB cambia según el dominio, causando 401).
+// En su lugar validamos el token manualmente contra la DB del tenant.
+Route::middleware(\App\Http\Middleware\PreventTenancyInit::class)
+    ->post('/errors/report', function (\Illuminate\Http\Request $request) {
+        try {
+            $bearerToken = $request->bearerToken();
+            if (!$bearerToken) {
+                return response()->json(['success' => false], 422);
+            }
+
+            // Determinar tenant desde el Host header (ej: las-marcas.localhost -> las_marcas)
+            $host = $request->getHost();
+            $parts = explode('.', $host);
+            if (count($parts) < 2) {
+                return response()->json(['success' => false], 422);
+            }
+            $tenantId = str_replace('-', '_', $parts[0]);
+
+            // Verificar que el tenant existe en la DB central
+            $tenantExists = \DB::connection('mysql')->table('tenants')->where('id', $tenantId)->exists();
+            if (!$tenantExists) {
+                return response()->json(['success' => false], 422);
+            }
+
+            // Validar el token manualmente contra la DB del tenant.
+            // Sanctum guarda el token como: sha256(rawToken) donde el bearer token
+            // tiene formato "{id}|{rawToken}" — hay que hashear solo la parte del rawToken.
+            $tokenParts = explode('|', $bearerToken, 2);
+            $rawToken   = count($tokenParts) === 2 ? $tokenParts[1] : $bearerToken;
+            $tokenId    = count($tokenParts) === 2 ? (int) $tokenParts[0] : null;
+            $tokenHash  = hash('sha256', $rawToken);
+            $tenantDbName = 'tenant' . $tenantId;
+            $tokenQuery = \DB::connection('mysql')
+                ->table($tenantDbName . '.personal_access_tokens')
+                ->where('token', $tokenHash);
+            if ($tokenId) {
+                $tokenQuery->where('id', $tokenId);
+            }
+            $tokenRecord = $tokenQuery->first();
+
+            if (!$tokenRecord) {
+                return response()->json(['success' => false], 401);
+            }
+
+            $request->validate([
+                'type'     => 'required|string|max:100',
+                'message'  => 'required|string|max:2000',
+                'severity' => 'nullable|string|in:warning,error,critical',
+                'url'      => 'nullable|string|max:500',
+                'context'  => 'nullable|array',
+            ]);
+
+            \App\Services\TenantErrorLoggerService::logEvent(
+                $tenantId,
+                $request->input('severity', 'warning'),
+                $request->input('type'),
+                $request->input('message'),
+                array_filter([
+                    'url'        => $request->input('url'),
+                    'user_agent' => $request->userAgent(),
+                    'extra'      => $request->input('context'),
+                ])
+            );
+
+            return response()->json(['success' => true]);
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false], 500);
+        }
+    });
+
 // Historial de pagos (PUBLIC - validación por tenant_id)
 Route::get('/payment-history/{tenantId}', [PaymentHistoryController::class, 'getPaymentHistory']);
 

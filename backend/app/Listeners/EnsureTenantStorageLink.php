@@ -24,14 +24,21 @@ class EnsureTenantStorageLink
                 return;
             }
 
-            $symlinkPath = public_path("storage/tenants/{$tenantId}");
-
-            // Fast path: symlink already exists and works
-            if (is_link($symlinkPath) && is_dir($symlinkPath)) {
-                return;
-            }
-
+            $symlinkPath      = public_path("storage/tenants/{$tenantId}");
             $tenantStoragePath = base_path("storage/tenant{$tenantId}/app/public");
+
+            // Fast path: symlink exists, is a directory, AND points to the correct target.
+            // We must also verify the target because CreateTenantStorageLink had a bug that
+            // created symlinks pointing to storage/tenant{id}/tenant{id}/app/public (double
+            // prefix). If the target is wrong we fall through and re-create it.
+            if (is_link($symlinkPath) && is_dir($symlinkPath)) {
+                $currentTarget = @readlink($symlinkPath);
+                if ($currentTarget === $tenantStoragePath) {
+                    return;
+                }
+                // Wrong target — remove so we can re-create below
+                @unlink($symlinkPath);
+            }
 
             // Ensure tenant storage directory exists
             if (!is_dir($tenantStoragePath)) {
