@@ -8,10 +8,10 @@
       :style="tickerBarStyle"
     >
       <div class="relative w-full h-full flex items-center justify-center">
-        <TransitionGroup name="ticker-train" tag="div" class="relative w-full h-full">
+        <TransitionGroup :name="tickerTransitionName" tag="div" class="relative w-full h-full">
           <span 
             :key="currentAnnouncement"
-            class="absolute inset-0 flex items-center justify-center gap-2 text-[10px] font-medium tracking-[0.08em] whitespace-nowrap px-4"
+            class="absolute inset-0 flex items-center justify-center gap-2 text-[11px] font-medium tracking-[0.08em] whitespace-nowrap px-4"
             :style="{ color: tickerTextColor }"
           >
             <span class="w-1.5 h-1.5 rounded-full flex-shrink-0" :style="{ backgroundColor: aiPalette.primary }"></span>
@@ -21,8 +21,81 @@
       </div>
     </div>
 
-    <!-- HEADER PREMIUM: Retail Fashion Store Style (KHARIS-inspired) -->
-    <header 
+    <!-- HEADER MODULAR: Switch entre los 5 estilos según headerConfig -->
+
+    <!-- editorial-center: Alta moda, logo centrado serif -->
+    <HeaderEditorialCenter
+      v-if="headerConfig.style === 'editorial-center'"
+      :storeName="storeName"
+      :logoUrl="storeConfig.logo_url"
+      :cartCount="cartCount"
+      v-model="searchQuery"
+      :palette="aiPalette"
+      :fonts="aiFonts"
+      class="fixed top-8 left-0 right-0 z-50"
+      @menu="showMobileMenu = true"
+      @cart="router.push('/catalog/bolsa')"
+    />
+
+    <!-- retail-left: Consumo masivo, logo izquierda -->
+    <HeaderRetailLeft
+      v-else-if="headerConfig.style === 'retail-left'"
+      :storeName="storeName"
+      :logoUrl="storeConfig.logo_url"
+      :cartCount="cartCount"
+      v-model="searchQuery"
+      :palette="aiPalette"
+      :fonts="aiFonts"
+      class="fixed top-8 left-0 right-0 z-50"
+      @menu="showMobileMenu = true"
+      @cart="router.push('/catalog/bolsa')"
+    />
+
+    <!-- transparent-glass: ★ Pairing perfecto con portrait o editorial -->
+    <!-- El header maneja su propio top-8 internamente -->
+    <HeaderTransparentGlass
+      v-else-if="headerConfig.style === 'transparent-glass'"
+      :storeName="storeName"
+      :logoUrl="storeConfig.logo_url"
+      :cartCount="cartCount"
+      v-model="searchQuery"
+      :palette="aiPalette"
+      :fonts="aiFonts"
+      @menu="showMobileMenu = true"
+      @cart="router.push('/catalog/bolsa')"
+    />
+
+    <!-- floating-pill: Streetwear/tech, píldora flotante -->
+    <!-- El header maneja su propio top-8 internamente -->
+    <HeaderFloatingPill
+      v-else-if="headerConfig.style === 'floating-pill'"
+      :storeName="storeName"
+      :logoUrl="storeConfig.logo_url"
+      :cartCount="cartCount"
+      v-model="searchQuery"
+      :palette="aiPalette"
+      :fonts="aiFonts"
+      @menu="showMobileMenu = true"
+      @cart="router.push('/catalog/bolsa')"
+    />
+
+    <!-- utility-search: Ferretería/catálogo grande, barra búsqueda 2 filas -->
+    <HeaderUtilitySearch
+      v-else-if="headerConfig.style === 'utility-search'"
+      :storeName="storeName"
+      :logoUrl="storeConfig.logo_url"
+      :cartCount="cartCount"
+      v-model="searchQuery"
+      :palette="aiPalette"
+      :fonts="aiFonts"
+      class="fixed top-8 left-0 right-0 z-50"
+      @menu="showMobileMenu = true"
+      @cart="router.push('/catalog/bolsa')"
+    />
+
+    <!-- DEFAULT (null): Header original del sistema — Retail Fashion / Kharis-inspired -->
+    <header
+      v-else
       ref="stickyHeader"
       class="fixed top-8 left-0 right-0 z-50 transition-all duration-300"
       :style="{ backgroundColor: aiPalette.background || '#ffffff' }"
@@ -128,100 +201,100 @@
       </Transition>
     </header>
 
-    <!-- HERO BANNER: Full-Impact Fashion -->
-    <section 
-      class="relative w-full overflow-hidden mt-[92px] lg:mt-[152px]" 
-      :class="heroSectionHeightClass"
-    >
-      <!-- Carousel with Ken Burns zoom -->
-      <div class="absolute inset-0">
-        <TransitionGroup name="fade-slide">
-          <div 
-            v-for="(image, index) in carouselImages" 
-            :key="index"
-            v-show="currentSlide === index"
-            class="absolute inset-0"
-          >
-            <img 
-              :src="image"
-              alt="Banner"
-              class="w-full h-full object-cover will-change-transform transition-transform duration-[12000ms] ease-out"
-              :class="currentSlide === index ? 'scale-110' : 'scale-100'"
-            />
-            <div class="absolute inset-0" :class="heroOverlayClass"></div>
-          </div>
-        </TransitionGroup>
-      </div>
+    <!-- HERO BANNER: Componente modular según hero_style del layout AI -->
+    <div :class="heroTopMargin">
+      <!-- EDITORIAL: Alta moda, full-bleed fotografía, tipografía serif -->
+      <HeroEditorial
+        v-if="layoutConfig.hero_style === 'editorial' || layoutConfig.hero_style === 'full-bleed'"
+        :headline="heroHeadlineDisplay"
+        :subheadline="heroSubheadlineDisplay"
+        :backgroundImage="carouselImages[0]"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        :ctaText="bannerCtaText"
+        :isMobilePreview="isMobilePreview"
+        :mood="layoutConfig.editorial_mood"
+        :textPosition="layoutConfig.hero_text_position"
+        @cta="scrollToProducts"
+      />
 
-      <!-- Hero Content -->
-      <div class="absolute inset-0 z-10 px-5 md:px-10 pb-10 md:pb-16" :class="heroContentPositionClass">
-        <p class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[9px] uppercase tracking-[0.14em] mb-3" :style="heroBadgeStyle">
-          Curado por IA
-        </p>
-        <h2 
-          class="text-white text-[35px] md:text-5xl lg:text-6xl mb-2 leading-[1.05] max-w-[14ch] md:max-w-[16ch]"
-          :style="{ fontFamily: aiFonts.heading + ', serif', fontWeight: 500, textShadow: '0 3px 22px rgba(0,0,0,0.36)' }"
-        >
-          {{ heroHeadlineDisplay }}
-        </h2>
-        <p 
-          class="text-white/90 text-[10px] md:text-sm font-medium tracking-[0.15em] uppercase mb-5 max-w-[320px]"
-          :style="{ fontFamily: aiFonts.body + ', sans-serif' }"
-        >
-          {{ heroSubheadlineDisplay }}
-        </p>
-        <!-- CTA: double-solid (Kharis-style) -->
-        <div v-if="layoutConfig.hero_cta_style === 'double-solid'" class="flex gap-2.5 md:gap-3">
-          <button
-            @click="scrollToProducts"
-            class="px-5 md:px-6 py-3 md:py-3.5 bg-white text-gray-900 text-[11px] md:text-xs font-bold uppercase tracking-[0.16em] rounded-lg transition-all duration-300 hover:bg-gray-100"
-            :style="{ fontFamily: aiFonts.body + ', sans-serif' }"
-          >
-            {{ bannerCtaText || 'VER CATÁLOGO' }}
-          </button>
-          <button
-            v-if="bannerCtaSecondary"
-            @click="scrollToProducts"
-            class="px-5 md:px-6 py-3 md:py-3.5 border border-white text-white text-[11px] md:text-xs font-bold uppercase tracking-[0.16em] rounded-lg transition-all duration-300 hover:bg-white/10"
-            :style="{ fontFamily: aiFonts.body + ', sans-serif' }"
-          >
-            {{ bannerCtaSecondary }}
-          </button>
-        </div>
-        <!-- CTA: bold-filled -->
-        <button
-          v-else-if="layoutConfig.hero_cta_style === 'bold-filled'"
-          @click="scrollToProducts"
-          class="px-9 py-3 md:py-4 text-white text-[11px] md:text-xs font-bold uppercase tracking-[0.2em] rounded-lg transition-all duration-300 hover:opacity-90"
-          :style="{ fontFamily: aiFonts.body + ', sans-serif', backgroundColor: aiPalette.primary }"
-        >
-          {{ bannerCtaText || 'COMPRAR AHORA' }}
-        </button>
-        <!-- CTA: single-outline (default) -->
-        <button
-          v-else
-          @click="scrollToProducts"
-          class="group px-9 py-3 md:py-3.5 border border-white/75 hover:bg-white hover:text-gray-900 text-white text-[11px] md:text-xs font-semibold uppercase tracking-[0.22em] rounded-lg transition-all duration-500 hover:tracking-[0.28em]"
-          :style="{ fontFamily: aiFonts.body + ', sans-serif' }"
-        >
-          {{ bannerCtaText || 'EXPLORAR COLECCIÓN' }}
-        </button>
-      </div>
+      <!-- SPLIT: Minimalismo, 50/50 color + foto -->
+      <HeroSplit
+        v-else-if="layoutConfig.hero_style === 'split-portrait' || layoutConfig.hero_style === 'split'"
+        :headline="heroHeadlineDisplay"
+        :subheadline="heroSubheadlineDisplay"
+        :backgroundImage="carouselImages[0]"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        :ctaText="bannerCtaText"
+        :isMobilePreview="isMobilePreview"
+        :mood="layoutConfig.editorial_mood"
+        @cta="scrollToProducts"
+      />
 
-      <!-- Slide Indicators -->
-      <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-        <button 
-          v-for="(img, index) in carouselImages.length || 3" 
-          :key="index"
-          @click="currentSlide = index"
-          class="h-[2px] rounded-full transition-all duration-500"
-          :class="currentSlide === index ? 'bg-white w-8' : 'bg-white/40 w-4'"
-        ></button>
-      </div>
-    </section>
+      <!-- STREETWEAR: Urbano, asimétrico, texto sobre imagen -->
+      <HeroStreetwear
+        v-else-if="layoutConfig.hero_style === 'streetwear' || layoutConfig.hero_style === 'urban'"
+        :headline="heroHeadlineDisplay"
+        :subheadline="heroSubheadlineDisplay"
+        :backgroundImage="carouselImages[0]"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        :ctaText="bannerCtaText"
+        :isMobilePreview="isMobilePreview"
+        @cta="scrollToProducts"
+      />
+
+      <!-- FOCUS: Conversión directa, copy + producto destacado -->
+      <HeroFocus
+        v-else-if="layoutConfig.hero_style === 'centered-minimal' || layoutConfig.hero_style === 'focus'"
+        :headline="heroHeadlineDisplay"
+        :subheadline="heroSubheadlineDisplay"
+        :backgroundImage="carouselImages[0]"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        :ctaText="bannerCtaText"
+        :badge="bannerCtaText ? 'Novedad' : 'Nueva Colección'"
+        :productCount="catalogProducts.length"
+        :isMobilePreview="isMobilePreview"
+        @cta="scrollToProducts"
+      />
+
+      <!-- PORTRAIT: Retrato full-bleed, tipografía mixta sans+serif, doble CTA rectangular + trust strip -->
+      <HeroPortrait
+        v-else-if="layoutConfig.hero_style === 'portrait'"
+        :headline="heroHeadlineDisplay"
+        :subheadline="heroSubheadlineDisplay"
+        :backgroundImage="carouselImages[0]"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        :ctaText="bannerCtaText"
+        :ctaSecondary="bannerCtaSecondary"
+        :trustMessages="storeConfig.ai_value_messages || []"
+        :isMobilePreview="isMobilePreview"
+        @cta="scrollToProducts"
+        @ctaSecondary="scrollToProducts"
+      />
+
+      <!-- FALLBACK: Editorial por defecto si hero_style no reconocido -->
+      <HeroEditorial
+        v-else
+        :headline="heroHeadlineDisplay"
+        :subheadline="heroSubheadlineDisplay"
+        :backgroundImage="carouselImages[0]"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        :ctaText="bannerCtaText"
+        :isMobilePreview="isMobilePreview"
+        :mood="layoutConfig.editorial_mood"
+        :textPosition="layoutConfig.hero_text_position"
+        @cta="scrollToProducts"
+      />
+    </div>
 
     <!-- HERO PRODUCT SPOTLIGHT: Productos visibles desde el primer scroll -->
-    <section v-if="heroProducts.length > 0" class="relative z-20 -mt-6 sm:-mt-10 md:-mt-14 lg:ml-64 px-3 lg:px-8">
+    <!-- Oculto en portrait: la trust strip integrada reemplaza este bloque -->
+    <section v-if="heroProducts.length > 0 && layoutConfig.hero_style !== 'portrait'" class="relative z-20 -mt-6 sm:-mt-10 md:-mt-14 lg:ml-64 px-3 lg:px-8">
       <div class="grid grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
         <article
           v-for="product in heroProducts"
@@ -250,8 +323,8 @@
       </div>
     </section>
 
-    <!-- TRUST SIGNALS: Barra de confianza editorial -->
-    <div :style="{ backgroundColor: aiPalette.background }">
+    <!-- TRUST SIGNALS: Barra de confianza editorial (oculto en portrait: usa trust strip integrada del hero) -->
+    <div v-if="layoutConfig.hero_style !== 'portrait'" :style="{ backgroundColor: aiPalette.background }">
       <!-- Línea divisoria superior, extremadamente sutil -->
       <div class="h-px" :style="{ backgroundColor: aiPalette.secondary + '33' }"></div>
 
@@ -1056,6 +1129,8 @@ import axios from 'axios'
 import QuantityModal from './QuantityModal.vue'
 import POSVariantSelector from '../POSVariantSelector.vue'
 import { useCatalogCart } from '../../stores/catalogCart.js'
+import { HeroEditorial, HeroSplit, HeroStreetwear, HeroFocus, HeroPortrait } from './blocks/heroes/index.js'
+import { HeaderEditorialCenter, HeaderRetailLeft, HeaderTransparentGlass, HeaderFloatingPill, HeaderUtilitySearch } from './blocks/headers/index.js'
 import { productUrl } from '../../utils/slugify.js'
 
 const router = useRouter()
@@ -1172,8 +1247,16 @@ const aiFonts = computed(() => {
 // AI layout config - controls hero style, CTA variant, category layout
 const layoutConfig = computed(() => {
   const cfg = props.storeConfig.ai_layout_config || {}
+  // 🧪 TEST: descomenta UNA línea para probar cada hero
+  //const TEST_HERO = null               // null = usa el valor real de la BD
+   const TEST_HERO = 'editorial'        // HeroEditorial   — full-bleed moda/lifestyle
+  //const TEST_HERO = 'split-portrait'   // HeroSplit        — 50/50 color+foto
+  // const TEST_HERO = 'streetwear'       // HeroStreetwear  — urbano bold
+  // const TEST_HERO = 'centered-minimal' // HeroFocus        — conversión directa
+  // const TEST_HERO = 'portrait'         // HeroPortrait     — belleza/cabello, doble CTA + trust strip
+
   return {
-    hero_style: cfg.hero_style || 'full-bleed',
+    hero_style: TEST_HERO || cfg.hero_style || 'editorial',
     hero_cta_style: cfg.hero_cta_style || 'single-outline',
     hero_text_position: cfg.hero_text_position || 'bottom-left',
     category_style: cfg.category_style || 'horizontal-pills',
@@ -1183,8 +1266,49 @@ const layoutConfig = computed(() => {
   }
 })
 
+// AI header config — controla qué navbar se renderiza + su ticker y animación
+const headerConfig = computed(() => {
+  const cfg = props.storeConfig.ai_layout_config || {}
+  // 🧪 TEST: descomenta UNA línea para probar cada header
+  // const TEST_HEADER = null                   // null = header original del sistema
+  // const TEST_HEADER = 'editorial-center'  // HeaderEditorialCenter — alta moda, logo centrado serif
+  // const TEST_HEADER = 'retail-left'       // HeaderRetailLeft      — consumo masivo, logo izquierda
+  // const TEST_HEADER = 'transparent-glass' // HeaderTransparentGlass — cosmética ★ pair con portrait/editorial
+   const TEST_HEADER = 'floating-pill'     // HeaderFloatingPill    — streetwear/tech, píldora flotante
+  // const TEST_HEADER = 'utility-search'    // HeaderUtilitySearch   — ferretería, barra búsqueda 2 filas
+
+  const style = TEST_HEADER || cfg.header_style || null
+
+  // Cada header dicta su propio ticker: estilo visual + animación
+  const presets = {
+    'editorial-center':   { tickerStyle: 'muted-light',  tickerMode: 'slide-left'  },
+    'retail-left':        { tickerStyle: 'soft-primary',  tickerMode: 'slide-left'  },
+    'transparent-glass':  { tickerStyle: 'contrast-dark', tickerMode: 'fade'        },
+    'floating-pill':      { tickerStyle: 'contrast-dark', tickerMode: 'slide-down'  },
+    'utility-search':     { tickerStyle: 'muted-light',   tickerMode: 'slide-left'  },
+  }
+
+  return {
+    style,
+    tickerStyle: presets[style]?.tickerStyle || null,
+    tickerMode:  presets[style]?.tickerMode  || 'slide-left',
+  }
+})
+
+// Espaciado dinámico encima del hero según el tipo de header activo
+// - transparent-glass y floating-pill flotan sobre el hero (sin margen)
+// - utility-search tiene 2 filas (ticker 32px + header 92px = 124px)
+// - Resto de headers sólidos: ticker 32px + header 56px = 88px mobile, 104px desktop
+const heroTopMargin = computed(() => {
+  const style = headerConfig.value.style
+  if (style === 'transparent-glass' || style === 'floating-pill') return 'mt-0'
+  if (style === 'utility-search') return 'mt-[124px]'
+  return 'mt-[88px] lg:mt-[104px]'
+})
+
 const tickerBarStyle = computed(() => {
-  const style = layoutConfig.value.ticker_style
+  // El header dicta el estilo del ticker (si no, usa layoutConfig)
+  const style = headerConfig.value.tickerStyle || layoutConfig.value.ticker_style
   if (style === 'contrast-dark') {
     return {
       backgroundColor: aiPalette.value.text_dark,
@@ -1192,13 +1316,11 @@ const tickerBarStyle = computed(() => {
     }
   }
   if (style === 'soft-primary') {
-    // Opaque: use store background with primary border hint
     return {
       backgroundColor: aiPalette.value.background || '#ffffff',
       borderColor: `${aiPalette.value.primary}55`
     }
   }
-  // muted-light: always opaque off-white (no transparency)
   return {
     backgroundColor: '#f6f5f3',
     borderColor: '#e6e3de'
@@ -1206,9 +1328,18 @@ const tickerBarStyle = computed(() => {
 })
 
 const tickerTextColor = computed(() => {
-  return layoutConfig.value.ticker_style === 'contrast-dark'
+  const style = headerConfig.value.tickerStyle || layoutConfig.value.ticker_style
+  return style === 'contrast-dark'
     ? aiPalette.value.text_light
     : aiPalette.value.text_dark
+})
+
+// Animación del ticker según el header
+const tickerTransitionName = computed(() => {
+  const mode = headerConfig.value.tickerMode
+  if (mode === 'fade')        return 'ticker-fade'
+  if (mode === 'slide-down')  return 'ticker-down'
+  return 'ticker-train'  // slide-left (default)
 })
 
 const currentAnnouncementText = computed(() => {
@@ -1858,23 +1989,23 @@ onUnmounted(() => {
   }
 }
 
-/* Ticker Tren - Animación horizontal: entra desde derecha, se detiene, sale por izquierda */
-.ticker-train-enter-active {
-  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.ticker-train-leave-active {
-  transition: all 0.5s cubic-bezier(0.7, 0, 0.84, 0);
-}
+/* Ticker: slide-left (default) — entra desde derecha, sale por izquierda */
+.ticker-train-enter-active { transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.ticker-train-leave-active  { transition: all 0.5s cubic-bezier(0.7, 0, 0.84, 0); }
+.ticker-train-enter-from    { opacity: 0; transform: translateX(100%); }
+.ticker-train-leave-to      { opacity: 0; transform: translateX(-100%); }
 
-.ticker-train-enter-from {
-  opacity: 0;
-  transform: translateX(100%);
-}
+/* Ticker: fade — aparece y desaparece suavemente (transparent-glass) */
+.ticker-fade-enter-active { transition: opacity 0.6s ease; }
+.ticker-fade-leave-active  { transition: opacity 0.4s ease; }
+.ticker-fade-enter-from    { opacity: 0; }
+.ticker-fade-leave-to      { opacity: 0; }
 
-.ticker-train-leave-to {
-  opacity: 0;
-  transform: translateX(-100%);
-}
+/* Ticker: slide-down — entra desde arriba, sale hacia arriba (floating-pill) */
+.ticker-down-enter-active { transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+.ticker-down-leave-active  { transition: all 0.4s cubic-bezier(0.7, 0, 0.84, 0); }
+.ticker-down-enter-from    { opacity: 0; transform: translateY(-100%); }
+.ticker-down-leave-to      { opacity: 0; transform: translateY(-100%); }
 
 /* Dual Range Slider - Estilos Premium */
 input[type="range"] {

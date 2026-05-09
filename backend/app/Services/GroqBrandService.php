@@ -43,8 +43,10 @@ class GroqBrandService
      */
     private array $heroStyles = [
         'full-bleed'       => 'Full-screen image with text and CTAs overlaying the photo (best for fashion, beauty, lifestyle)',
-        'split-portrait'   => 'Half image + half text panel side by side (best for boutiques, artisan brands)',
-        'centered-minimal' => 'Clean centered layout, minimal imagery (best for premium, minimalist brands)'
+        'split-portrait'   => 'Half image + half text panel side by side (best for boutiques, artisan brands, cosmetics)',
+        'centered-minimal' => 'Clean centered layout, product-focused (best for premium, minimalist, direct-conversion brands)',
+        'streetwear'       => 'Asymmetric bold layout, huge typography overlapping image (best for urban brands, youth, bold/edgy aesthetics)',
+        'portrait'         => 'Full-bleed close-up portrait photo, mixed sans+serif typography headline, two solid rectangular CTAs, integrated trust strip below (best for beauty, hair, cosmetics distributors, brands where face/product close-up photography is the hero)'
     ];
 
     /**
@@ -221,7 +223,7 @@ FORMATO DE RESPUESTA JSON:
         "cta_secondary": "Texto del segundo botón CTA (solo para double-solid)"
     },
     "layout_config": {
-        "hero_style": "full-bleed|split-portrait|centered-minimal",
+        "hero_style": "full-bleed|split-portrait|centered-minimal|streetwear|portrait",
         "hero_cta_style": "double-solid|single-outline|bold-filled",
         "hero_text_position": "bottom-left|center|bottom-center",
         "hero_content_density": "compact|balanced|rich",
@@ -276,6 +278,7 @@ INSTRUCCIONES:
 8. Genera anuncios cortos para la barra superior del sitio (ticker)
 9. Escribe mensajes profesionales de venta cruzada que complementen la compra
 10. Define layout_config coherente con el negocio (hero, CTA, ticker, densidad de texto, estilo de categorías)
+11. Para hero_style: usa "portrait" para marcas de belleza, cabello, cosméticos o distribuidoras donde las fotos tipo retrato o close-up de producto/persona son el centro. Usa "streetwear" solo si la marca es explícitamente urbana, juvenil, bold o edgy. Usa "split-portrait" para marcas equilibradas y minimalistas. Usa "full-bleed" para moda editorial y lifestyle. Usa "centered-minimal" para marcas premium de conversión directa.
 
 Recuerda: La tienda se llama "{$storeName}". Personaliza todo para este negocio específico.
 Genera SOLO el JSON, nada más.
@@ -322,7 +325,7 @@ PROMPT;
                 'editorial_mood' => 'luxury'
             ];
         } else {
-            $validHeroStyles = ['full-bleed', 'split-portrait', 'centered-minimal'];
+            $validHeroStyles = ['full-bleed', 'split-portrait', 'centered-minimal', 'streetwear', 'portrait'];
             $validCtaStyles = ['double-solid', 'single-outline', 'bold-filled'];
             $validCategoryStyles = ['horizontal-pills', 'image-cards'];
             $validTextPositions = ['bottom-left', 'center', 'bottom-center'];
