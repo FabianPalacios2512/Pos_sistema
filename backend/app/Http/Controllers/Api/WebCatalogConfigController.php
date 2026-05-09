@@ -90,6 +90,9 @@ class WebCatalogConfigController extends Controller
                 'minimum_order' => $request->input('businessRules.minimumOrder', 0),
                 'sync_with_cash_register' => $request->input('businessRules.syncWithCashRegister', false),
 
+                // Media por componente de diseño activo (imágenes/video del hero, lookbook, bento, editorial)
+                'catalog_media' => json_encode($request->input('catalog_media', null)),
+
                 'updated_at' => now()
             ];
 
@@ -191,6 +194,7 @@ class WebCatalogConfigController extends Controller
                 'ai_announcements' => json_decode($config->ai_announcements ?? 'null', true),
                 'ai_cross_sell_messages' => json_decode($config->ai_cross_sell_messages ?? 'null', true),
                 'ai_layout_config' => json_decode($config->ai_layout_config ?? 'null', true),
+                'catalog_media' => json_decode($config->catalog_media ?? 'null', true),
             ];
 
             return response()->json([

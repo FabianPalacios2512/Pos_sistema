@@ -1,0 +1,69 @@
+<template>
+  <!-- TRUST STRIP: MARQUEE — Urbano / Streetwear -->
+  <!-- Solo texto, separado por ✦. Animación CSS infinita de derecha a izquierda. -->
+  <div
+    class="w-full overflow-hidden relative"
+    :style="{ backgroundColor: bgColor }"
+  >
+    <!-- Track animado — duplicado para loop seamless -->
+    <div
+      class="flex items-center"
+      :class="animate ? 'marquee-track' : 'justify-center flex-wrap gap-x-6 py-2.5 px-4'"
+    >
+      <template v-for="pass in (animate ? 2 : 1)" :key="pass">
+        <span
+          v-for="(item, i) in items"
+          :key="`${pass}-${i}`"
+          class="flex items-center gap-3 flex-shrink-0 py-2.5 px-3"
+        >
+          <span
+            class="text-[10px] uppercase font-bold tracking-[0.18em] whitespace-nowrap"
+            :style="{ color: textColor }"
+          >{{ item.label }}</span>
+          <span
+            class="text-[10px] flex-shrink-0"
+            :style="{ color: accentColor }"
+            aria-hidden="true"
+          >✦</span>
+        </span>
+      </template>
+    </div>
+  </div>
+</template>
+
+<script setup>
+defineProps({
+  items: {
+    type: Array,
+    default: () => [
+      { label: 'Envío gratis' },
+      { label: 'Pago seguro' },
+      { label: 'Devolución fácil' },
+      { label: 'Asesoría VIP' },
+      { label: 'Productos originales' },
+      { label: 'Envío gratis' },
+    ]
+  },
+  bgColor:     { type: String, default: '#111111' },
+  textColor:   { type: String, default: '#ffffff' },
+  accentColor: { type: String, default: '#ffffff' },
+  animate:     { type: Boolean, default: true },
+})
+</script>
+
+<style scoped>
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 28s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+</style>

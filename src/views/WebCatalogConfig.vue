@@ -427,6 +427,7 @@
                 <h3 class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Activos Visuales</h3>
               </div>
               <div class="p-6">
+                <!-- Fila 1: Logo + Hero Imagen 1 -->
                 <div class="grid grid-cols-2 gap-5">
                   <!-- Logotipo -->
                   <div class="space-y-2">
@@ -451,29 +452,261 @@
                     </div>
                   </div>
 
-                  <!-- Banner Principal -->
+                  <!-- Hero imagen 1 (campo legacy banner_url mantenido por compatibilidad) -->
                   <div class="space-y-2">
-                    <p class="text-sm font-semibold text-[#9aa0a6] uppercase tracking-wider">Banner Principal</p>
+                    <p class="text-sm font-semibold text-[#9aa0a6] uppercase tracking-wider">Hero – Imagen Principal</p>
                     <div
-                      @click="triggerFileUpload('banner')"
+                      @click="triggerFileUpload('hero_image', 0)"
                       class="relative w-full h-28 border-2 border-dashed border-gray-200 dark:border-[#3a3a3f] rounded-xl hover:bg-gray-50 dark:hover:bg-[#282a2c] hover:border-gray-300 dark:hover:border-[#5f6368] transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
                     >
-                      <div v-if="config.brandIdentity.banner" class="absolute inset-0 overflow-hidden rounded-xl">
-                        <img :src="config.brandIdentity.banner" class="w-full h-full object-cover" />
+                      <div v-if="config.catalogMedia.hero_images[0]" class="absolute inset-0 overflow-hidden rounded-xl">
+                        <img :src="config.catalogMedia.hero_images[0]" class="w-full h-full object-cover" />
                         <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <button @click.stop="config.brandIdentity.banner = ''" class="text-white text-xs font-medium px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full transition-colors">Eliminar</button>
+                          <button @click.stop="config.catalogMedia.hero_images[0] = ''" class="text-white text-xs font-medium px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full transition-colors">Eliminar</button>
                         </div>
                       </div>
                       <div v-else class="flex flex-col items-center gap-2 text-[#9aa0a6] group-hover:text-[#5f6368] dark:group-hover:text-[#e3e3e3] transition-colors">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                         </svg>
-                        <span class="text-sm font-medium">1200 × 400 px</span>
+                        <span class="text-sm font-medium">Foto principal</span>
                       </div>
-                      <input type="file" ref="bannerInput" class="hidden" accept="image/*" @change="(e) => handleFileUpload(e, 'banner')" />
+                      <input
+                        :ref="(el) => heroImageInputs[0] = el"
+                        type="file" class="hidden" accept="image/*"
+                        @change="(e) => handleFileUpload(e, 'hero_image', 0)"
+                      />
                     </div>
                   </div>
                 </div>
+
+                <!-- Hero Carrusel: imágenes 2 y 3 -->
+                <div class="mt-5 pt-5 border-t border-gray-100 dark:border-[#2a2a30]">
+                  <div class="flex items-center justify-between mb-3">
+                    <div>
+                      <p class="text-sm font-semibold text-[#9aa0a6] uppercase tracking-wider">Carrusel del Hero</p>
+                      <p class="text-xs text-[#9aa0a6] mt-0.5">Opcional · hasta 2 fotos adicionales que rotan con la principal</p>
+                    </div>
+                    <span class="text-xs font-medium text-[#9aa0a6] bg-[#f8f9fa] dark:bg-[#282a2c] px-2 py-1 rounded-full border border-[#e8eaed] dark:border-[#3a3a3f]">
+                      {{ config.catalogMedia.hero_images.filter(Boolean).length }}/3
+                    </span>
+                  </div>
+                  <div class="grid grid-cols-2 gap-3">
+                    <div v-for="idx in [1, 2]" :key="'hero-extra-'+idx" class="space-y-1.5">
+                      <p class="text-[11px] font-medium text-[#9aa0a6] uppercase tracking-wider">Foto {{ idx + 1 }}</p>
+                      <div
+                        @click="triggerFileUpload('hero_image', idx)"
+                        class="relative w-full h-24 border-2 border-dashed border-gray-200 dark:border-[#3a3a3f] rounded-xl hover:bg-gray-50 dark:hover:bg-[#282a2c] hover:border-gray-300 dark:hover:border-[#5f6368] transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
+                      >
+                        <div v-if="config.catalogMedia.hero_images[idx]" class="absolute inset-0 overflow-hidden rounded-xl">
+                          <img :src="config.catalogMedia.hero_images[idx]" class="w-full h-full object-cover" />
+                          <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button @click.stop="config.catalogMedia.hero_images[idx] = ''" class="text-white text-xs font-medium px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full transition-colors">Eliminar</button>
+                          </div>
+                        </div>
+                        <div v-else class="flex flex-col items-center gap-1.5 text-[#9aa0a6] group-hover:text-[#5f6368] dark:group-hover:text-[#e3e3e3] transition-colors">
+                          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                          </svg>
+                          <span class="text-xs font-medium">Agregar</span>
+                        </div>
+                        <input
+                          :ref="(el) => heroImageInputs[idx] = el"
+                          type="file" class="hidden" accept="image/*"
+                          @change="(e) => handleFileUpload(e, 'hero_image', idx)"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 04b: MEDIOS DEL DISEÑO ACTIVO — solo visible si la IA asignó un hook_style -->
+            <div
+              v-if="activeHookStyle"
+              class="bg-white dark:bg-[#1e1f20] rounded-xl border border-gray-100 dark:border-[#2a2a30] overflow-hidden shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.3)] transition-shadow duration-200"
+            >
+              <div class="px-6 py-5 border-b border-gray-100 dark:border-[#2a2a30] flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-bold tracking-widest text-[#9aa0a6] uppercase mb-0.5">Medios del Diseño</p>
+                  <h3 class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">
+                    {{ activeHookStyle === 'urban-lookbook' ? 'Urban Lookbook' : activeHookStyle === 'dynamic-bento' ? 'Dynamic Bento' : 'Editorial Story' }}
+                  </h3>
+                  <p class="text-xs text-[#9aa0a6] mt-1">
+                    {{ activeHookStyle === 'urban-lookbook'
+                        ? 'Hasta 4 imágenes + 1 video opcional para el bloque tipo carrusel urbano'
+                        : activeHookStyle === 'dynamic-bento'
+                        ? '2 imágenes para el grid bento: una lifestyle grande y un detalle de producto'
+                        : 'Una imagen inspiracional para el bloque editorial de tu marca' }}
+                  </p>
+                </div>
+                <!-- Badge del estilo activo -->
+                <span class="flex-shrink-0 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full"
+                  :class="activeHookStyle === 'urban-lookbook'
+                    ? 'bg-violet-50 dark:bg-violet-950 text-violet-700 dark:text-violet-400 border border-violet-100 dark:border-violet-800'
+                    : activeHookStyle === 'dynamic-bento'
+                    ? 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-800'
+                    : 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-800'"
+                >
+                  Activo
+                </span>
+              </div>
+
+              <div class="p-6">
+
+                <!-- ══ URBAN LOOKBOOK: 4 imágenes + 1 video ══ -->
+                <template v-if="activeHookStyle === 'urban-lookbook'">
+                  <div class="grid grid-cols-2 gap-4">
+                    <div v-for="idx in [0,1,2,3]" :key="'lkb-'+idx" class="space-y-1.5">
+                      <p class="text-[11px] font-medium text-[#9aa0a6] uppercase tracking-wider">
+                        {{ idx === 0 ? 'Imagen Principal' : `Imagen ${idx + 1}` }}
+                      </p>
+                      <div
+                        @click="triggerFileUpload('lookbook_image', idx)"
+                        class="relative w-full h-32 border-2 border-dashed border-gray-200 dark:border-[#3a3a3f] rounded-xl hover:bg-gray-50 dark:hover:bg-[#282a2c] hover:border-violet-300 dark:hover:border-violet-700 transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
+                      >
+                        <div v-if="config.catalogMedia.lookbook_images[idx]" class="absolute inset-0 overflow-hidden rounded-xl">
+                          <img :src="config.catalogMedia.lookbook_images[idx]" class="w-full h-full object-cover" />
+                          <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button @click.stop="config.catalogMedia.lookbook_images[idx] = ''" class="text-white text-xs font-medium px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full transition-colors">Eliminar</button>
+                          </div>
+                        </div>
+                        <div v-else class="flex flex-col items-center gap-2 text-[#9aa0a6] group-hover:text-violet-500 transition-colors">
+                          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                          </svg>
+                          <span class="text-xs font-medium">{{ idx === 0 ? 'Foto hero' : 'Agregar foto' }}</span>
+                        </div>
+                        <input
+                          :ref="(el) => lookbookImageInputs[idx] = el"
+                          type="file" class="hidden" accept="image/*"
+                          @change="(e) => handleFileUpload(e, 'lookbook_image', idx)"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Video opcional -->
+                  <div class="mt-5 pt-5 border-t border-gray-100 dark:border-[#2a2a30]">
+                    <div class="flex items-center justify-between mb-3">
+                      <div>
+                        <p class="text-sm font-semibold text-[#9aa0a6] uppercase tracking-wider">Video Opcional</p>
+                        <p class="text-xs text-[#9aa0a6] mt-0.5">MP4 · MOV · WebM · máx. 50 MB · se muestra como 5to elemento del carrusel</p>
+                      </div>
+                      <span v-if="config.catalogMedia.lookbook_video" class="text-[10px] text-violet-600 dark:text-violet-400 font-semibold">Cargado ✓</span>
+                    </div>
+                    <div
+                      @click="triggerFileUpload('lookbook_video')"
+                      class="relative w-full h-20 border-2 border-dashed border-gray-200 dark:border-[#3a3a3f] rounded-xl hover:bg-gray-50 dark:hover:bg-[#282a2c] hover:border-violet-300 dark:hover:border-violet-700 transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center gap-3 px-5 overflow-hidden"
+                    >
+                      <div v-if="config.catalogMedia.lookbook_video" class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-950 border border-violet-100 dark:border-violet-800 flex items-center justify-center flex-shrink-0">
+                          <svg class="w-5 h-5 text-violet-600 dark:text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Video cargado</p>
+                          <button @click.stop="config.catalogMedia.lookbook_video = ''" class="text-xs text-[#ea4335] dark:text-[#f28b82] hover:underline">Eliminar</button>
+                        </div>
+                      </div>
+                      <div v-else class="flex items-center gap-3 text-[#9aa0a6] group-hover:text-violet-500 transition-colors">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
+                        </svg>
+                        <div>
+                          <p class="text-sm font-medium">Subir video opcional</p>
+                          <p class="text-xs">MP4, MOV o WebM</p>
+                        </div>
+                      </div>
+                      <input ref="lookbookVideoInput" type="file" class="hidden" accept="video/*" @change="(e) => handleFileUpload(e, 'lookbook_video')" />
+                    </div>
+                  </div>
+                </template>
+
+                <!-- ══ DYNAMIC BENTO: imagen principal + imagen detalle ══ -->
+                <template v-else-if="activeHookStyle === 'dynamic-bento'">
+                  <div class="grid grid-cols-2 gap-5">
+                    <!-- Imagen principal (grande, lifestyle) -->
+                    <div class="space-y-2">
+                      <p class="text-sm font-semibold text-[#9aa0a6] uppercase tracking-wider">Imagen Lifestyle</p>
+                      <p class="text-xs text-[#9aa0a6]">Foto grande que ocupa 2/3 del bento · retrato o acción deportiva</p>
+                      <div
+                        @click="triggerFileUpload('bento_main')"
+                        class="relative w-full h-36 border-2 border-dashed border-gray-200 dark:border-[#3a3a3f] rounded-xl hover:border-blue-300 dark:hover:border-blue-700 hover:bg-gray-50 dark:hover:bg-[#282a2c] transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
+                      >
+                        <div v-if="config.catalogMedia.bento_main" class="absolute inset-0 overflow-hidden rounded-xl">
+                          <img :src="config.catalogMedia.bento_main" class="w-full h-full object-cover" />
+                          <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button @click.stop="config.catalogMedia.bento_main = ''" class="text-white text-xs font-medium px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full transition-colors">Eliminar</button>
+                          </div>
+                        </div>
+                        <div v-else class="flex flex-col items-center gap-2 text-[#9aa0a6] group-hover:text-blue-500 transition-colors">
+                          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                          </svg>
+                          <span class="text-sm font-medium">Foto lifestyle</span>
+                        </div>
+                        <input ref="bentoMainInput" type="file" class="hidden" accept="image/*" @change="(e) => handleFileUpload(e, 'bento_main')" />
+                      </div>
+                    </div>
+
+                    <!-- Imagen detalle (producto de cerca) -->
+                    <div class="space-y-2">
+                      <p class="text-sm font-semibold text-[#9aa0a6] uppercase tracking-wider">Imagen Detalle</p>
+                      <p class="text-xs text-[#9aa0a6]">Primer plano de producto · textura, material o detalle técnico</p>
+                      <div
+                        @click="triggerFileUpload('bento_detail')"
+                        class="relative w-full h-36 border-2 border-dashed border-gray-200 dark:border-[#3a3a3f] rounded-xl hover:border-blue-300 dark:hover:border-blue-700 hover:bg-gray-50 dark:hover:bg-[#282a2c] transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
+                      >
+                        <div v-if="config.catalogMedia.bento_detail" class="absolute inset-0 overflow-hidden rounded-xl">
+                          <img :src="config.catalogMedia.bento_detail" class="w-full h-full object-cover" />
+                          <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button @click.stop="config.catalogMedia.bento_detail = ''" class="text-white text-xs font-medium px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full transition-colors">Eliminar</button>
+                          </div>
+                        </div>
+                        <div v-else class="flex flex-col items-center gap-2 text-[#9aa0a6] group-hover:text-blue-500 transition-colors">
+                          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6" />
+                          </svg>
+                          <span class="text-sm font-medium">Foto detalle</span>
+                        </div>
+                        <input ref="bentoDetailInput" type="file" class="hidden" accept="image/*" @change="(e) => handleFileUpload(e, 'bento_detail')" />
+                      </div>
+                    </div>
+                  </div>
+                </template>
+
+                <!-- ══ EDITORIAL STORY: 1 imagen inspiracional ══ -->
+                <template v-else-if="activeHookStyle === 'editorial-story'">
+                  <div class="space-y-2">
+                    <p class="text-sm font-semibold text-[#9aa0a6] uppercase tracking-wider">Imagen Inspiracional</p>
+                    <p class="text-xs text-[#9aa0a6]">Foto que acompaña el relato de marca · proporción vertical 3:4 recomendada</p>
+                    <div
+                      @click="triggerFileUpload('editorial_image')"
+                      class="relative w-full h-52 border-2 border-dashed border-gray-200 dark:border-[#3a3a3f] rounded-xl hover:border-amber-300 dark:hover:border-amber-700 hover:bg-gray-50 dark:hover:bg-[#282a2c] transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
+                    >
+                      <div v-if="config.catalogMedia.editorial_image" class="absolute inset-0 overflow-hidden rounded-xl">
+                        <img :src="config.catalogMedia.editorial_image" class="w-full h-full object-cover" />
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <button @click.stop="config.catalogMedia.editorial_image = ''" class="text-white text-xs font-medium px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full transition-colors">Eliminar</button>
+                        </div>
+                      </div>
+                      <div v-else class="flex flex-col items-center gap-3 text-[#9aa0a6] group-hover:text-amber-500 transition-colors">
+                        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                        </svg>
+                        <div class="text-center">
+                          <p class="text-sm font-medium">Subir imagen editorial</p>
+                          <p class="text-xs mt-0.5">Retrato · ambiente · still life · 3:4 ideal</p>
+                        </div>
+                      </div>
+                      <input ref="editorialImageInput" type="file" class="hidden" accept="image/*" @change="(e) => handleFileUpload(e, 'editorial_image')" />
+                    </div>
+                  </div>
+                </template>
+
               </div>
             </div>
 
@@ -1527,6 +1760,13 @@ const emit = defineEmits(['navigate', 'changeModule', 'openQuotationInPos', 'ref
 const logoInput = ref(null)
 const bannerInput = ref(null)
 const previewKey = ref(0)
+// Refs para medios del hero (carrusel) y componentes de diseño
+const heroImageInputs = ref([])
+const lookbookImageInputs = ref([])
+const lookbookVideoInput = ref(null)
+const bentoMainInput = ref(null)
+const bentoDetailInput = ref(null)
+const editorialImageInput = ref(null)
 
 // Catalog URL - Se construye dinámicamente según el entorno
 const catalogUrl = computed(() => {
@@ -1785,6 +2025,11 @@ const getValidTemplate = (template) => {
   return template || 'speed-market'
 }
 
+// Hook/Spotlight style activo según la identidad IA generada
+const activeHookStyle = computed(() => {
+  return aiBrandData.value?.layout_config?.hook_style || null
+})
+
 // Configuration Object (Reactive)
 const config = reactive({
   storeActive: false, // Por defecto inactivo hasta que seleccionen categorías
@@ -1793,6 +2038,15 @@ const config = reactive({
     banner: '',
     primaryColor: '#10B981', 
     template: getValidTemplate('speed-market') // Plantilla por defecto validada
+  },
+  // Medios por componente de diseño — solo se envían los del estilo activo
+  catalogMedia: {
+    hero_images: ['', '', ''],         // Carrusel del hero (siempre, máx 3)
+    lookbook_images: ['', '', '', ''], // Urban Lookbook: 4 imágenes
+    lookbook_video: '',                // Urban Lookbook: video opcional
+    bento_main: '',                    // Dynamic Bento: imagen principal
+    bento_detail: '',                  // Dynamic Bento: imagen detalle
+    editorial_image: ''                // Editorial Story: imagen inspiracional
   },
   inventoryVisibility: {
     visibleCategories: [], 
@@ -2048,34 +2302,62 @@ const toggleCategory = (categoryId) => {
   }
 }
 
-// Trigger file upload
-const triggerFileUpload = (type) => {
+// Trigger file upload — soporta logo, banner, hero_image_N, lookbook_image_N,
+// lookbook_video, bento_main, bento_detail, editorial_image
+const triggerFileUpload = (type, index = null) => {
   if (type === 'logo') {
-    logoInput.value.click()
+    logoInput.value?.click()
   } else if (type === 'banner') {
-    bannerInput.value.click()
+    bannerInput.value?.click()
+  } else if (type === 'hero_image' && index !== null) {
+    heroImageInputs.value[index]?.click()
+  } else if (type === 'lookbook_image' && index !== null) {
+    lookbookImageInputs.value[index]?.click()
+  } else if (type === 'lookbook_video') {
+    lookbookVideoInput.value?.click()
+  } else if (type === 'bento_main') {
+    bentoMainInput.value?.click()
+  } else if (type === 'bento_detail') {
+    bentoDetailInput.value?.click()
+  } else if (type === 'editorial_image') {
+    editorialImageInput.value?.click()
   }
 }
 
-// Handle file upload
-const handleFileUpload = (event, type) => {
+// Handle file upload — base64 para todos los tipos de media
+const handleFileUpload = (event, type, index = null) => {
   const file = event.target.files[0]
   if (!file) return
 
+  const isVideo = file.type.startsWith('video/')
+  const maxSize = isVideo ? 50 * 1024 * 1024 : 2 * 1024 * 1024
+  const maxLabel = isVideo ? '50MB' : '2MB'
 
-  if (file.size > 2 * 1024 * 1024) {
-    showWarning('El archivo es muy grande. Máximo 2MB.')
+  if (file.size > maxSize) {
+    showWarning(`El archivo es muy grande. Máximo ${maxLabel}.`)
     return
   }
 
   const reader = new FileReader()
   reader.onload = (e) => {
     const base64String = e.target.result
-    
+
     if (type === 'logo') {
       config.brandIdentity.logo = base64String
     } else if (type === 'banner') {
       config.brandIdentity.banner = base64String
+    } else if (type === 'hero_image' && index !== null) {
+      config.catalogMedia.hero_images[index] = base64String
+    } else if (type === 'lookbook_image' && index !== null) {
+      config.catalogMedia.lookbook_images[index] = base64String
+    } else if (type === 'lookbook_video') {
+      config.catalogMedia.lookbook_video = base64String
+    } else if (type === 'bento_main') {
+      config.catalogMedia.bento_main = base64String
+    } else if (type === 'bento_detail') {
+      config.catalogMedia.bento_detail = base64String
+    } else if (type === 'editorial_image') {
+      config.catalogMedia.editorial_image = base64String
     }
   }
   reader.readAsDataURL(file)
@@ -2115,6 +2397,17 @@ const loadConfiguration = async () => {
       config.businessRules.deliveryCost = parseFloat(data.delivery_cost || 0)
       config.businessRules.minimumOrder = parseFloat(data.minimum_order || 0)
       config.businessRules.syncWithCashRegister = data.sync_with_cash_register ?? false
+
+      // Cargar medios del catálogo (catalog_media puede venir como string o como objeto)
+      const rawMedia = typeof data.catalog_media === 'string'
+        ? JSON.parse(data.catalog_media)
+        : (data.catalog_media || {})
+      config.catalogMedia.hero_images       = rawMedia.hero_images       || ['', '', '']
+      config.catalogMedia.lookbook_images   = rawMedia.lookbook_images   || ['', '', '', '']
+      config.catalogMedia.lookbook_video    = rawMedia.lookbook_video    || ''
+      config.catalogMedia.bento_main        = rawMedia.bento_main        || ''
+      config.catalogMedia.bento_detail      = rawMedia.bento_detail      || ''
+      config.catalogMedia.editorial_image   = rawMedia.editorial_image   || ''
     }
   } catch (error) {
     console.error('Error loading configuration:', error)
@@ -2157,6 +2450,15 @@ const saveConfiguration = async () => {
         deliveryCost: config.businessRules.deliveryCost,
         minimumOrder: config.businessRules.minimumOrder,
         syncWithCashRegister: config.businessRules.syncWithCashRegister
+      },
+      // Medios contextuales por diseño activo
+      catalog_media: {
+        hero_images: config.catalogMedia.hero_images.filter(Boolean),
+        lookbook_images: config.catalogMedia.lookbook_images.filter(Boolean),
+        lookbook_video: config.catalogMedia.lookbook_video || null,
+        bento_main: config.catalogMedia.bento_main || null,
+        bento_detail: config.catalogMedia.bento_detail || null,
+        editorial_image: config.catalogMedia.editorial_image || null
       }
     }
     
@@ -2191,7 +2493,15 @@ const saveConfiguration = async () => {
           ai_value_messages: aiBrandData.value?.value_messages || null,
           ai_announcements: aiBrandData.value?.announcements || null,
           ai_cross_sell_messages: aiBrandData.value?.cross_sell_messages || null,
-          ai_layout_config: aiBrandData.value?.layout_config || null
+          ai_layout_config: aiBrandData.value?.layout_config || null,
+          catalog_media: {
+            hero_images: config.catalogMedia.hero_images.filter(Boolean),
+            lookbook_images: config.catalogMedia.lookbook_images.filter(Boolean),
+            lookbook_video: config.catalogMedia.lookbook_video || null,
+            bento_main: config.catalogMedia.bento_main || null,
+            bento_detail: config.catalogMedia.bento_detail || null,
+            editorial_image: config.catalogMedia.editorial_image || null
+          }
         }
         localStorage.setItem('pos_catalog_config_cache', JSON.stringify(cacheData))
       } catch (e) {}

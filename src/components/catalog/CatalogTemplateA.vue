@@ -1,8 +1,8 @@
 ﻿<template>
-  <!-- PLANTILLA A: "MODA PREMIUM" - Estilo Vélez/Zara -->
+  <!-- PLANTILLA A: "MODA PREMIUM" - Estilo V�lez/Zara -->
   <div class="catalog-visual-story relative overflow-x-hidden min-h-screen" :style="themeVars">
     
-    <!-- TOP BAR: Ticker sólido y elegante -->
+    <!-- TOP BAR: Ticker s�lido y elegante -->
     <div
       class="fixed top-0 left-0 right-0 z-[60] h-8 flex items-center justify-center overflow-hidden border-b"
       :style="tickerBarStyle"
@@ -21,7 +21,7 @@
       </div>
     </div>
 
-    <!-- HEADER MODULAR: Switch entre los 5 estilos según headerConfig -->
+    <!-- HEADER MODULAR: Switch entre los 5 estilos seg�n headerConfig -->
 
     <!-- editorial-center: Alta moda, logo centrado serif -->
     <HeaderEditorialCenter
@@ -51,7 +51,7 @@
       @cart="router.push('/catalog/bolsa')"
     />
 
-    <!-- transparent-glass: ★ Pairing perfecto con portrait o editorial -->
+    <!-- transparent-glass: ? Pairing perfecto con portrait o editorial -->
     <!-- El header maneja su propio top-8 internamente -->
     <HeaderTransparentGlass
       v-else-if="headerConfig.style === 'transparent-glass'"
@@ -65,9 +65,8 @@
       @cart="router.push('/catalog/bolsa')"
     />
 
-    <!-- floating-pill: Streetwear/tech, píldora flotante -->
-    <!-- El header maneja su propio top-8 internamente -->
-    <HeaderFloatingPill
+    <!-- floating-pill ? retail-overlay: Urbano/Premium, transparente sobre hero -->
+    <HeaderRetailOverlay
       v-else-if="headerConfig.style === 'floating-pill'"
       :storeName="storeName"
       :logoUrl="storeConfig.logo_url"
@@ -79,7 +78,7 @@
       @cart="router.push('/catalog/bolsa')"
     />
 
-    <!-- utility-search: Ferretería/catálogo grande, barra búsqueda 2 filas -->
+    <!-- utility-search: Ferreter�a/cat�logo grande, barra b�squeda 2 filas -->
     <HeaderUtilitySearch
       v-else-if="headerConfig.style === 'utility-search'"
       :storeName="storeName"
@@ -93,7 +92,23 @@
       @cart="router.push('/catalog/bolsa')"
     />
 
-    <!-- DEFAULT (null): Header original del sistema — Retail Fashion / Kharis-inspired -->
+    <!-- DEFAULT (null): Header original del sistema � Retail Fashion / Kharis-inspired -->
+    <!-- centered-serif: Distribuidora / Boutique � Kharis-style (componente externo) -->
+    <HeaderCenteredSerif
+      v-else-if="headerConfig.style === 'centered-serif'"
+      :storeName="storeName"
+      :storeSubtitle="storeConfig.ai_brand?.tagline || storeConfig.category || ''"
+      :logoUrl="storeConfig.logo_url"
+      :cartCount="cartCount"
+      v-model="searchQuery"
+      :palette="aiPalette"
+      :fonts="aiFonts"
+      class="fixed top-8 left-0 right-0 z-50"
+      @menu="showMobileMenu = true"
+      @cart="router.push('/catalog/bolsa')"
+    />
+
+    <!-- DEFAULT (null): Header original del sistema � Retail Fashion / Kharis-inspired -->
     <header
       v-else
       ref="stickyHeader"
@@ -101,12 +116,12 @@
       :style="{ backgroundColor: aiPalette.background || '#ffffff' }"
       style="box-shadow: 0 1px 3px rgba(0,0,0,0.08);"
     >
-      <!-- Línea decorativa superior sutil -->
+      <!-- L�nea decorativa superior sutil -->
       <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
       
       <div class="w-full px-4 lg:px-8 h-14 lg:h-[72px] flex items-center justify-between">
         
-        <!-- Left: Menú Hamburguesa (Líneas finas elegantes) -->
+        <!-- Left: Men� Hamburguesa (L�neas finas elegantes) -->
         <div class="flex items-center gap-2 w-[72px]">
           <button 
             @click="showMobileMenu = !showMobileMenu"
@@ -118,7 +133,7 @@
           </button>
         </div>
 
-        <!-- CENTER: Nombre del Comercio - Tipografía Serif Elegante -->
+        <!-- CENTER: Nombre del Comercio - Tipograf�a Serif Elegante -->
         <div class="flex-1 flex flex-col items-center justify-center lg:justify-start lg:flex-none lg:absolute lg:left-1/2 lg:-translate-x-1/2">
           <h1 
             class="text-[22px] lg:text-[30px] text-gray-900 leading-none"
@@ -130,7 +145,7 @@
 
         <!-- Right: Lupa + Bolsa (Elegantes, negro) -->
         <div class="flex items-center gap-0 w-[72px] justify-end">
-          <!-- Lupa Móvil -->
+          <!-- Lupa M�vil -->
           <button 
             @click="showMobileSearch = !showMobileSearch"
             class="lg:hidden w-10 h-10 flex items-center justify-center"
@@ -159,7 +174,7 @@
         </div>
       </div>
 
-      <!-- Desktop: Barra de Búsqueda + Navegación -->
+      <!-- Desktop: Barra de B�squeda + Navegaci�n -->
       <div class="hidden lg:flex justify-center border-t border-gray-100 py-2 px-8">
         <div class="relative w-full max-w-lg">
           <input 
@@ -175,17 +190,17 @@
         </div>
       </div>
 
-      <!-- Línea decorativa inferior -->
+      <!-- L�nea decorativa inferior -->
       <div class="h-[1px] w-full bg-gray-100"></div>
 
-      <!-- Barra de Búsqueda Móvil Expandible -->
+      <!-- Barra de B�squeda M�vil Expandible -->
       <Transition name="slide-down">
         <div v-if="showMobileSearch" class="lg:hidden px-4 py-3 bg-white border-b border-gray-100">
           <div class="relative">
             <input 
               v-model="searchQuery"
               type="text" 
-              placeholder="¿Qué estás buscando?"
+              placeholder="�Qu� est�s buscando?"
               class="w-full h-11 pl-10 pr-10 border rounded-full text-sm placeholder-gray-500 transition-all outline-none"
               :style="{ backgroundColor: aiPalette.background, borderColor: aiPalette.secondary, color: aiPalette.text_dark }"
               autofocus
@@ -201,14 +216,14 @@
       </Transition>
     </header>
 
-    <!-- HERO BANNER: Componente modular según hero_style del layout AI -->
+    <!-- HERO BANNER: Componente modular seg�n hero_style del layout AI -->
     <div :class="heroTopMargin">
-      <!-- EDITORIAL: Alta moda, full-bleed fotografía, tipografía serif -->
+      <!-- EDITORIAL: Alta moda, full-bleed fotograf�a, tipograf�a serif -->
       <HeroEditorial
         v-if="layoutConfig.hero_style === 'editorial' || layoutConfig.hero_style === 'full-bleed'"
         :headline="heroHeadlineDisplay"
         :subheadline="heroSubheadlineDisplay"
-        :backgroundImage="carouselImages[0]"
+        :backgroundImage="currentHeroImage"
         :palette="aiPalette"
         :fonts="aiFonts"
         :ctaText="bannerCtaText"
@@ -223,7 +238,7 @@
         v-else-if="layoutConfig.hero_style === 'split-portrait' || layoutConfig.hero_style === 'split'"
         :headline="heroHeadlineDisplay"
         :subheadline="heroSubheadlineDisplay"
-        :backgroundImage="carouselImages[0]"
+        :backgroundImage="currentHeroImage"
         :palette="aiPalette"
         :fonts="aiFonts"
         :ctaText="bannerCtaText"
@@ -232,12 +247,12 @@
         @cta="scrollToProducts"
       />
 
-      <!-- STREETWEAR: Urbano, asimétrico, texto sobre imagen -->
+      <!-- STREETWEAR: Urbano, asim�trico, texto sobre imagen -->
       <HeroStreetwear
         v-else-if="layoutConfig.hero_style === 'streetwear' || layoutConfig.hero_style === 'urban'"
         :headline="heroHeadlineDisplay"
         :subheadline="heroSubheadlineDisplay"
-        :backgroundImage="carouselImages[0]"
+        :backgroundImage="currentHeroImage"
         :palette="aiPalette"
         :fonts="aiFonts"
         :ctaText="bannerCtaText"
@@ -245,27 +260,27 @@
         @cta="scrollToProducts"
       />
 
-      <!-- FOCUS: Conversión directa, copy + producto destacado -->
+      <!-- FOCUS: Conversi�n directa, copy + producto destacado -->
       <HeroFocus
         v-else-if="layoutConfig.hero_style === 'centered-minimal' || layoutConfig.hero_style === 'focus'"
         :headline="heroHeadlineDisplay"
         :subheadline="heroSubheadlineDisplay"
-        :backgroundImage="carouselImages[0]"
+        :backgroundImage="currentHeroImage"
         :palette="aiPalette"
         :fonts="aiFonts"
         :ctaText="bannerCtaText"
-        :badge="bannerCtaText ? 'Novedad' : 'Nueva Colección'"
+        :badge="bannerCtaText ? 'Novedad' : 'Nueva Colecci�n'"
         :productCount="catalogProducts.length"
         :isMobilePreview="isMobilePreview"
         @cta="scrollToProducts"
       />
 
-      <!-- PORTRAIT: Retrato full-bleed, tipografía mixta sans+serif, doble CTA rectangular + trust strip -->
+      <!-- PORTRAIT: Retrato full-bleed, tipograf�a mixta sans+serif, doble CTA rectangular + trust strip -->
       <HeroPortrait
         v-else-if="layoutConfig.hero_style === 'portrait'"
         :headline="heroHeadlineDisplay"
         :subheadline="heroSubheadlineDisplay"
-        :backgroundImage="carouselImages[0]"
+        :backgroundImage="currentHeroImage"
         :palette="aiPalette"
         :fonts="aiFonts"
         :ctaText="bannerCtaText"
@@ -281,7 +296,7 @@
         v-else
         :headline="heroHeadlineDisplay"
         :subheadline="heroSubheadlineDisplay"
-        :backgroundImage="carouselImages[0]"
+        :backgroundImage="currentHeroImage"
         :palette="aiPalette"
         :fonts="aiFonts"
         :ctaText="bannerCtaText"
@@ -315,7 +330,7 @@
             </div>
           </div>
           <div class="px-2 sm:px-3 py-2 sm:py-2.5">
-            <p class="text-[8px] sm:text-[10px] uppercase tracking-[0.08em] mb-0.5 truncate" :style="{ color: aiPalette.primary + '99' }">{{ product.category || 'Colección' }}</p>
+            <p class="text-[8px] sm:text-[10px] uppercase tracking-[0.08em] mb-0.5 truncate" :style="{ color: aiPalette.primary + '99' }">{{ product.category || 'Colecci�n' }}</p>
             <h3 class="text-[11px] sm:text-sm leading-snug truncate" :style="{ fontFamily: aiFonts.heading + ', serif', fontWeight: 500, color: aiPalette.text_dark }">{{ product.name }}</h3>
             <p class="text-[11px] sm:text-sm font-bold mt-0.5" :style="{ color: aiPalette.text_dark }">{{ storeConfig.currency_symbol }}{{ formatPrice(product.price) }}</p>
           </div>
@@ -323,129 +338,100 @@
       </div>
     </section>
 
-    <!-- TRUST SIGNALS: Barra de confianza editorial (oculto en portrait: usa trust strip integrada del hero) -->
-    <div v-if="layoutConfig.hero_style !== 'portrait'" :style="{ backgroundColor: aiPalette.background }">
-      <!-- Línea divisoria superior, extremadamente sutil -->
-      <div class="h-px" :style="{ backgroundColor: aiPalette.secondary + '33' }"></div>
-
-      <div class="lg:ml-64 px-6 py-8">
-        <!-- Con datos de IA: grid centrado, icono arriba, texto abajo -->
-        <template v-if="storeConfig.ai_value_messages && storeConfig.ai_value_messages.length > 0">
-          <div
-            class="grid gap-y-6"
-            :class="storeConfig.ai_value_messages.slice(0, 3).length === 2 ? 'grid-cols-2' : 'grid-cols-3'"
-          >
-            <div
-              v-for="(msg, i) in storeConfig.ai_value_messages.slice(0, 3)"
-              :key="'trust-'+i"
-              class="flex flex-col items-center text-center gap-3 px-2"
-            >
-              <!-- Icono fino y minimalista, sin fondo ni borde -->
-              <svg
-                class="w-[22px] h-[22px] flex-shrink-0"
-                :style="{ color: aiPalette.text_dark + 'aa' }"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2"
-              >
-                <!-- Envío / Entrega -->
-                <path v-if="i === 0" stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
-                <!-- Garantía / Calidad -->
-                <path v-else-if="i === 1" stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                <!-- Pago seguro -->
-                <path v-else stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-              </svg>
-              <p
-                class="text-[10px] leading-snug"
-                :style="{ color: aiPalette.text_dark + '99', fontFamily: aiFonts.body + ', sans-serif', letterSpacing: '0.03em' }"
-              >{{ msg }}</p>
-            </div>
-          </div>
-        </template>
-
-        <!-- Sin datos de IA: fallback con 3 pilares de moda clásicos -->
-        <template v-else>
-          <div class="grid grid-cols-3 gap-y-6">
-            <div class="flex flex-col items-center text-center gap-3 px-2">
-              <svg class="w-[22px] h-[22px]" :style="{ color: aiPalette.text_dark + 'aa' }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
-              </svg>
-              <p class="text-[10px]" :style="{ color: aiPalette.text_dark + '99', fontFamily: aiFonts.body + ', sans-serif', letterSpacing: '0.03em' }">Envío a todo el país</p>
-            </div>
-            <div class="flex flex-col items-center text-center gap-3 px-2">
-              <svg class="w-[22px] h-[22px]" :style="{ color: aiPalette.text_dark + 'aa' }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-              </svg>
-              <p class="text-[10px]" :style="{ color: aiPalette.text_dark + '99', fontFamily: aiFonts.body + ', sans-serif', letterSpacing: '0.03em' }">Calidad garantizada</p>
-            </div>
-            <div class="flex flex-col items-center text-center gap-3 px-2">
-              <svg class="w-[22px] h-[22px]" :style="{ color: aiPalette.text_dark + 'aa' }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-              </svg>
-              <p class="text-[10px]" :style="{ color: aiPalette.text_dark + '99', fontFamily: aiFonts.body + ', sans-serif', letterSpacing: '0.03em' }">Pago seguro</p>
-            </div>
-          </div>
-        </template>
-      </div>
-
-      <!-- Línea divisoria inferior -->
-      <div class="h-px" :style="{ backgroundColor: aiPalette.secondary + '33' }"></div>
+    <!-- TRUST STRIP: Sistema modular � aplica a todos los estilos de hero -->
+    <div class="lg:ml-64">
+      <TrustStripMarquee
+        v-if="trustStripStyle === 'marquee'"
+        :items="trustStripItems"
+        :bgColor="aiPalette.text_dark"
+        :textColor="'#ffffff'"
+        :accentColor="aiPalette.primary"
+        :animate="true"
+      />
+      <TrustStripDarkContrast
+        v-else-if="trustStripStyle === 'dark-contrast'"
+        :items="trustStripItems"
+        :bgColor="aiPalette.text_dark"
+        :textColor="'#ffffff'"
+        :iconColor="aiPalette.primary || '#ffffff'"
+      />
+      <TrustStripDivided
+        v-else-if="trustStripStyle === 'divided'"
+        :items="trustStripItems"
+        :bgColor="aiPalette.background"
+        :textColor="aiPalette.text_dark"
+        :iconColor="aiPalette.primary"
+        :iconBgColor="aiPalette.primary + '18'"
+        :dividerColor="aiPalette.secondary + '55'"
+      />
+      <TrustStripSoftPills
+        v-else-if="trustStripStyle === 'soft-pills'"
+        :items="trustStripItems"
+        :bgColor="aiPalette.background"
+        :pillBgColor="'#ffffff'"
+        :textColor="aiPalette.text_dark"
+        :iconColor="aiPalette.primary"
+      />
+      <!-- Default / minimal-border -->
+      <TrustStripMinimalBorder
+        v-else
+        :items="trustStripItems"
+        :bgColor="aiPalette.background"
+        :textColor="aiPalette.text_dark"
+        :iconColor="aiPalette.text_dark"
+        :borderColor="aiPalette.secondary + '55'"
+      />
     </div>
 
-    <!-- EDITORIAL STRIP: Historia + colecciones + anuncios cerca del hero -->
-    <section class="lg:ml-64 px-4 lg:px-8 pt-8 pb-4 space-y-5">
-      <div class="rounded-3xl border border-gray-200/80 overflow-hidden" :style="{ backgroundColor: aiPalette.background }">
-        <div class="grid lg:grid-cols-[1.2fr,1fr] gap-0">
-          <div class="p-5 md:p-7 lg:p-8">
-            <p class="text-[10px] uppercase tracking-[0.25em] font-semibold" :style="{ color: aiPalette.primary }">Brand Story</p>
-            <h3
-              class="mt-2 text-2xl md:text-3xl leading-tight text-gray-900"
-              :style="{ fontFamily: aiFonts.heading + ', serif', fontWeight: 500 }"
-            >
-              {{ bannerHeadline }}
-            </h3>
-            <p class="mt-3 text-sm md:text-base leading-relaxed text-gray-600 whitespace-pre-line" :style="{ fontFamily: aiFonts.body + ', sans-serif' }">
-              {{ storySnippet }}
-            </p>
+    <!-- HOOK / SPOTLIGHT: Bloque pre-cat�logo modular (reemplaza Brand Story gen�rico) -->
+    <div class="lg:ml-64">
+      <!-- editorial-story: Boutique / Lencer�a / Alta Costura -->
+      <HookEditorialStory
+        v-if="hookStyle === 'editorial-story'"
+        :headline="bannerHeadline"
+        :body="hookBodyText"
+        :label="storeConfig.category || 'Brand Story'"
+        ctaText="Ver Colecci�n"
+        :image="storyImageSlots[0]"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        @cta="scrollToProducts"
+      />
+      <!-- urban-lookbook: Streetwear / Sneakers / Drop -->
+      <HookUrbanLookbook
+        v-else-if="hookStyle === 'urban-lookbook'"
+        :headline="bannerHeadline"
+        :subheadline="storySnippet.slice(0, 60)"
+        :dropLabel="storeConfig.category || 'Nueva Colecci�n'"
+        ctaText="Shop Now"
+        :image="storyImageSlots[0]"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        @cta="scrollToProducts"
+      />
+      <!-- dynamic-bento: Deportivo / Tech / Consumo -->
+      <HookDynamicBento
+        v-else-if="hookStyle === 'dynamic-bento'"
+        :headline="bannerHeadline"
+        :subheadline="hookBodyText.slice(0, 55)"
+        :benefit="storeConfig.ai_banner_texts?.cta_secondary || 'Alto\nRendimiento'"
+        :label="storeConfig.category || 'Colecci�n 2026'"
+        ctaText="Ver Colecci�n"
+        :image="storyImageSlots[0]"
+        :detailImage="storyImageSlots[1]"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        @cta="scrollToProducts"
+      />
+    </div>
 
-            <button
-              @click="scrollToProducts"
-              class="mt-5 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.15em] transition-all duration-300 hover:gap-3"
-              :style="{ color: aiPalette.primary }"
-            >
-              Ver colección
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" /></svg>
-            </button>
-          </div>
-
-          <div class="relative overflow-hidden lg:min-h-full">
-            <!-- Imagen principal de fondo -->
-            <img v-if="storyImageSlots[0]" :src="storyImageSlots[0]" alt="Historia de marca" class="w-full h-52 sm:h-64 lg:h-full object-cover" />
-            <div v-else class="w-full h-52 sm:h-64 lg:h-full bg-gray-100"></div>
-            <!-- Gradient overlay -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
-            <!-- Thumbnails flotantes -->
-            <div class="absolute bottom-3 right-3 flex flex-col gap-2">
-              <div class="w-16 h-16 rounded-xl overflow-hidden border-2 border-white/80 shadow-lg">
-                <img v-if="storyImageSlots[1]" :src="storyImageSlots[1]" alt="" class="w-full h-full object-cover" />
-                <div v-else class="w-full h-full bg-gray-200"></div>
-              </div>
-              <div class="w-16 rounded-xl px-2 py-1.5 flex flex-col items-center justify-center text-center" :style="{ backgroundColor: aiPalette.primary }">
-                <p class="text-white text-base font-bold leading-tight">{{ filteredProducts.length }}</p>
-                <p class="text-white/80 text-[8px] uppercase tracking-wider leading-tight">items</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- BARRA STICKY: Filtrar + Ordenar (Móvil) - Sólida -->
+    <!-- BARRA STICKY: Filtrar + Ordenar (M�vil) - S�lida -->
     <div 
       class="lg:hidden sticky top-[90px] z-40 border-t border-b border-gray-200"
       :style="{ backgroundColor: aiPalette.background || '#ffffff', boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }"
     >
       <div class="flex">
-        <!-- Botón FILTRAR (50%) -->
+        <!-- Bot�n FILTRAR (50%) -->
         <button 
           @click="showMobileFilters = true"
           class="flex-1 h-11 flex items-center justify-center gap-2 text-[11px] font-semibold text-gray-700 uppercase tracking-[0.1em] transition-colors hover:bg-gray-50 active:bg-gray-100"
@@ -457,7 +443,7 @@
         </button>
         <!-- Separador central fino -->
         <div class="w-px h-6 bg-gray-200 self-center"></div>
-        <!-- Botón ORDENAR (50%) -->
+        <!-- Bot�n ORDENAR (50%) -->
         <button 
           @click="showSortModal = true"
           class="flex-1 h-11 flex items-center justify-center gap-2 text-[11px] font-semibold text-gray-700 uppercase tracking-[0.1em] transition-colors hover:bg-gray-50 active:bg-gray-100"
@@ -472,9 +458,9 @@
 
     <!-- SIDEBAR LATERAL (Desktop) - Premium Minimalista -->
     <aside v-if="!isMobilePreview" class="hidden lg:block fixed left-0 top-[154px] bottom-0 w-64 bg-white border-r border-gray-100 overflow-y-auto z-30 px-6 py-8">
-      <!-- Filtro por Categoría - Minimalista con línea vertical -->
+      <!-- Filtro por Categor�a - Minimalista con l�nea vertical -->
       <div class="mb-8">
-        <h3 class="text-xs font-bold text-gray-400 mb-5 uppercase tracking-widest">Categorías</h3>
+        <h3 class="text-xs font-bold text-gray-400 mb-5 uppercase tracking-widest">Categor�as</h3>
         <div class="space-y-0.5">
           <button
             @click="selectedCategory = null"
@@ -511,7 +497,7 @@
         </div>
       </div>
 
-      <!-- Filtro por Rango de Precio - Slider Simple (Solo Máximo) -->
+      <!-- Filtro por Rango de Precio - Slider Simple (Solo M�ximo) -->
       <div class="mb-8">
         <h3 class="text-xs font-bold text-gray-400 mb-5 uppercase tracking-widest">Precio</h3>
         <div class="space-y-4">
@@ -621,7 +607,7 @@
         </label>
       </div>
 
-      <!-- Botón Limpiar Filtros -->
+      <!-- Bot�n Limpiar Filtros -->
       <button
         v-if="selectedCategory || showOnlyAvailable || sortOrder"
         @click="clearFilters"
@@ -631,20 +617,20 @@
       </button>
     </aside>
 
-    <!-- ÁREA PRINCIPAL: Productos -->
+    <!-- �REA PRINCIPAL: Productos -->
     <section ref="productsSection" class="lg:ml-64 pt-3 px-4 lg:px-8 pb-8">
       
-      <!-- Header de Catálogo -->
+      <!-- Header de Cat�logo -->
       <div class="mb-5 pb-4 border-b border-gray-200 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p class="text-[10px] uppercase tracking-[0.22em] font-semibold" :style="{ color: aiPalette.primary }">Catálogo Curado</p>
+          <p class="text-[10px] uppercase tracking-[0.22em] font-semibold" :style="{ color: aiPalette.primary }">Cat�logo Curado</p>
           <h3 class="mt-1 text-2xl md:text-3xl text-gray-900" :style="{ fontFamily: aiFonts.heading + ', serif', fontWeight: 500 }">
             {{ selectedCategory !== null ? activeCategoryName : (bannerCtaText || 'Compra por estilo') }}
           </h3>
           <p class="mt-1 text-sm text-gray-500">
             {{ filteredProducts.length }} productos
             <span v-if="selectedCategory !== null || showOnlyAvailable || sortOrder" class="font-semibold" :style="{ color: aiPalette.primary }">
-              · filtrados
+              � filtrados
             </span>
           </p>
         </div>
@@ -692,7 +678,7 @@
                   </svg>
                 </div>
                 
-                <!-- Botón Agregar - Minimal -->
+                <!-- Bot�n Agregar - Minimal -->
                 <button
                   @click.stop="addToCart(product)"
                   :disabled="product.stock === 0"
@@ -729,7 +715,7 @@
 
               <!-- Product Info - Compacto y Alineado -->
               <div class="pt-3 pb-4 px-3">
-                <p class="text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-1 truncate">{{ product.category || 'Colección' }}</p>
+                <p class="text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-1 truncate">{{ product.category || 'Colecci�n' }}</p>
                 <h3 class="text-[13px] font-normal text-gray-700 truncate leading-snug mb-1" :style="{ fontFamily: aiFonts.heading + ', serif' }">
                   {{ product.name }}
                 </h3>
@@ -787,7 +773,7 @@
             </div>
 
             <div class="relative min-h-[260px] md:min-h-full">
-              <img v-if="storyImageSlots[0]" :src="storyImageSlots[0]" alt="Colección principal" class="w-full h-full object-cover" />
+              <img v-if="storyImageSlots[0]" :src="storyImageSlots[0]" alt="Colecci�n principal" class="w-full h-full object-cover" />
               <div v-else class="w-full h-full bg-gray-100"></div>
               <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent"></div>
             </div>
@@ -799,7 +785,7 @@
     <!-- FOOTER: Powered by 105 POS -->
     <footer class="border-t py-8 text-center" :class="{ 'mb-16': cartCount > 0 }" :style="{ backgroundColor: aiPalette.background, borderColor: aiPalette.secondary }">
       <p class="text-xs text-gray-400 tracking-wide">
-        Tecnología por
+        Tecnolog�a por
         <a 
           href="https://105pos.pro/register" 
           target="_blank" 
@@ -809,7 +795,7 @@
       </p>
     </footer>
 
-    <!-- WHATSAPP BUTTON - En móvil sube con carrito, en PC fijo -->
+    <!-- WHATSAPP BUTTON - En m�vil sube con carrito, en PC fijo -->
     <a 
       v-if="storeConfig.whatsapp_number"
       :href="`https://wa.me/${storeConfig.whatsapp_number.replace(/[^0-9]/g, '')}?text=Hola, me interesa hacer un pedido`"
@@ -824,7 +810,7 @@
       </svg>
     </a>
 
-    <!-- STICKY BOTTOM ACTION BAR - Solo Móvil (Desktop usa Mini-Cart en Header) -->
+    <!-- STICKY BOTTOM ACTION BAR - Solo M�vil (Desktop usa Mini-Cart en Header) -->
     <Transition name="slide-up">
       <div 
         v-if="cartCount > 0"
@@ -838,7 +824,7 @@
           <p class="text-lg font-bold text-gray-900">{{ storeConfig.currency_symbol }}{{ formatPrice(cartTotal) }}</p>
         </div>
         
-        <!-- Derecha: Botón VER BOLSA -->
+        <!-- Derecha: Bot�n VER BOLSA -->
         <button 
           @click="router.push('/catalog/bolsa')"
           class="text-white px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors flex items-center gap-2"
@@ -852,7 +838,7 @@
       </div>
     </Transition>
 
-    <!-- OFF-CANVAS DRAWER MENU (Menú Lateral de Categorías) -->
+    <!-- OFF-CANVAS DRAWER MENU (Men� Lateral de Categor�as) -->
     <Transition name="fade">
       <div v-if="showMobileMenu" class="fixed inset-0 bg-black/50 z-[160]" @click="showMobileMenu = false"></div>
     </Transition>
@@ -864,7 +850,7 @@
             class="text-[15px] text-gray-900 tracking-[0.06em] uppercase"
             style="font-family: 'Playfair Display', 'Georgia', serif; font-weight: 600;"
           >
-            {{ storeConfig.store_name || 'Menú' }}
+            {{ storeConfig.store_name || 'Men�' }}
           </h2>
           <button 
             @click="showMobileMenu = false"
@@ -876,7 +862,7 @@
           </button>
         </div>
 
-        <!-- Categorías -->
+        <!-- Categor�as -->
         <nav class="flex-1 overflow-y-auto">
           <ul>
             <li>
@@ -885,7 +871,7 @@
                 class="w-full text-left px-5 py-4 text-sm font-medium transition-colors border-b border-gray-100 flex items-center justify-between"
                 :class="selectedCategory === null ? 'text-gray-900 bg-gray-50' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'"
               >
-                <span>Todas las categorías</span>
+                <span>Todas las categor�as</span>
                 <span v-if="selectedCategory === null" class="w-1.5 h-1.5 bg-gray-900 rounded-full"></span>
               </button>
             </li>
@@ -905,14 +891,14 @@
         <!-- Footer del drawer -->
         <div class="flex-shrink-0 px-5 py-4 border-t border-gray-100">
           <p class="text-[10px] text-gray-400 text-center tracking-wide">
-            Tecnología por
+            Tecnolog�a por
             <a href="https://105pos.pro/register" target="_blank" rel="noopener noreferrer" class="font-semibold text-gray-500">105 POS</a>
           </p>
         </div>
       </div>
     </Transition>
 
-    <!-- MOBILE FILTERS DRAWER (Solo Móvil) -->
+    <!-- MOBILE FILTERS DRAWER (Solo M�vil) -->
     <Transition name="fade">
       <div v-if="showMobileFilters" class="lg:hidden fixed inset-0 bg-black/50 z-[150]" @click="showMobileFilters = false"></div>
     </Transition>
@@ -930,9 +916,9 @@
         
         <!-- Contenido de Filtros -->
         <div class="flex-1 overflow-y-auto px-6 py-5 space-y-6">
-          <!-- Categorías -->
+          <!-- Categor�as -->
           <div>
-            <h4 class="text-xs font-bold text-gray-400 mb-4 uppercase tracking-widest">Categorías</h4>
+            <h4 class="text-xs font-bold text-gray-400 mb-4 uppercase tracking-widest">Categor�as</h4>
             <div class="space-y-1">
               <button
                 @click="selectedCategory = null; showMobileFilters = false"
@@ -961,7 +947,7 @@
           
           <!-- Precio - Slider Simple -->
           <div>
-            <h4 class="text-xs font-bold text-gray-400 mb-4 uppercase tracking-widest">Precio máximo</h4>
+            <h4 class="text-xs font-bold text-gray-400 mb-4 uppercase tracking-widest">Precio m�ximo</h4>
             <div class="space-y-3">
               <div class="relative h-1.5 bg-gray-200 rounded-full">
                 <div 
@@ -996,7 +982,7 @@
           </div>
         </div>
         
-        <!-- Footer con botón -->
+        <!-- Footer con bot�n -->
         <div class="flex-shrink-0 px-6 py-4 border-t border-gray-100 bg-gray-50">
           <button 
             @click="showMobileFilters = false"
@@ -1008,7 +994,7 @@
       </div>
     </Transition>
 
-    <!-- MOBILE SORT MODAL (Solo Móvil) -->
+    <!-- MOBILE SORT MODAL (Solo M�vil) -->
     <Transition name="fade">
       <div v-if="showSortModal" class="lg:hidden fixed inset-0 bg-black/50 z-[150]" @click="showSortModal = false"></div>
     </Transition>
@@ -1089,7 +1075,7 @@
       @confirm="handleQuantityConfirmed"
     />
 
-    <!-- Modal de Selección de Variantes (Fashion) -->
+    <!-- Modal de Selecci�n de Variantes (Fashion) -->
     <POSVariantSelector
       :show="showVariantModal"
       :product="selectedProductForVariants"
@@ -1130,7 +1116,9 @@ import QuantityModal from './QuantityModal.vue'
 import POSVariantSelector from '../POSVariantSelector.vue'
 import { useCatalogCart } from '../../stores/catalogCart.js'
 import { HeroEditorial, HeroSplit, HeroStreetwear, HeroFocus, HeroPortrait } from './blocks/heroes/index.js'
-import { HeaderEditorialCenter, HeaderRetailLeft, HeaderTransparentGlass, HeaderFloatingPill, HeaderUtilitySearch } from './blocks/headers/index.js'
+import { HeaderEditorialCenter, HeaderRetailLeft, HeaderTransparentGlass, HeaderRetailOverlay, HeaderUtilitySearch, HeaderCenteredSerif } from './blocks/headers/index.js'
+import { TrustStripDarkContrast, TrustStripMinimalBorder, TrustStripDivided, TrustStripMarquee, TrustStripSoftPills } from './blocks/trust-strips/index.js'
+import { HookEditorialStory, HookUrbanLookbook, HookDynamicBento } from './blocks/hooks/index.js'
 import { productUrl } from '../../utils/slugify.js'
 
 const router = useRouter()
@@ -1174,10 +1162,10 @@ const showOnlyAvailable = ref(false) // Filtro de disponibilidad
 
 // Ticker de anuncios vertical - Use AI-generated or defaults
 const defaultAnnouncements = [
-  'Envío Gratis en compras mayores a $150.000',
+  'Env�o Gratis en compras mayores a $150.000',
   'Nuevas Colecciones Disponibles',
-  'Hasta 3 cuotas sin interés',
-  'Devoluciones gratis en 30 días'
+  'Hasta 3 cuotas sin inter�s',
+  'Devoluciones gratis en 30 d�as'
 ]
 const announcements = computed(() => {
   const aiAnnouncements = props.storeConfig.ai_announcements
@@ -1195,19 +1183,19 @@ const stickyHeader = ref(null)
 const productsSection = ref(null)
 const currentSlide = ref(0)
 
-// 🆕 Estados para modales nuevos
+// ?? Estados para modales nuevos
 const showQuantityModal = ref(false)
 const selectedProductForQuantity = ref(null)
 const showVariantModal = ref(false)
 const selectedProductForVariants = ref(null)
 
-// 🆕 Estados para UI Premium Móvil
+// ?? Estados para UI Premium M�vil
 const showMobileMenu = ref(false)
 const showMobileSearch = ref(false)
 const showMobileFilters = ref(false)
 const showSortModal = ref(false)
 
-// Color primario dinámico del storeConfig
+// Color primario din�mico del storeConfig
 const primaryColor = computed(() => props.storeConfig.primary_color || '#10B981')
 
 // AI color palette with resilient fallbacks
@@ -1247,13 +1235,13 @@ const aiFonts = computed(() => {
 // AI layout config - controls hero style, CTA variant, category layout
 const layoutConfig = computed(() => {
   const cfg = props.storeConfig.ai_layout_config || {}
-  // 🧪 TEST: descomenta UNA línea para probar cada hero
-  //const TEST_HERO = null               // null = usa el valor real de la BD
-   const TEST_HERO = 'editorial'        // HeroEditorial   — full-bleed moda/lifestyle
-  //const TEST_HERO = 'split-portrait'   // HeroSplit        — 50/50 color+foto
-  // const TEST_HERO = 'streetwear'       // HeroStreetwear  — urbano bold
-  // const TEST_HERO = 'centered-minimal' // HeroFocus        — conversión directa
-  // const TEST_HERO = 'portrait'         // HeroPortrait     — belleza/cabello, doble CTA + trust strip
+  // ?? TEST: descomenta UNA l�nea para probar cada hero
+  const TEST_HERO = null               // null = usa el valor real de la BD
+  // const TEST_HERO = 'editorial'        // HeroEditorial   � full-bleed moda/lifestyle
+  //const TEST_HERO = 'split-portrait'   // HeroSplit        � 50/50 color+foto
+  // const TEST_HERO = 'streetwear'       // HeroStreetwear  � urbano bold
+  // const TEST_HERO = 'centered-minimal' // HeroFocus        � conversi�n directa
+  // const TEST_HERO = 'portrait'         // HeroPortrait     � belleza/cabello, doble CTA + trust strip
 
   return {
     hero_style: TEST_HERO || cfg.hero_style || 'editorial',
@@ -1266,26 +1254,27 @@ const layoutConfig = computed(() => {
   }
 })
 
-// AI header config — controla qué navbar se renderiza + su ticker y animación
+// AI header config � controla qu� navbar se renderiza + su ticker y animaci�n
 const headerConfig = computed(() => {
   const cfg = props.storeConfig.ai_layout_config || {}
-  // 🧪 TEST: descomenta UNA línea para probar cada header
-  // const TEST_HEADER = null                   // null = header original del sistema
-  // const TEST_HEADER = 'editorial-center'  // HeaderEditorialCenter — alta moda, logo centrado serif
-  // const TEST_HEADER = 'retail-left'       // HeaderRetailLeft      — consumo masivo, logo izquierda
-  // const TEST_HEADER = 'transparent-glass' // HeaderTransparentGlass — cosmética ★ pair con portrait/editorial
-   const TEST_HEADER = 'floating-pill'     // HeaderFloatingPill    — streetwear/tech, píldora flotante
-  // const TEST_HEADER = 'utility-search'    // HeaderUtilitySearch   — ferretería, barra búsqueda 2 filas
-
+  // ?? TEST: descomenta UNA l�nea para probar cada header
+   const TEST_HEADER = null                   // null = header original del sistema
+  // const TEST_HEADER = 'editorial-center'  // HeaderEditorialCenter � alta moda, logo centrado serif
+  // const TEST_HEADER = 'retail-left'       // HeaderRetailLeft      � consumo masivo, logo izquierda
+  // const TEST_HEADER = 'transparent-glass' // HeaderTransparentGlass � cosm�tica ? pair con portrait/editorial
+   // const TEST_HEADER = 'floating-pill'     // HeaderFloatingPill    � streetwear/tech, p�ldora flotante
+  // const TEST_HEADER = 'utility-search'    // HeaderUtilitySearch   � ferreter�a, barra b�squeda 2 filas
+  // const TEST_HEADER = 'centered-serif' // HeaderCenteredSerif � elegante, logo centrado serif, sin ticker (usa layoutConfig) 
   const style = TEST_HEADER || cfg.header_style || null
 
-  // Cada header dicta su propio ticker: estilo visual + animación
+  // Cada header dicta su propio ticker: estilo visual + animaci�n
   const presets = {
     'editorial-center':   { tickerStyle: 'muted-light',  tickerMode: 'slide-left'  },
     'retail-left':        { tickerStyle: 'soft-primary',  tickerMode: 'slide-left'  },
     'transparent-glass':  { tickerStyle: 'contrast-dark', tickerMode: 'fade'        },
     'floating-pill':      { tickerStyle: 'contrast-dark', tickerMode: 'slide-down'  },
     'utility-search':     { tickerStyle: 'muted-light',   tickerMode: 'slide-left'  },
+    'centered-serif':     { tickerStyle: 'muted-light',   tickerMode: 'slide-left'  },
   }
 
   return {
@@ -1295,15 +1284,64 @@ const headerConfig = computed(() => {
   }
 })
 
-// Espaciado dinámico encima del hero según el tipo de header activo
+// Espaciado din�mico encima del hero seg�n el tipo de header activo
 // - transparent-glass y floating-pill flotan sobre el hero (sin margen)
 // - utility-search tiene 2 filas (ticker 32px + header 92px = 124px)
-// - Resto de headers sólidos: ticker 32px + header 56px = 88px mobile, 104px desktop
+// - Resto de headers s�lidos: ticker 32px + header 56px = 88px mobile, 104px desktop
 const heroTopMargin = computed(() => {
   const style = headerConfig.value.style
   if (style === 'transparent-glass' || style === 'floating-pill') return 'mt-0'
   if (style === 'utility-search') return 'mt-[124px]'
   return 'mt-[88px] lg:mt-[104px]'
+})
+
+// Hook / Spotlight: bloque pre-cat�logo que reemplaza el Brand Story gen�rico
+const hookStyle = computed(() => {
+  const cfg = props.storeConfig.ai_layout_config || {}
+  // ?? TEST: descomenta UNA l�nea para probar cada bloque
+   const TEST_HOOK = null                    // null = usa el valor real de la BD
+  // const TEST_HOOK = 'editorial-story'    // HookEditorialStory  � boutique/lencer�a/alta costura
+  // const TEST_HOOK = 'urban-lookbook'     // HookUrbanLookbook   � streetwear/sneakers/drop
+  // const TEST_HOOK = 'dynamic-bento'      // HookDynamicBento    � deportivo/tech/consumo
+  return TEST_HOOK || cfg.hook_style || 'editorial-story' // editorial-story como default
+})
+
+// Texto del cuerpo del Hook (usa ai_about_us como fuente, truncado para el bloque)
+const hookBodyText = computed(() => {
+  const about = (props.storeConfig.ai_about_us || '').trim()
+  if (!about) return 'Cada pieza es pensada con materiales de primera calidad. Tu comodidad y estilo son nuestra obsesi�n desde el primer boceto.'
+  return about.length > 200 ? `${about.slice(0, 200).trim()}...` : about
+})
+
+// Trust Strip: estilo visual y datos normalizados desde ai_value_messages
+const trustStripStyle = computed(() => {
+  const cfg = props.storeConfig.ai_layout_config || {}
+  // ?? TEST: descomenta UNA l�nea para probar cada estilo
+   const TEST_TRUST_STRIP = null              // null = usa el valor real de la BD
+  // const TEST_TRUST_STRIP = 'dark-contrast'  // Kharis � fondo negro, texto blanco, scroll
+  // const TEST_TRUST_STRIP = 'minimal-border' // Boutique/Zara � blanco, borde fino
+  // const TEST_TRUST_STRIP = 'divided'        // Cosm�tica/Corp � gris sutil, divide-x
+  // const TEST_TRUST_STRIP = 'marquee'        // Streetwear � texto en loop infinito
+  // const TEST_TRUST_STRIP = 'soft-pills'     // Tech/R�pido � pastillas blancas
+  return TEST_TRUST_STRIP || cfg.trust_strip_style || null
+})
+
+const trustStripItems = computed(() => {
+  const msgs = props.storeConfig.ai_value_messages || []
+  const iconMap = ['truck', 'shield', 'star', 'chat']
+  if (msgs.length > 0) {
+    return msgs.slice(0, 4).map((msg, i) => ({
+      icon: iconMap[i] || 'star',
+      label: msg.length > 22 ? msg.slice(0, 22) : msg,
+      sublabel: ''
+    }))
+  }
+  return [
+    { icon: 'truck',  label: 'Env�o a todo el pa�s', sublabel: 'R�pido y seguro' },
+    { icon: 'shield', label: 'Pago 100% seguro',      sublabel: 'SSL encriptado' },
+    { icon: 'star',   label: 'Calidad garantizada',   sublabel: 'Productos originales' },
+    { icon: 'chat',   label: 'Atenci�n personalizada', sublabel: 'Lun�S�b 8am�6pm' },
+  ]
 })
 
 const tickerBarStyle = computed(() => {
@@ -1334,7 +1372,7 @@ const tickerTextColor = computed(() => {
     : aiPalette.value.text_dark
 })
 
-// Animación del ticker según el header
+// Animaci�n del ticker seg�n el header
 const tickerTransitionName = computed(() => {
   const mode = headerConfig.value.tickerMode
   if (mode === 'fade')        return 'ticker-fade'
@@ -1398,7 +1436,7 @@ const bannerCtaSecondary = computed(() => {
 
 // AI-generated banner texts with fallbacks
 const bannerHeadline = computed(() => {
-  return props.storeConfig.ai_banner_texts?.headline || 'Nueva Colección'
+  return props.storeConfig.ai_banner_texts?.headline || 'Nueva Colecci�n'
 })
 
 const bannerSubheadline = computed(() => {
@@ -1410,7 +1448,7 @@ const bannerCtaText = computed(() => {
 })
 
 const heroHeadlineDisplay = computed(() => {
-  const text = bannerHeadline.value || 'Nueva Colección'
+  const text = bannerHeadline.value || 'Nueva Colecci�n'
   const maxChars = layoutConfig.value.hero_content_density === 'compact' ? 58 : 76
   return text.length > maxChars ? `${text.slice(0, maxChars - 3).trim()}...` : text
 })
@@ -1421,21 +1459,37 @@ const heroSubheadlineDisplay = computed(() => {
   return text.length > maxChars ? `${text.slice(0, maxChars - 3).trim()}...` : text
 })
 
-// Imágenes del carrusel - usar banner y logo si están disponibles
+// Im�genes del carrusel � prioriza catalog_media.hero_images, luego banner_url, luego fallbacks
 const carouselImages = computed(() => {
+  // 1. Im�genes subidas por el comerciante en el admin
+  const catalogMedia = props.storeConfig.catalog_media || {}
+  const heroImages = Array.isArray(catalogMedia.hero_images)
+    ? catalogMedia.hero_images.filter(Boolean)
+    : []
+
+  if (heroImages.length > 0) {
+    // Completar hasta 3 con el mismo array en loop si hay menos de 3
+    const result = [...heroImages]
+    while (result.length < 3) result.push(heroImages[result.length % heroImages.length] || heroImages[0])
+    return result.slice(0, 3)
+  }
+
+  // 2. Fallback: banner_url legacy
   const images = []
   if (props.storeConfig.banner_url) images.push(props.storeConfig.banner_url)
-  // Rellenar con imágenes predeterminadas
+
+  // 3. Fallback: Unsplash defaults
   const defaultImages = [
-    'https://images.unsplash.com/photo-1441986300917-64674bd600d8', // Tienda de ropa/boutique (Clean)
-    'https://images.unsplash.com/photo-1483985988355-763728e1935b', // Modelo Fashion / Shopping (Moda)
-    'https://images.unsplash.com/photo-1490481651871-ab68de25d43d'  // Ropa en ganchos (Minimalista)
+    'https://images.unsplash.com/photo-1441986300917-64674bd600d8',
+    'https://images.unsplash.com/photo-1483985988355-763728e1935b',
+    'https://images.unsplash.com/photo-1490481651871-ab68de25d43d'
   ]
-  defaultImages.forEach(img => {
-    if (images.length < 3) images.push(img)
-  })
+  defaultImages.forEach(img => { if (images.length < 3) images.push(img) })
   return images.slice(0, 3)
 })
+
+// Imagen activa del hero según el slide del carrusel
+const currentHeroImage = computed(() => carouselImages.value[currentSlide.value] || carouselImages.value[0] || '')
 
 const catalogProducts = computed(() => props.storeConfig.catalog_products || [])
 
@@ -1452,20 +1506,42 @@ const heroProducts = computed(() => {
 })
 
 const storyImageSlots = computed(() => {
+  const catalogMedia = props.storeConfig.catalog_media || {}
+  const hook = hookStyle.value
+
+  // Imágenes contextuales según el diseño activo
+  if (hook === 'urban-lookbook') {
+    const lookbookImgs = Array.isArray(catalogMedia.lookbook_images)
+      ? catalogMedia.lookbook_images.filter(Boolean)
+      : []
+    // Completar con product images como fallback
+    if (lookbookImgs.length > 0) return [...lookbookImgs, ...Array(4).fill('')].slice(0, 4)
+  }
+  if (hook === 'dynamic-bento') {
+    return [
+      catalogMedia.bento_main || '',
+      catalogMedia.bento_detail || '',
+      carouselImages.value[0] || ''
+    ]
+  }
+  if (hook === 'editorial-story') {
+    const editImg = catalogMedia.editorial_image || ''
+    if (editImg) return [editImg, carouselImages.value[0] || '', carouselImages.value[1] || '']
+  }
+
+  // Fallback genérico: product images + carousel
   const productImages = catalogProducts.value
     .map(product => getProductImage(product))
     .filter(Boolean)
-
   const fallback = [...carouselImages.value]
   const combined = [...productImages, ...fallback]
-
   return [combined[0] || '', combined[1] || '', combined[2] || '']
 })
 
 const storySnippet = computed(() => {
   const about = (props.storeConfig.ai_about_us || '').trim()
   if (!about) {
-    return 'Curamos piezas con diseño, calidad y carácter para que tu compra se sienta especial desde el primer vistazo.'
+    return 'Curamos piezas con dise�o, calidad y car�cter para que tu compra se sienta especial desde el primer vistazo.'
   }
   return about.length > 260 ? `${about.slice(0, 260).trim()}...` : about
 })
@@ -1478,7 +1554,7 @@ const categoryHighlights = computed(() => {
   catalogProducts.value.forEach((product) => {
     const rawId = product.category_id ?? product.category ?? 'sin-categoria'
     const id = String(rawId)
-    const name = product.category || product.category_name || 'Sin categoría'
+    const name = product.category || product.category_name || 'Sin categor�a'
 
     if (!countMap.has(id)) {
       countMap.set(id, { id: rawId, name, count: 0 })
@@ -1492,15 +1568,15 @@ const categoryHighlights = computed(() => {
 })
 
 const activeCategoryName = computed(() => {
-  if (selectedCategory.value === null) return 'Toda la colección'
+  if (selectedCategory.value === null) return 'Toda la colecci�n'
   const match = categoryHighlights.value.find(category => String(category.id) === String(selectedCategory.value))
-  return match?.name || 'Colección seleccionada'
+  return match?.name || 'Colecci�n seleccionada'
 })
 
 // Computed
 const storeName = computed(() => props.storeConfig.store_name || 'Mi Tienda')
 
-// Precios mínimo y máximo de productos
+// Precios m�nimo y m�ximo de productos
 const minProductPrice = computed(() => {
   const products = catalogProducts.value
   if (products.length === 0) return 0
@@ -1516,7 +1592,7 @@ const maxProductPrice = computed(() => {
 const filteredProducts = computed(() => {
   let products = catalogProducts.value
   
-  // Filtro por búsqueda
+  // Filtro por b�squeda
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase()
     products = products.filter(p => 
@@ -1525,7 +1601,7 @@ const filteredProducts = computed(() => {
     )
   }
   
-  // Filtro por categoría seleccionada
+  // Filtro por categor�a seleccionada
   if (selectedCategory.value !== null) {
     products = products.filter(p => p.category_id === selectedCategory.value)
   }
@@ -1535,7 +1611,7 @@ const filteredProducts = computed(() => {
     products = products.filter(p => p.stock && p.stock > 0)
   }
   
-  // Filtro por precio máximo
+  // Filtro por precio m�ximo
   if (priceRange.value.max < maxProductPrice.value) {
     products = products.filter(p => {
       const price = parseFloat(p.price || 0)
@@ -1570,7 +1646,7 @@ const cartTotal = computed(() => {
   return cartItems.value.reduce((sum, item) => sum + parseFloat(item.price), 0)
 })
 
-// Clases del grid según el modo de vista
+// Clases del grid seg�n el modo de vista
 const gridClasses = computed(() => {
   if (props.isMobilePreview) {
     return 'grid grid-cols-2 gap-3'
@@ -1578,7 +1654,7 @@ const gridClasses = computed(() => {
   return 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 lg:gap-5'
 })
 
-// Grid Premium para Moda (2 columnas en móvil, máximo 4 en desktop)
+// Grid Premium para Moda (2 columnas en m�vil, m�ximo 4 en desktop)
 const gridClassesPremium = computed(() => {
   if (props.isMobilePreview) {
     return 'grid grid-cols-2 gap-3 px-0'
@@ -1587,7 +1663,7 @@ const gridClassesPremium = computed(() => {
 })
 
 
-// Métodos
+// M�todos
 const formatPrice = (price) => {
   return parseFloat(price).toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 }
@@ -1653,7 +1729,7 @@ const handleQuantityConfirmed = ({ product, quantity }) => {
   showQuantityModal.value = false
 }
 
-// 🆕 Handler para modal de variantes
+// ?? Handler para modal de variantes
 const handleVariantConfirmed = ({ variant, selectedOptions }) => {
   if (!variant || !selectedProductForVariants.value) return
   
@@ -1819,7 +1895,7 @@ onUnmounted(() => {
   transform: translateX(-100%);
 }
 
-/* Animación Carrusel de Anuncios */
+/* Animaci�n Carrusel de Anuncios */
 @keyframes scroll-left {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
@@ -1829,7 +1905,7 @@ onUnmounted(() => {
   animation: scroll-left 20s linear infinite;
 }
 
-/* Transición Slide Down para búsqueda móvil */
+/* Transici�n Slide Down para b�squeda m�vil */
 .slide-down-enter-active,
 .slide-down-leave-active {
   transition: all 0.3s ease;
@@ -1900,7 +1976,7 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-/* Transición del Carrusel */
+/* Transici�n del Carrusel */
 .fade-slide-enter-active {
   transition: opacity 1.5s ease;
 }
@@ -1917,7 +1993,7 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-/* Animación Fade In */
+/* Animaci�n Fade In */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
@@ -1989,19 +2065,19 @@ onUnmounted(() => {
   }
 }
 
-/* Ticker: slide-left (default) — entra desde derecha, sale por izquierda */
+/* Ticker: slide-left (default) � entra desde derecha, sale por izquierda */
 .ticker-train-enter-active { transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
 .ticker-train-leave-active  { transition: all 0.5s cubic-bezier(0.7, 0, 0.84, 0); }
 .ticker-train-enter-from    { opacity: 0; transform: translateX(100%); }
 .ticker-train-leave-to      { opacity: 0; transform: translateX(-100%); }
 
-/* Ticker: fade — aparece y desaparece suavemente (transparent-glass) */
+/* Ticker: fade � aparece y desaparece suavemente (transparent-glass) */
 .ticker-fade-enter-active { transition: opacity 0.6s ease; }
 .ticker-fade-leave-active  { transition: opacity 0.4s ease; }
 .ticker-fade-enter-from    { opacity: 0; }
 .ticker-fade-leave-to      { opacity: 0; }
 
-/* Ticker: slide-down — entra desde arriba, sale hacia arriba (floating-pill) */
+/* Ticker: slide-down � entra desde arriba, sale hacia arriba (floating-pill) */
 .ticker-down-enter-active { transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
 .ticker-down-leave-active  { transition: all 0.4s cubic-bezier(0.7, 0, 0.84, 0); }
 .ticker-down-enter-from    { opacity: 0; transform: translateY(-100%); }

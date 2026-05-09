@@ -248,6 +248,7 @@ class PublicCatalogController extends Controller
                         'ai_announcements' => null,
                         'ai_cross_sell_messages' => null,
                         'ai_layout_config' => null,
+                        'catalog_media' => null,
                         'store_name' => DB::table('system_settings')->value('company_name')
                             ?? \Stancl\Tenancy\Facades\Tenancy::tenant()?->business_name
                             ?? tenant('name')
@@ -280,6 +281,7 @@ class PublicCatalogController extends Controller
                     'ai_announcements' => json_decode($config->ai_announcements ?? 'null', true),
                     'ai_cross_sell_messages' => json_decode($config->ai_cross_sell_messages ?? 'null', true),
                     'ai_layout_config' => json_decode($config->ai_layout_config ?? 'null', true),
+                    'catalog_media' => json_decode($config->catalog_media ?? 'null', true),
                     'store_name' => DB::table('system_settings')->value('company_name')
                         ?? \Stancl\Tenancy\Facades\Tenancy::tenant()?->business_name
                         ?? tenant('name')

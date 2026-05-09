@@ -10,15 +10,19 @@ export { default as HeaderRetailLeft }      from './HeaderRetailLeft.vue'
 export { default as HeaderTransparentGlass } from './HeaderTransparentGlass.vue'
 // Cosmética / Heroes visuales — transparente + glassmorphism al scroll (fixed)
 
-export { default as HeaderFloatingPill }    from './HeaderFloatingPill.vue'
-// Streetwear / Urbano / Tech — píldora flotante, sombra fuerte, no toca bordes
+export { default as HeaderRetailOverlay }   from './HeaderRetailOverlay.vue'
+// Streetwear / Urbano / Premium — transparente sobre hero, sólido al scroll, full-width
 
 export { default as HeaderUtilitySearch }   from './HeaderUtilitySearch.vue'
 // Ferreterías / Catálogos grandes — 2 filas, barra de búsqueda full-width integrada
+
+export { default as HeaderCenteredSerif }   from './HeaderCenteredSerif.vue'
+// Distribuidoras / Boutiques — nombre centrado serif + subtítulo, Kharis-inspired
 
 // ─── Mapeo para selección por IA ─────────────────────────────────────────────
 // 'editorial-center'   → HeaderEditorialCenter  (moda premium, boutique)
 // 'retail-left'        → HeaderRetailLeft        (masivo, funcional, minimarket)
 // 'transparent-glass'  → HeaderTransparentGlass  (cosmética, lifestyle, foto fuerte)
-// 'floating-pill'      → HeaderFloatingPill       (streetwear, tech, urbano)
+// 'floating-pill'      → HeaderRetailOverlay      (streetwear, urbano, premium overlay)
 // 'utility-search'     → HeaderUtilitySearch      (ferretería, electrónica, catálogo)
+// 'centered-serif'     → HeaderCenteredSerif      (distribuidora, boutique, Kharis-style)
