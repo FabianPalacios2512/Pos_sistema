@@ -18,6 +18,9 @@ import { ref, computed, onMounted } from 'vue'
 import CatalogTemplateSelector from '../components/catalog/CatalogTemplateSelector.vue'
 import apiClient from '../services/apiClient.js'
 
+// Clave de caché en localStorage para carga instantánea
+const CATALOG_CACHE_KEY = 'pos_catalog_config_cache'
+
 // Estado
 const configLoaded = ref(false)
 const catalogConfig = ref({
@@ -58,6 +61,21 @@ const storeConfigForTemplate = computed(() => ({
   ai_layout_config: catalogConfig.value.ai_layout_config
 }))
 
+// Leer configuración guardada en caché (síncrono, sin esperar API)
+const tryLoadFromCache = () => {
+  try {
+    const raw = localStorage.getItem(CATALOG_CACHE_KEY)
+    if (!raw) return false
+    const cached = JSON.parse(raw)
+    if (cached && cached.template) {
+      catalogConfig.value = cached
+      configLoaded.value = true
+      return true
+    }
+  } catch (e) {}
+  return false
+}
+
 // Cargar configuración del catálogo
 const loadCatalogConfig = async () => {
   try {
@@ -65,7 +83,7 @@ const loadCatalogConfig = async () => {
     
     if (response.data.success && response.data.data) {
       const data = response.data.data
-      catalogConfig.value = {
+      const newConfig = {
         template: data.template || 'speed-market', // Plantilla por defecto segura
         primary_color: data.primary_color || '#10B981',
         logo_url: data.logo_url || '',
@@ -86,10 +104,15 @@ const loadCatalogConfig = async () => {
         ai_cross_sell_messages: data.ai_cross_sell_messages || null,
         ai_layout_config: data.ai_layout_config || null
       }
+      catalogConfig.value = newConfig
+      // Guardar en caché para carga instantánea en la próxima visita
+      try { localStorage.setItem(CATALOG_CACHE_KEY, JSON.stringify(newConfig)) } catch (e) {}
     }
   } catch (error) {
     console.error('Error loading catalog config:', error)
     // Usar valores por defecto
+  } finally {
+    configLoaded.value = true
   }
 }
 // Helper para corregir URLs de imágenes
@@ -97,6 +120,8 @@ const getImageUrl = (path) => {
   if (!path) return ''
   // No modificar base64 ni URLs absolutas
   if (path.startsWith('http') || path.startsWith('data:')) return path
+  // Asumir que los nombres de archivo planos están en storage/products/
+  if (!path.includes('/')) return `/storage/products/${path}`
   // Asegurar que tenga slash inicial si es relativa
   return path.startsWith('/') ? path : `/${path}`
 }
@@ -147,8 +172,19 @@ const loadVisibleCategories = async () => {
 
 // Lifecycle
 onMounted(async () => {
-  await loadCatalogConfig()
-  configLoaded.value = true
-  await Promise.all([loadProducts(), loadVisibleCategories()])
+  const hasCachedConfig = tryLoadFromCache()
+
+  if (hasCachedConfig) {
+    // Config ya visible desde caché: cargar todo en paralelo sin bloquear UI
+    await Promise.all([
+      loadCatalogConfig(), // Refresca caché en background
+      loadProducts(),
+      loadVisibleCategories()
+    ])
+  } else {
+    // Primera visita: esperar config para evitar flash de plantilla incorrecta
+    await loadCatalogConfig()
+    await Promise.all([loadProducts(), loadVisibleCategories()])
+  }
 })
 </script>

@@ -250,34 +250,71 @@
       </div>
     </section>
 
-    <!-- VALUE PROPOSITIONS: Trust Strip -->
-    <div class="border-b border-gray-100" :style="{ backgroundColor: aiPalette.background }">
-      <div class="flex items-center justify-center gap-6 md:gap-12 px-4 py-3.5 overflow-x-auto scrollbar-hide">
+    <!-- TRUST SIGNALS: Barra de confianza editorial -->
+    <div :style="{ backgroundColor: aiPalette.background }">
+      <!-- Línea divisoria superior, extremadamente sutil -->
+      <div class="h-px" :style="{ backgroundColor: aiPalette.secondary + '33' }"></div>
+
+      <div class="lg:ml-64 px-6 py-8">
+        <!-- Con datos de IA: grid centrado, icono arriba, texto abajo -->
         <template v-if="storeConfig.ai_value_messages && storeConfig.ai_value_messages.length > 0">
-          <div v-for="(msg, i) in storeConfig.ai_value_messages.slice(0, 3)" :key="'vp-'+i" class="flex items-center gap-2 flex-shrink-0">
-            <svg class="w-4 h-4 flex-shrink-0" :style="{ color: aiPalette.primary }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path v-if="i === 0" stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              <path v-else-if="i === 1" stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-              <path v-else stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
-            </svg>
-            <span class="text-[11px] md:text-xs text-gray-600 font-medium whitespace-nowrap" :style="{ fontFamily: aiFonts.body + ', sans-serif' }">{{ msg }}</span>
+          <div
+            class="grid gap-y-6"
+            :class="storeConfig.ai_value_messages.slice(0, 3).length === 2 ? 'grid-cols-2' : 'grid-cols-3'"
+          >
+            <div
+              v-for="(msg, i) in storeConfig.ai_value_messages.slice(0, 3)"
+              :key="'trust-'+i"
+              class="flex flex-col items-center text-center gap-3 px-2"
+            >
+              <!-- Icono fino y minimalista, sin fondo ni borde -->
+              <svg
+                class="w-[22px] h-[22px] flex-shrink-0"
+                :style="{ color: aiPalette.text_dark + 'aa' }"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2"
+              >
+                <!-- Envío / Entrega -->
+                <path v-if="i === 0" stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                <!-- Garantía / Calidad -->
+                <path v-else-if="i === 1" stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                <!-- Pago seguro -->
+                <path v-else stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+              </svg>
+              <p
+                class="text-[10px] leading-snug"
+                :style="{ color: aiPalette.text_dark + '99', fontFamily: aiFonts.body + ', sans-serif', letterSpacing: '0.03em' }"
+              >{{ msg }}</p>
+            </div>
           </div>
         </template>
+
+        <!-- Sin datos de IA: fallback con 3 pilares de moda clásicos -->
         <template v-else>
-          <div class="flex items-center gap-2 flex-shrink-0">
-            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>
-            <span class="text-[11px] text-gray-500 font-medium whitespace-nowrap">Envío a todo el país</span>
-          </div>
-          <div class="flex items-center gap-2 flex-shrink-0">
-            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <span class="text-[11px] text-gray-500 font-medium whitespace-nowrap">Calidad garantizada</span>
-          </div>
-          <div class="flex items-center gap-2 flex-shrink-0">
-            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
-            <span class="text-[11px] text-gray-500 font-medium whitespace-nowrap">Pago seguro</span>
+          <div class="grid grid-cols-3 gap-y-6">
+            <div class="flex flex-col items-center text-center gap-3 px-2">
+              <svg class="w-[22px] h-[22px]" :style="{ color: aiPalette.text_dark + 'aa' }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+              </svg>
+              <p class="text-[10px]" :style="{ color: aiPalette.text_dark + '99', fontFamily: aiFonts.body + ', sans-serif', letterSpacing: '0.03em' }">Envío a todo el país</p>
+            </div>
+            <div class="flex flex-col items-center text-center gap-3 px-2">
+              <svg class="w-[22px] h-[22px]" :style="{ color: aiPalette.text_dark + 'aa' }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+              </svg>
+              <p class="text-[10px]" :style="{ color: aiPalette.text_dark + '99', fontFamily: aiFonts.body + ', sans-serif', letterSpacing: '0.03em' }">Calidad garantizada</p>
+            </div>
+            <div class="flex flex-col items-center text-center gap-3 px-2">
+              <svg class="w-[22px] h-[22px]" :style="{ color: aiPalette.text_dark + 'aa' }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+              </svg>
+              <p class="text-[10px]" :style="{ color: aiPalette.text_dark + '99', fontFamily: aiFonts.body + ', sans-serif', letterSpacing: '0.03em' }">Pago seguro</p>
+            </div>
           </div>
         </template>
       </div>
+
+      <!-- Línea divisoria inferior -->
+      <div class="h-px" :style="{ backgroundColor: aiPalette.secondary + '33' }"></div>
     </div>
 
     <!-- EDITORIAL STRIP: Historia + colecciones + anuncios cerca del hero -->
@@ -327,100 +364,6 @@
         </div>
       </div>
 
-      <!-- PROMOS: Retail Impact Design -->
-      <div v-if="announcementCards.length > 0" class="space-y-2.5">
-
-        <!-- Promo Destacada: Banner premium estilo retail -->
-        <article
-          v-if="announcementCards[0]"
-          @click="scrollToProducts"
-          class="relative rounded-2xl overflow-hidden cursor-pointer group"
-        >
-          <!-- Fondo degradado: primary → dark -->
-          <div class="absolute inset-0" :style="{ background: `linear-gradient(130deg, ${aiPalette.primary} 0%, ${aiPalette.text_dark} 115%)` }"></div>
-          <!-- Círculos decorativos flotantes -->
-          <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/[0.06] pointer-events-none"></div>
-          <div class="absolute -bottom-8 right-8 w-28 h-28 rounded-full bg-white/[0.04] pointer-events-none"></div>
-
-          <div class="relative flex items-center gap-4 px-5 py-5">
-            <!-- Contenido principal -->
-            <div class="flex-1 min-w-0">
-              <!-- Label oferta -->
-              <div class="flex items-center gap-1.5 mb-2.5">
-                <svg class="w-3 h-3 text-white/70 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-white/75 text-[9px] font-bold uppercase tracking-[0.2em]">Oferta especial</span>
-              </div>
-              <!-- Mensaje grande -->
-              <p
-                class="text-white text-[16px] font-bold leading-snug mb-3.5"
-                style="max-width: 210px;"
-                :style="{ fontFamily: aiFonts.body + ', sans-serif' }"
-              >{{ announcementCards[0] }}</p>
-              <!-- CTA subtle -->
-              <span class="inline-flex items-center gap-1.5 text-white/75 text-[10px] font-bold uppercase tracking-[0.18em] group-hover:text-white group-hover:gap-2.5 transition-all duration-300">
-                Ver colección
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-                </svg>
-              </span>
-            </div>
-            <!-- Badge circular decorativo -->
-            <div
-              class="w-[60px] h-[60px] flex-shrink-0 rounded-full border-2 border-white/20 flex items-center justify-center bg-white/10"
-            >
-              <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.3">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
-              </svg>
-            </div>
-          </div>
-        </article>
-
-        <!-- Promos Secundarias: horizontal lista retail elegante -->
-        <div v-if="announcementCards.length > 1" class="space-y-2">
-          <article
-            v-for="(message, idx) in announcementCards.slice(1)"
-            :key="'promo-s-' + idx"
-            @click="scrollToProducts"
-            class="flex items-stretch rounded-xl overflow-hidden cursor-pointer group transition-all duration-200 hover:shadow-md border"
-            :style="{ backgroundColor: aiPalette.background || '#ffffff', borderColor: `${aiPalette.secondary}55` }"
-          >
-            <!-- Stripe lateral de color -->
-            <div
-              class="w-[4px] flex-shrink-0"
-              :style="{ backgroundColor: idx === 0 ? aiPalette.primary : (aiPalette.accent || aiPalette.text_dark) }"
-            ></div>
-            <!-- Icono -->
-            <div
-              class="w-12 h-12 my-auto ml-3.5 rounded-xl flex-shrink-0 flex items-center justify-center"
-              :style="{ backgroundColor: `${idx === 0 ? aiPalette.primary : (aiPalette.accent || aiPalette.text_dark)}14` }"
-            >
-              <svg v-if="idx === 0" class="w-5 h-5" :style="{ color: aiPalette.primary }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
-              </svg>
-              <svg v-else class="w-5 h-5" :style="{ color: aiPalette.accent || aiPalette.text_dark }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
-              </svg>
-            </div>
-            <!-- Texto -->
-            <div class="flex-1 py-3.5 px-3 min-w-0">
-              <p
-                class="text-[9px] uppercase tracking-[0.16em] font-bold mb-0.5"
-                :style="{ color: idx === 0 ? aiPalette.primary : (aiPalette.accent || aiPalette.text_dark) }"
-              >{{ idx === 0 ? 'Descuento exclusivo' : 'Beneficio' }}</p>
-              <p
-                class="text-[13px] font-semibold leading-tight"
-                :style="{ color: aiPalette.text_dark, fontFamily: aiFonts.body + ', sans-serif' }"
-              >{{ message }}</p>
-            </div>
-            <!-- Flecha -->
-            <svg class="w-4 h-4 self-center mr-3.5 flex-shrink-0 text-gray-300 group-hover:text-gray-500 group-hover:translate-x-0.5 transition-all duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-            </svg>
-          </article>
-        </div>
-      </div>
     </section>
 
     <!-- BARRA STICKY: Filtrar + Ordenar (Móvil) - Sólida -->

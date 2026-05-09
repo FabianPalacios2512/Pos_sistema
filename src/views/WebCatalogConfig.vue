@@ -1,10 +1,10 @@
 <template>
-  <div>
+  <div class="h-full overflow-hidden">
   <!-- Layout de 3 Columnas: Menú Lateral + Contenido + Preview - Gemini Style -->
-  <div class="flex overflow-hidden bg-[#f8f9fa] dark:bg-gradient-to-b dark:from-[#131314] dark:via-[#1e1f20] dark:to-[#131314]" style="height: 100%;">
+  <div class="flex overflow-hidden bg-[#f8f9fa] dark:bg-gradient-to-b dark:from-[#131314] dark:via-[#1e1f20] dark:to-[#131314] h-full">
     
     <!-- SIDEBAR IZQUIERDO - Menú de Navegación - Gemini -->
-    <aside class="w-64 bg-white dark:bg-[#1e1f20] border-r border-[#e8eaed] dark:border-[#3a3a3f] flex flex-col" style="min-height: 0;">
+    <aside class="w-52 bg-white dark:bg-[#1e1f20] border-r border-[#e8eaed] dark:border-[#3a3a3f] flex flex-col" style="min-height: 0;">
       <!-- Header Sidebar - Gemini -->
       <div class="px-4 py-3 border-b border-[#e8eaed] dark:border-[#3a3a3f] flex-shrink-0">
         <div class="flex items-center gap-2 mb-3">
@@ -82,7 +82,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </div>
-          <span class="text-xs font-medium">{{ tab.label }}</span>
+          <span class="text-sm font-medium">{{ tab.label }}</span>
         </button>
       </nav>
       
@@ -125,7 +125,32 @@
     </aside>
     
     <!-- CONTENIDO CENTRAL - Gemini -->
-    <main class="flex-1 overflow-y-auto bg-[#f8f9fa] dark:bg-transparent">
+    <main class="flex-1 flex flex-col overflow-hidden bg-[#f8f9fa] dark:bg-transparent">
+
+      <!-- Sticky Action Bar -->
+      <div class="flex-shrink-0 px-8 py-3 bg-white/95 dark:bg-[#1e1f20]/95 backdrop-blur-sm border-b border-[#e8eaed] dark:border-[#3a3a3f] flex items-center justify-between z-10 shadow-[0_1px_0_0_rgba(0,0,0,0.06)]">
+        <div>
+          <h2 class="text-base font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ currentTabLabel }}</h2>
+          <p class="text-sm text-[#9aa0a6] mt-0.5">{{ currentTabDescription }}</p>
+        </div>
+        <button
+          @click="saveConfiguration"
+          :disabled="isSaving"
+          class="px-4 py-2 bg-[#1e8e3e] hover:bg-[#168936] text-white text-sm font-medium rounded-full transition-all duration-150 flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+        >
+          <svg v-if="!isSaving" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          <svg v-else class="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {{ isSaving ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+      </div>
+
+      <!-- Área de contenido con scroll independiente -->
+      <div class="flex-1 overflow-y-auto">
       <div class="p-8 space-y-6 max-w-5xl mx-auto">
         
         <!-- Barra de Advertencia - Configuración Incompleta - Gemini -->
@@ -152,6 +177,445 @@
           </button>
         </div>
           
+          <!-- ============================================================ -->
+          <!-- SECCIÓN: IDENTIDAD VISUAL — Módulo Unificado (Solo Moda)   -->
+          <!-- ============================================================ -->
+          <div v-if="activeTab === 'identidad-visual'" class="space-y-5 animate-fade-in pb-10">
+
+            <!-- 01: BRIEF DE MARCA -->
+            <div class="bg-white dark:bg-[#1e1f20] rounded-xl border border-gray-100 dark:border-[#2a2a30] overflow-hidden shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.3)] transition-shadow duration-200">
+              <div class="px-6 py-5 border-b border-gray-100 dark:border-[#2a2a30] flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-bold tracking-widest text-[#9aa0a6] uppercase mb-0.5">01</p>
+                  <h3 class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Brief de Marca</h3>
+                </div>
+                <span v-if="aiBrandData" class="flex items-center gap-1.5 text-sm text-[#1e8e3e] dark:text-[#81c995] font-medium">
+                  <span class="relative flex w-2 h-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#1e8e3e] dark:bg-[#81c995] opacity-40"></span>
+                    <span class="relative inline-flex rounded-full w-2 h-2 bg-[#1e8e3e] dark:bg-[#81c995]"></span>
+                  </span>
+                  Generado
+                </span>
+              </div>
+              <div class="p-5">
+                <!-- Fused intelligent input container -->
+                <div class="relative rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] bg-[#f8f9fa] dark:bg-[#282a2c] overflow-hidden focus-within:border-[#1a73e8]/50 dark:focus-within:border-[#8ab4f8]/40 focus-within:shadow-[0_0_0_3px_rgba(26,115,232,0.08)] transition-all duration-200">
+                  <!-- Character counter -->
+                  <div class="absolute top-3.5 right-4 text-xs text-[#9aa0a6] pointer-events-none z-10 select-none">{{ aiBrandDescription.length }}/2000</div>
+                  <!-- Textarea - no border, blends into container -->
+                  <textarea
+                    v-model="aiBrandDescription"
+                    rows="5"
+                    placeholder="Describe tu marca: estilo, público objetivo, valores, estética visual... Cuanto más detallado, mejor será el resultado."
+                    class="w-full px-5 pt-4 pb-3 bg-transparent text-base text-[#1e1f20] dark:text-[#e3e3e3] placeholder-[#b0b4ba] dark:placeholder-[#5f6368] focus:outline-none resize-none leading-relaxed"
+                    :disabled="isGeneratingBrand"
+                    maxlength="2000"
+                  ></textarea>
+                  <!-- Inner divider -->
+                  <div class="h-px bg-[#e8eaed] dark:bg-[#3a3a3f]"></div>
+                  <!-- Action toolbar fused at bottom -->
+                  <div class="flex items-center gap-2.5 px-4 py-3">
+                    <!-- AI Generate button - premium dark gradient -->
+                    <button
+                      @click="generateAiBrand"
+                      :disabled="isGeneratingBrand || aiBrandDescription.trim().length < 10"
+                      class="flex-1 px-4 py-2.5 bg-gradient-to-r from-[#0d0d1f] via-[#151535] to-[#0d1528] hover:from-[#080812] hover:via-[#0f0f28] hover:to-[#08101e] dark:from-[#c8d6f5] dark:via-[#b0c4f0] dark:to-[#a0b8eb] dark:hover:from-[#d8e6ff] dark:hover:to-[#b8cffa] text-white dark:text-[#0d0d1f] text-sm font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_2px_14px_rgba(13,13,31,0.3)] hover:shadow-[0_3px_22px_rgba(13,13,31,0.42)] dark:shadow-[0_2px_14px_rgba(160,184,235,0.18)]"
+                    >
+                      <svg v-if="!isGeneratingBrand" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                      </svg>
+                      <svg v-else class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      {{ isGeneratingBrand ? aiGenerationProgress || 'Generando...' : 'Generar Identidad con IA' }}
+                    </button>
+                    <!-- Mic button -->
+                    <button
+                      @click="isRecordingVoice ? stopVoiceRecording() : startVoiceRecording()"
+                      :class="isRecordingVoice
+                        ? 'bg-[#ea4335] text-white animate-pulse shadow-[0_0_12px_rgba(234,67,53,0.4)]'
+                        : 'bg-white dark:bg-[#1e1f20] text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#f0f4f9] dark:hover:bg-[#3a3a3f] border border-[#e8eaed] dark:border-[#3a3a3f]'"
+                      class="w-10 h-10 rounded-xl flex items-center justify-center transition-all flex-shrink-0 shadow-sm"
+                      :title="isRecordingVoice ? 'Detener grabación' : 'Dictar descripción'"
+                    >
+                      <svg v-if="!isRecordingVoice" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+                      </svg>
+                      <svg v-else class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 7.5A2.25 2.25 0 017.5 5.25h9a2.25 2.25 0 012.25 2.25v9a2.25 2.25 0 01-2.25 2.25h-9a2.25 2.25 0 01-2.25-2.25v-9z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <!-- Recording status -->
+                <p v-if="isRecordingVoice" class="text-sm text-[#ea4335] dark:text-[#f28b82] flex items-center gap-1.5 mt-3">
+                  <span class="w-2 h-2 bg-[#ea4335] rounded-full animate-pulse"></span>
+                  Grabando... Habla sobre tu negocio y presiona el botón para terminar.
+                </p>
+              </div>
+            </div>
+
+            <!-- 02: IDENTIDAD DE COLOR -->
+            <div class="bg-white dark:bg-[#1e1f20] rounded-xl border border-gray-100 dark:border-[#2a2a30] overflow-hidden shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.3)] transition-shadow duration-200">
+              <div class="px-6 py-5 border-b border-gray-100 dark:border-[#2a2a30] flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-bold tracking-widest text-[#9aa0a6] uppercase mb-0.5">02</p>
+                  <h3 class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Identidad de Color</h3>
+                </div>
+                <!-- Pencil: toggle refinement panel -->
+                <button
+                  v-if="aiBrandData?.color_palette"
+                  @click="showColorRefinement = !showColorRefinement"
+                  :class="showColorRefinement
+                    ? 'text-[#1a73e8] dark:text-[#8ab4f8] border-[#1a73e8]/30 dark:border-[#8ab4f8]/30'
+                    : 'text-gray-400 dark:text-[#9aa0a6] hover:text-gray-600 dark:hover:text-[#e3e3e3] border-gray-100 dark:border-[#3a3a3f] hover:border-gray-200 dark:hover:border-[#5f6368]'"
+                  class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-full border transition-all duration-150"
+                  title="Refinar colores con IA"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                  Refinar
+                </button>
+              </div>
+              <div class="p-6">
+                <!-- Color Primario Manual — siempre visible -->
+                <p class="text-sm font-semibold text-[#9aa0a6] uppercase tracking-wider mb-3">Color Principal</p>
+                <div class="flex items-center gap-4 p-4 border border-gray-100 dark:border-[#2a2a30] rounded-xl bg-gray-50 dark:bg-[#282a2c]">
+                  <!-- Circular color swatch — hides ugly native square -->
+                  <label class="relative cursor-pointer flex-shrink-0">
+                    <div class="w-12 h-12 rounded-full shadow-md ring-1 ring-black/10 dark:ring-white/10 transition-transform hover:scale-105" :style="{ backgroundColor: config.brandIdentity.primaryColor }"></div>
+                    <input type="color" v-model="config.brandIdentity.primaryColor" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer rounded-full" tabindex="-1" />
+                  </label>
+                  <div class="flex-1">
+                    <input
+                      type="text"
+                      v-model="config.brandIdentity.primaryColor"
+                      class="w-32 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-[#3a3a3f] text-sm font-mono text-gray-900 dark:text-[#e3e3e3] bg-white dark:bg-[#1e1f20] focus:outline-none focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-600 uppercase"
+                      placeholder="#000000"
+                    />
+                    <p class="text-xs font-medium text-gray-400 dark:text-[#9aa0a6] mt-1.5">Aplicado en botones, acentos y llamadas a la acción</p>
+                  </div>
+                </div>
+
+                <!-- Paleta Generada por IA -->
+                <template v-if="aiBrandData?.color_palette">
+                  <div class="mt-5 pt-5 border-t border-gray-100 dark:border-[#2a2a30]">
+                    <div class="flex items-center justify-between mb-4">
+                      <p class="text-sm font-semibold text-[#9aa0a6] uppercase tracking-wider">Paleta IA</p>
+                      <button
+                        @click="applyAiColors"
+                        class="text-sm font-medium px-3 py-1.5 rounded-full border border-gray-100 dark:border-[#3a3a3f] text-gray-400 dark:text-[#9aa0a6] hover:border-gray-300 dark:hover:border-[#5f6368] hover:text-gray-700 dark:hover:text-[#e3e3e3] transition-colors"
+                      >
+                        Usar primario de IA
+                      </button>
+                    </div>
+                    <div class="flex gap-2">
+                      <div
+                        v-for="(color, key) in aiBrandData.color_palette"
+                        :key="key"
+                        class="flex-1 group cursor-pointer"
+                        :title="color"
+                      >
+                        <div
+                          class="h-14 rounded-xl mb-1.5 transition-transform group-hover:scale-105 shadow-sm"
+                          :style="{ backgroundColor: color }"
+                        ></div>
+                        <p class="text-[11px] text-center text-gray-400 dark:text-[#9aa0a6] uppercase tracking-wider font-medium truncate">{{ key.replace('_', '\u00a0') }}</p>
+                        <p class="text-[11px] text-center font-mono text-gray-500 dark:text-[#9aa0a6] uppercase tracking-wider truncate">{{ color }}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Refinement panel — slides in with transition -->
+                  <Transition
+                    enter-active-class="transition-all duration-300 ease-out"
+                    enter-from-class="opacity-0 -translate-y-2"
+                    enter-to-class="opacity-100 translate-y-0"
+                    leave-active-class="transition-all duration-200 ease-in"
+                    leave-from-class="opacity-100 translate-y-0"
+                    leave-to-class="opacity-0 -translate-y-2"
+                  >
+                    <div v-if="showColorRefinement" class="mt-5">
+                      <div class="relative rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] bg-[#f8f9fa] dark:bg-[#282a2c] overflow-hidden focus-within:border-[#1a73e8]/50 dark:focus-within:border-[#8ab4f8]/40 focus-within:shadow-[0_0_0_3px_rgba(26,115,232,0.08)] transition-all duration-200">
+                        <!-- Label strip -->
+                        <div class="px-5 pt-4 pb-0">
+                          <p class="text-xs font-semibold text-[#9aa0a6] uppercase tracking-wider">Guía para la IA</p>
+                        </div>
+                        <!-- Borderless textarea -->
+                        <textarea
+                          v-model="colorRefinementPrompt"
+                          rows="3"
+                          placeholder="Ej: Quiero tonos tierra más cálidos, menos saturación. Prefiero paleta seria y minimalista con acentos dorados..."
+                          class="w-full px-5 pt-3 pb-3 bg-transparent text-base text-[#1e1f20] dark:text-[#e3e3e3] placeholder-[#b0b4ba] dark:placeholder-[#5f6368] focus:outline-none resize-none leading-relaxed"
+                          :disabled="isRegeneratingColors"
+                        ></textarea>
+                        <!-- Divider -->
+                        <div class="h-px bg-[#e8eaed] dark:bg-[#3a3a3f]"></div>
+                        <!-- Action row -->
+                        <div class="flex items-center justify-end gap-2 px-4 py-3">
+                          <button
+                            @click="showColorRefinement = false; colorRefinementPrompt = ''"
+                            class="px-3 py-2 text-sm text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#1e1f20] dark:hover:text-[#e3e3e3] transition-colors rounded-xl"
+                          >
+                            Cancelar
+                          </button>
+                          <button
+                            @click="regenerateColors"
+                            :disabled="isRegeneratingColors"
+                            class="px-5 py-2.5 bg-gradient-to-r from-[#0d0d1f] via-[#151535] to-[#0d1528] hover:from-[#080812] hover:via-[#0f0f28] hover:to-[#08101e] dark:from-[#c8d6f5] dark:via-[#b0c4f0] dark:to-[#a0b8eb] dark:hover:from-[#d8e6ff] dark:hover:to-[#b8cffa] text-white dark:text-[#0d0d1f] text-sm font-semibold rounded-xl transition-all duration-200 flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_2px_14px_rgba(13,13,31,0.3)] hover:shadow-[0_3px_22px_rgba(13,13,31,0.42)] dark:shadow-[0_2px_14px_rgba(160,184,235,0.18)]"
+                          >
+                            <svg v-if="!isRegeneratingColors" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                            </svg>
+                            <svg v-else class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+                              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            {{ isRegeneratingColors ? 'Regenerando...' : 'Regenerar Colores' }}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </Transition>
+                </template>
+              </div>
+            </div>
+
+            <!-- 03: TIPOGRAFÍA (Solo cuando hay datos de IA) -->
+            <div v-if="aiBrandData?.fonts" class="bg-white dark:bg-[#1e1f20] rounded-xl border border-gray-100 dark:border-[#2a2a30] overflow-hidden shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.3)] transition-shadow duration-200">
+              <div class="px-6 py-5 border-b border-gray-100 dark:border-[#2a2a30] flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-bold tracking-widest text-[#9aa0a6] uppercase mb-0.5">03</p>
+                  <h3 class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Tipografía</h3>
+                </div>
+                <button
+                  @click="showFontModal = true"
+                  class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-400 dark:text-[#9aa0a6] hover:text-gray-700 dark:hover:text-[#e3e3e3] rounded-full border border-gray-100 dark:border-[#3a3a3f] hover:border-gray-200 dark:hover:border-[#5f6368] transition-all duration-150"
+                  title="Cambiar par tipográfico"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                  Modificar
+                </button>
+              </div>
+              <div class="p-6">
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="p-5 rounded-xl border border-gray-100 dark:border-[#2a2a30] bg-gray-50 dark:bg-[#282a2c]">
+                    <p class="text-[11px] font-medium text-gray-500 dark:text-[#9aa0a6] uppercase tracking-wider mb-3">Títulos</p>
+                    <p class="text-4xl text-[#1e1f20] dark:text-[#e3e3e3] leading-none mb-2" :style="{ fontFamily: aiBrandData.fonts.heading + ', serif' }">Aa</p>
+                    <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] font-medium">{{ aiBrandData.fonts.heading }}</p>
+                  </div>
+                  <div class="p-5 rounded-xl border border-gray-100 dark:border-[#2a2a30] bg-gray-50 dark:bg-[#282a2c]">
+                    <p class="text-[11px] font-medium text-gray-500 dark:text-[#9aa0a6] uppercase tracking-wider mb-3">Cuerpo</p>
+                    <p class="text-base text-[#1e1f20] dark:text-[#e3e3e3] leading-relaxed mb-2" :style="{ fontFamily: aiBrandData.fonts.body + ', sans-serif' }">Texto base</p>
+                    <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] font-medium">{{ aiBrandData.fonts.body }}</p>
+                  </div>
+                </div>
+                <p v-if="aiBrandData.fonts.style_rationale" class="text-sm text-[#9aa0a6] mt-4 leading-relaxed italic border-l-2 border-[#e8eaed] dark:border-[#3a3a3f] pl-3">
+                  {{ aiBrandData.fonts.style_rationale }}
+                </p>
+              </div>
+            </div>
+
+            <!-- 04 / 03: ACTIVOS VISUALES -->
+            <div class="bg-white dark:bg-[#1e1f20] rounded-xl border border-gray-100 dark:border-[#2a2a30] overflow-hidden shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.3)] transition-shadow duration-200">
+              <div class="px-6 py-5 border-b border-gray-100 dark:border-[#2a2a30]">
+                <p class="text-xs font-bold tracking-widest text-[#9aa0a6] uppercase mb-0.5">{{ aiBrandData?.fonts ? '04' : '03' }}</p>
+                <h3 class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Activos Visuales</h3>
+              </div>
+              <div class="p-6">
+                <div class="grid grid-cols-2 gap-5">
+                  <!-- Logotipo -->
+                  <div class="space-y-2">
+                    <p class="text-sm font-semibold text-[#9aa0a6] uppercase tracking-wider">Logotipo</p>
+                    <div
+                      @click="triggerFileUpload('logo')"
+                      class="relative w-full h-28 border-2 border-dashed border-gray-200 dark:border-[#3a3a3f] rounded-xl hover:bg-gray-50 dark:hover:bg-[#282a2c] hover:border-gray-300 dark:hover:border-[#5f6368] transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
+                    >
+                      <div v-if="config.brandIdentity.logo" class="absolute inset-0 p-3 flex items-center justify-center">
+                        <img :src="config.brandIdentity.logo" class="max-w-full max-h-full object-contain" />
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl">
+                          <button @click.stop="config.brandIdentity.logo = ''" class="text-white text-xs font-medium px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full transition-colors">Eliminar</button>
+                        </div>
+                      </div>
+                      <div v-else class="flex flex-col items-center gap-2 text-[#9aa0a6] group-hover:text-[#5f6368] dark:group-hover:text-[#e3e3e3] transition-colors">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                        </svg>
+                        <span class="text-sm font-medium">PNG · SVG · JPG</span>
+                      </div>
+                      <input type="file" ref="logoInput" class="hidden" accept="image/*" @change="(e) => handleFileUpload(e, 'logo')" />
+                    </div>
+                  </div>
+
+                  <!-- Banner Principal -->
+                  <div class="space-y-2">
+                    <p class="text-sm font-semibold text-[#9aa0a6] uppercase tracking-wider">Banner Principal</p>
+                    <div
+                      @click="triggerFileUpload('banner')"
+                      class="relative w-full h-28 border-2 border-dashed border-gray-200 dark:border-[#3a3a3f] rounded-xl hover:bg-gray-50 dark:hover:bg-[#282a2c] hover:border-gray-300 dark:hover:border-[#5f6368] transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
+                    >
+                      <div v-if="config.brandIdentity.banner" class="absolute inset-0 overflow-hidden rounded-xl">
+                        <img :src="config.brandIdentity.banner" class="w-full h-full object-cover" />
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <button @click.stop="config.brandIdentity.banner = ''" class="text-white text-xs font-medium px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full transition-colors">Eliminar</button>
+                        </div>
+                      </div>
+                      <div v-else class="flex flex-col items-center gap-2 text-[#9aa0a6] group-hover:text-[#5f6368] dark:group-hover:text-[#e3e3e3] transition-colors">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                        </svg>
+                        <span class="text-sm font-medium">1200 × 400 px</span>
+                      </div>
+                      <input type="file" ref="bannerInput" class="hidden" accept="image/*" @change="(e) => handleFileUpload(e, 'banner')" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 05 / 04: PLANTILLA DE TIENDA (Solo templates de moda) -->
+            <div class="bg-white dark:bg-[#1e1f20] rounded-xl border border-gray-100 dark:border-[#2a2a30] overflow-hidden shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.3)] transition-shadow duration-200">
+              <div class="px-6 py-5 border-b border-gray-100 dark:border-[#2a2a30] flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-bold tracking-widest text-[#9aa0a6] uppercase mb-0.5">{{ aiBrandData?.fonts ? '05' : '04' }}</p>
+                  <h3 class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Plantilla de Tienda</h3>
+                </div>
+                <span v-if="aiBrandData?.recommended_template" class="text-sm text-[#9aa0a6]">
+                  IA recomienda:
+                  <button @click="applyAiTemplate" class="font-medium text-[#1a73e8] dark:text-[#8ab4f8] hover:underline ml-0.5">
+                    {{ aiBrandData.recommended_template === 'visual-story' ? 'Historia Visual' : 'Urban Streetwear' }}
+                  </button>
+                </span>
+              </div>
+              <div class="p-6">
+                <div class="grid grid-cols-2 gap-4">
+
+                  <!-- Historia Visual -->
+                  <button
+                    @click="config.brandIdentity.template = 'visual-story'"
+                    class="group relative p-5 rounded-xl border-2 transition-all duration-200 text-left"
+                    :class="config.brandIdentity.template === 'visual-story'
+                      ? 'border-[#1e1f20] dark:border-[#e3e3e3] bg-[#1e1f20] dark:bg-[#e3e3e3]'
+                      : 'border-[#e8eaed] dark:border-[#3a3a3f] hover:border-[#c0c4c8] dark:hover:border-[#5f6368] bg-white dark:bg-[#282a2c]'"
+                  >
+                    <!-- Wireframe visual -->
+                    <div class="w-full h-16 rounded-lg overflow-hidden mb-4 flex flex-col gap-1">
+                      <div class="flex-1 rounded-sm" :class="config.brandIdentity.template === 'visual-story' ? 'bg-white/15 dark:bg-black/15' : 'bg-[#f0f4f9] dark:bg-[#3a3a3f]'"></div>
+                      <div class="h-4 grid grid-cols-3 gap-1">
+                        <div class="rounded-sm" :class="config.brandIdentity.template === 'visual-story' ? 'bg-white/15 dark:bg-black/15' : 'bg-[#f0f4f9] dark:bg-[#3a3a3f]'"></div>
+                        <div class="rounded-sm" :class="config.brandIdentity.template === 'visual-story' ? 'bg-white/15 dark:bg-black/15' : 'bg-[#f0f4f9] dark:bg-[#3a3a3f]'"></div>
+                        <div class="rounded-sm" :class="config.brandIdentity.template === 'visual-story' ? 'bg-white/15 dark:bg-black/15' : 'bg-[#f0f4f9] dark:bg-[#3a3a3f]'"></div>
+                      </div>
+                    </div>
+                    <p class="text-sm font-semibold mb-0.5" :class="config.brandIdentity.template === 'visual-story' ? 'text-white dark:text-[#1e1f20]' : 'text-[#1e1f20] dark:text-[#e3e3e3]'">
+                      Historia Visual
+                    </p>
+                    <p class="text-sm" :class="config.brandIdentity.template === 'visual-story' ? 'text-white/60 dark:text-[#1e1f20]/60' : 'text-[#9aa0a6]'">
+                      Boutique · Editorial
+                    </p>
+                    <div v-if="config.brandIdentity.template === 'visual-story'" class="absolute top-3.5 right-3.5 w-4 h-4 rounded-full bg-white dark:bg-[#1e1f20] flex items-center justify-center">
+                      <svg class="w-2.5 h-2.5 text-[#1e1f20] dark:text-[#e3e3e3]" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                  </button>
+
+                  <!-- Urban Streetwear -->
+                  <button
+                    @click="config.brandIdentity.template = 'urban-street'"
+                    class="group relative p-5 rounded-xl border-2 transition-all duration-200 text-left"
+                    :class="config.brandIdentity.template === 'urban-street'
+                      ? 'border-[#1e1f20] dark:border-[#e3e3e3] bg-[#1e1f20] dark:bg-[#e3e3e3]'
+                      : 'border-[#e8eaed] dark:border-[#3a3a3f] hover:border-[#c0c4c8] dark:hover:border-[#5f6368] bg-white dark:bg-[#282a2c]'"
+                  >
+                    <!-- Wireframe grid visual -->
+                    <div class="w-full h-16 rounded-lg overflow-hidden mb-4 grid grid-cols-2 gap-1">
+                      <div class="rounded-sm" :class="config.brandIdentity.template === 'urban-street' ? 'bg-white/15 dark:bg-black/15' : 'bg-[#f0f4f9] dark:bg-[#3a3a3f]'"></div>
+                      <div class="rounded-sm" :class="config.brandIdentity.template === 'urban-street' ? 'bg-white/15 dark:bg-black/15' : 'bg-[#f0f4f9] dark:bg-[#3a3a3f]'"></div>
+                      <div class="rounded-sm" :class="config.brandIdentity.template === 'urban-street' ? 'bg-white/15 dark:bg-black/15' : 'bg-[#f0f4f9] dark:bg-[#3a3a3f]'"></div>
+                      <div class="rounded-sm" :class="config.brandIdentity.template === 'urban-street' ? 'bg-white/15 dark:bg-black/15' : 'bg-[#f0f4f9] dark:bg-[#3a3a3f]'"></div>
+                    </div>
+                    <p class="text-sm font-semibold mb-0.5" :class="config.brandIdentity.template === 'urban-street' ? 'text-white dark:text-[#1e1f20]' : 'text-[#1e1f20] dark:text-[#e3e3e3]'">
+                      Urban Streetwear
+                    </p>
+                    <p class="text-sm" :class="config.brandIdentity.template === 'urban-street' ? 'text-white/60 dark:text-[#1e1f20]/60' : 'text-[#9aa0a6]'">
+                      Urbano · Premium
+                    </p>
+                    <div v-if="config.brandIdentity.template === 'urban-street'" class="absolute top-3.5 right-3.5 w-4 h-4 rounded-full bg-white dark:bg-[#1e1f20] flex items-center justify-center">
+                      <svg class="w-2.5 h-2.5 text-[#1e1f20] dark:text-[#e3e3e3]" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                  </button>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- CONTENIDO GENERADO POR IA -->
+            <template v-if="aiBrandData">
+
+              <!-- Texto del Banner -->
+              <div v-if="aiBrandData.banner_texts" class="bg-white dark:bg-[#1e1f20] rounded-xl border border-gray-100 dark:border-[#2a2a30] overflow-hidden shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.3)] transition-shadow duration-200">
+                <div class="px-6 py-5 border-b border-gray-100 dark:border-[#2a2a30]">
+                  <p class="text-xs font-bold tracking-widest text-[#9aa0a6] uppercase mb-0.5">Copy</p>
+                  <h3 class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Texto del Banner</h3>
+                </div>
+                <div class="px-6 py-5 space-y-5">
+                  <!-- Headline -->
+                  <div>
+                    <p class="text-[11px] font-medium text-gray-400 dark:text-[#9aa0a6] uppercase tracking-wider mb-2">Titular</p>
+                    <p class="text-lg font-medium text-gray-900 dark:text-[#e3e3e3] leading-snug border-b border-gray-100 dark:border-[#2a2a30] pb-3">{{ aiBrandData.banner_texts.headline }}</p>
+                  </div>
+                  <!-- Subheadline -->
+                  <div>
+                    <p class="text-[11px] font-medium text-gray-400 dark:text-[#9aa0a6] uppercase tracking-wider mb-2">Subtítulo</p>
+                    <p class="text-sm text-gray-500 dark:text-[#9aa0a6] uppercase tracking-widest border-b border-gray-100 dark:border-[#2a2a30] pb-3">{{ aiBrandData.banner_texts.subheadline }}</p>
+                  </div>
+                  <!-- CTA -->
+                  <div v-if="aiBrandData.banner_texts.cta_text">
+                    <p class="text-[11px] font-medium text-gray-400 dark:text-[#9aa0a6] uppercase tracking-wider mb-2">Llamada a la acción</p>
+                    <span class="inline-flex items-center px-4 py-1.5 border border-gray-200 dark:border-[#3a3a3f] rounded-full text-sm font-medium text-gray-700 dark:text-[#e3e3e3] bg-gray-50 dark:bg-[#282a2c]">{{ aiBrandData.banner_texts.cta_text }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sobre Nosotros -->
+              <div v-if="aiBrandData.about_us" class="bg-white dark:bg-[#1e1f20] rounded-xl border border-gray-100 dark:border-[#2a2a30] overflow-hidden shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.3)] transition-shadow duration-200">
+                <div class="px-6 py-5 border-b border-gray-100 dark:border-[#2a2a30]">
+                  <p class="text-xs font-bold tracking-widest text-[#9aa0a6] uppercase mb-0.5">Historia</p>
+                  <h3 class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Sobre Nosotros</h3>
+                </div>
+                <div class="p-6">
+                  <p class="text-base text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed whitespace-pre-line">{{ aiBrandData.about_us }}</p>
+                </div>
+              </div>
+
+              <!-- Aplicar Todo -->
+              <div class="flex items-center justify-between py-1">
+                <p v-if="aiBrandData.generated_at" class="text-sm text-[#9aa0a6]">
+                  Generado: {{ new Date(aiBrandData.generated_at).toLocaleString('es-CO') }}
+                </p>
+                <button
+                  @click="applyAllAiSettings"
+                  class="px-5 py-2.5 bg-[#1e1f20] dark:bg-[#e3e3e3] hover:bg-black dark:hover:bg-white text-white dark:text-[#1e1f20] text-sm font-medium rounded-xl transition-all flex items-center gap-2"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Aplicar Todo y Guardar
+                </button>
+              </div>
+
+            </template>
+
+          </div>
+          <!-- /IDENTIDAD VISUAL -->
+
           <!-- SECCIÓN: IA MARCA - Motor de Diseño Adaptativo -->
           <div v-if="activeTab === 'ai-brand'" class="space-y-6 animate-fade-in">
 
@@ -830,14 +1294,15 @@
           </div>
       
       </div> <!-- Cierra p-8 space-y-6 max-w-5xl mx-auto -->
+      </div> <!-- Cierra overflow-y-auto scroll area -->
     </main>
     
-    <!-- PREVIEW DERECHO - Solo Vista Móvil (Sticky) - Gemini -->
-    <aside class="flex-shrink-0 w-[480px] bg-white dark:bg-[#1e1f20] border-l border-[#e8eaed] dark:border-[#3a3a3f] flex flex-col overflow-hidden">
-      <div class="h-full overflow-y-auto py-8 px-8">
-        <div class="sticky top-0">
+    <!-- PREVIEW DERECHO - Solo Vista Móvil (Fija) - Gemini -->
+    <aside class="flex-shrink-0 w-[560px] bg-white dark:bg-[#1e1f20] border-l border-[#e8eaed] dark:border-[#3a3a3f] flex flex-col overflow-hidden">
+      <div class="flex-1 flex flex-col overflow-hidden py-6 px-6">
+        <div class="flex flex-col h-full">
           <!-- Preview Header - Gemini -->
-          <div class="mb-6 flex items-center justify-between">
+          <div class="flex-shrink-0 mb-5 flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-[#1e8e3e] animate-pulse"></span>
               <h3 class="text-[#1e1f20] dark:text-[#e3e3e3] font-medium text-sm">Vista Previa</h3>
@@ -855,10 +1320,10 @@
           </div>
         
           <!-- Marco de Dispositivo Móvil con Iframe Real -->
-          <div class="flex items-center justify-center">
+          <div class="flex-1 flex items-start justify-center overflow-hidden pt-2">
             <div 
-              class="relative bg-white transition-all duration-300 overflow-hidden isolate w-[375px] h-[740px] rounded-[3rem] shadow-2xl dark:shadow-black/80"
-              style="container-type: inline-size; width: 375px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.1);"
+              class="relative bg-white transition-all duration-300 overflow-hidden isolate rounded-[3rem] shadow-2xl dark:shadow-black/80 flex-shrink-0"
+              style="container-type: inline-size; width: 375px; height: 740px; transform: scale(0.95); transform-origin: top center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.1);"
             >
               <!-- Borde exterior del teléfono (marco negro) -->
               <div class="absolute inset-0 rounded-[3rem] border-[14px] border-black pointer-events-none z-50">
@@ -873,7 +1338,14 @@
               
               <!-- Pantalla del teléfono - Iframe Real del Catálogo -->
               <div class="w-full h-full overflow-hidden bg-white relative rounded-[2.2rem]" style="isolation: isolate; transform: translateZ(0);">
-                <iframe 
+                <!-- Loading state mientras la config carga (solo en la primera carga) -->
+                <div v-if="isLoading" class="w-full h-full flex flex-col items-center justify-center gap-3 bg-white">
+                  <div class="w-7 h-7 border-2 border-gray-100 border-t-gray-500 rounded-full animate-spin"></div>
+                  <p class="text-[11px] text-gray-400 font-medium tracking-wide">Cargando catálogo...</p>
+                </div>
+                <!-- Iframe: aparece una sola vez, ya con el caché listo para render instantáneo -->
+                <iframe
+                  v-else
                   :src="catalogUrl"
                   :key="previewKey"
                   class="w-full h-full border-0"
@@ -887,8 +1359,115 @@
       </div>
     </aside>
 
-  </div> <!-- Cierra flex min-h-screen -->
-  
+  </div> <!-- Cierra flex h-full -->
+
+  <!-- ======================================================= -->
+  <!-- MODAL: Selector de Pares Tipográficos                   -->
+  <!-- ======================================================= -->
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="showFontModal"
+        class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+        @keydown.escape="showFontModal = false"
+      >
+        <!-- Backdrop -->
+        <div
+          class="absolute inset-0 bg-black/55 backdrop-blur-sm"
+          @click="showFontModal = false"
+        ></div>
+
+        <!-- Modal Panel -->
+        <div
+          class="relative bg-white dark:bg-[#1e1f20] rounded-3xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_32px_64px_-12px_rgba(0,0,0,0.7)] border border-[#e8eaed]/60 dark:border-[#3a3a3f] w-full max-w-2xl max-h-[88vh] flex flex-col overflow-hidden"
+          style="animation: modalSlideIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;"
+        >
+          <!-- Modal Header -->
+          <div class="flex-shrink-0 px-7 py-5 border-b border-[#f0f2f5] dark:border-[#3a3a3f] flex items-start justify-between">
+            <div>
+              <h2 class="text-base font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Pares Tipográficos</h2>
+              <p class="text-[11px] text-[#9aa0a6] mt-0.5">Elige cómo se verán los textos de tu tienda. Verás la fuente aplicada en tiempo real.</p>
+            </div>
+            <button
+              @click="showFontModal = false"
+              class="ml-4 w-8 h-8 flex items-center justify-center rounded-full text-[#9aa0a6] hover:text-[#1e1f20] dark:hover:text-[#e3e3e3] hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all flex-shrink-0"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Modal Body — Font Pair Grid -->
+          <div class="flex-1 overflow-y-auto p-6">
+            <div class="grid grid-cols-2 gap-3">
+              <button
+                v-for="pair in fontPairs"
+                :key="pair.id"
+                @click="applyFontPair(pair)"
+                class="group relative text-left p-5 rounded-2xl border-2 transition-all duration-150 hover:shadow-[0_4px_16px_0_rgba(0,0,0,0.1)] dark:hover:shadow-[0_4px_16px_0_rgba(0,0,0,0.35)]"
+                :class="(selectedFontPairId === pair.id || (aiBrandData?.fonts?.heading === pair.heading && aiBrandData?.fonts?.body === pair.body))
+                  ? 'border-[#1e1f20] dark:border-[#e3e3e3] bg-[#f8f9fa] dark:bg-[#282a2c]'
+                  : 'border-[#e8eaed] dark:border-[#3a3a3f] bg-white dark:bg-[#1e1f20] hover:border-[#c0c4c8] dark:hover:border-[#5f6368]'"
+              >
+                <!-- Selected indicator -->
+                <div
+                  v-if="selectedFontPairId === pair.id || (aiBrandData?.fonts?.heading === pair.heading && aiBrandData?.fonts?.body === pair.body)"
+                  class="absolute top-3 right-3 w-5 h-5 rounded-full bg-[#1e1f20] dark:bg-[#e3e3e3] flex items-center justify-center"
+                >
+                  <svg class="w-3 h-3 text-white dark:text-[#1e1f20]" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+
+                <!-- Heading preview -->
+                <p
+                  class="text-[22px] leading-tight text-[#1e1f20] dark:text-[#e3e3e3] mb-2 pr-6 truncate"
+                  :style="{ fontFamily: pair.heading + ', serif' }"
+                >{{ pair.sampleHeading }}</p>
+
+                <!-- Body preview -->
+                <p
+                  class="text-[11px] text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed line-clamp-2 mb-4"
+                  :style="{ fontFamily: pair.body + ', sans-serif' }"
+                >{{ pair.sampleBody }}</p>
+
+                <!-- Meta -->
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-[9px] font-semibold text-[#9aa0a6] uppercase tracking-wider">{{ pair.heading }}</p>
+                    <p class="text-[9px] text-[#9aa0a6]/70">+ {{ pair.body }}</p>
+                  </div>
+                  <span class="text-[9px] px-2 py-0.5 rounded-full bg-[#f0f4f9] dark:bg-[#282a2c] text-[#5f6368] dark:text-[#9aa0a6] font-medium border border-[#e8eaed] dark:border-[#3a3a3f]">
+                    {{ pair.tag }}
+                  </span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Modal Footer -->
+          <div class="flex-shrink-0 px-7 py-4 border-t border-[#f0f2f5] dark:border-[#3a3a3f] bg-[#fafafa] dark:bg-[#1a1a1e] flex items-center justify-between">
+            <p class="text-[10px] text-[#9aa0a6]">Haz clic en un par para aplicarlo instantáneamente</p>
+            <button
+              @click="showFontModal = false"
+              class="px-4 py-2 text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#1e1f20] dark:hover:text-[#e3e3e3] hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] rounded-full border border-[#e8eaed] dark:border-[#3a3a3f] transition-all"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+
   <!-- Toast de Éxito -->
   <Transition
     enter-active-class="transition duration-300 ease-out"
@@ -963,7 +1542,8 @@ const toastMessage = reactive({
   description: 'Vista previa actualizada.'
 })
 const isLoading = ref(true)
-const activeTab = ref('ai-brand')
+const isInitializing = ref(true) // Bloquea los watchers durante la carga inicial para evitar guardados falsos
+const activeTab = ref('identity') // Will be corrected by isFashionStore watch (immediate)
 const showWarningMessage = ref(false) // Control independiente del mensaje de alerta
 const warningType = ref('categories') // 'categories' | 'whatsapp' - tipo de advertencia
 
@@ -975,6 +1555,116 @@ const isRecordingVoice = ref(false)
 const voiceRecognition = ref(null)
 const aiGenerationProgress = ref('')
 
+// Color Refinement State
+const showColorRefinement = ref(false)
+const colorRefinementPrompt = ref('')
+const isRegeneratingColors = ref(false)
+
+// Font Modal State
+const showFontModal = ref(false)
+const selectedFontPairId = ref(null)
+
+const fontPairs = [
+  {
+    id: 'playfair-lato',
+    name: 'Luxury Editorial',
+    heading: 'Playfair Display',
+    body: 'Lato',
+    tag: 'Lujo · Boutique',
+    sampleHeading: 'La Moda es Arte',
+    sampleBody: 'Descubre piezas únicas diseñadas para durar más que una temporada.'
+  },
+  {
+    id: 'montserrat-inter',
+    name: 'Modern Minimal',
+    heading: 'Montserrat',
+    body: 'Inter',
+    tag: 'Moderno · Limpio',
+    sampleHeading: 'New Collection',
+    sampleBody: 'Simplicidad y sofisticación en cada detalle de nuestra colección.'
+  },
+  {
+    id: 'cormorant-work',
+    name: 'High Fashion',
+    heading: 'Cormorant Garamond',
+    body: 'Work Sans',
+    tag: 'Alta Moda · Elegante',
+    sampleHeading: 'Élégance Intemporelle',
+    sampleBody: 'Para quienes entienden que el buen gusto nunca pasa de moda.'
+  },
+  {
+    id: 'dm-serif-dm-sans',
+    name: 'Contemporary',
+    heading: 'DM Serif Display',
+    body: 'DM Sans',
+    tag: 'Contemporáneo',
+    sampleHeading: 'Colección Otoño',
+    sampleBody: 'Texturas cálidas y siluetas modernas para la nueva temporada.'
+  },
+  {
+    id: 'raleway-open',
+    name: 'Soft Elegance',
+    heading: 'Raleway',
+    body: 'Open Sans',
+    tag: 'Elegante · Suave',
+    sampleHeading: 'Studio Collection',
+    sampleBody: 'Líneas limpias y proporciones perfectas en cada prenda.'
+  },
+  {
+    id: 'bebas-nunito',
+    name: 'Urban Bold',
+    heading: 'Bebas Neue',
+    body: 'Nunito',
+    tag: 'Urbano · Bold',
+    sampleHeading: 'STREET CULTURE',
+    sampleBody: 'Lo auténtico nunca pasa de moda. Estilo urbano sin concesiones.'
+  },
+  {
+    id: 'josefin-josefin',
+    name: 'Geometric',
+    heading: 'Josefin Sans',
+    body: 'Josefin Slab',
+    tag: 'Geométrico · Minimal',
+    sampleHeading: 'Form & Function',
+    sampleBody: 'Geometría perfecta aplicada al diseño de moda contemporánea.'
+  },
+  {
+    id: 'fraunces-dm',
+    name: 'Artisan Craft',
+    heading: 'Fraunces',
+    body: 'DM Sans',
+    tag: 'Artesanal · Cálido',
+    sampleHeading: 'Hecho con Alma',
+    sampleBody: 'Cada pieza cuenta la historia de manos que crean con pasión.'
+  }
+]
+
+const loadedFonts = new Set()
+const loadGoogleFont = (fontName) => {
+  if (loadedFonts.has(fontName)) return
+  const safeName = fontName.replace(/ /g, '+')
+  const link = document.createElement('link')
+  link.rel = 'stylesheet'
+  link.href = `https://fonts.googleapis.com/css2?family=${safeName}:wght@400;600;700&display=swap`
+  document.head.appendChild(link)
+  loadedFonts.add(fontName)
+}
+
+const applyFontPair = (pair) => {
+  if (!aiBrandData.value) {
+    aiBrandData.value = { fonts: { heading: pair.heading, body: pair.body } }
+  } else {
+    if (!aiBrandData.value.fonts) aiBrandData.value.fonts = {}
+    aiBrandData.value.fonts.heading = pair.heading
+    aiBrandData.value.fonts.body = pair.body
+  }
+  selectedFontPairId.value = pair.id
+  showFontModal.value = false
+  // Pre-load font in browser
+  loadGoogleFont(pair.heading)
+  loadGoogleFont(pair.body)
+}
+
 // Helper: Verificar si el número de WhatsApp es válido (más de solo el código de país)
 const isValidWhatsappNumber = (number) => {
   if (!number) return false
@@ -985,47 +1675,72 @@ const isValidWhatsappNumber = (number) => {
   return cleanNumber.length >= 10
 }
 
-// Tabs Configuration
-const tabs = [
-  { 
-    id: 'ai-brand', 
-    label: 'IA Marca', 
-    icon: 'sparkles',
-    description: 'Genera tu identidad de marca con Inteligencia Artificial'
-  },
-  { 
-    id: 'identity', 
-    label: 'Diseño', 
-    icon: 'palette',
-    description: 'Define la identidad visual de tu catálogo online'
-  },
-  { 
-    id: 'catalog', 
-    label: 'Catálogo', 
-    icon: 'box',
-    description: 'Controla la visibilidad de categorías y productos'
-  },
-  { 
-    id: 'orders', 
-    label: 'Pedidos', 
-    icon: 'message',
-    description: 'Configura el sistema de pedidos por WhatsApp'
-  },
-  { 
-    id: 'rules', 
-    label: 'Reglas', 
-    icon: 'settings',
-    description: 'Establece las reglas de negocio y integraciones'
+// Tabs Configuration - Computed based on store type
+const tabs = computed(() => {
+  if (isFashionStore.value) {
+    return [
+      {
+        id: 'identidad-visual',
+        label: 'Identidad Visual',
+        icon: 'sparkles',
+        description: 'Define la esencia visual y estética de tu marca'
+      },
+      {
+        id: 'catalog',
+        label: 'Catálogo',
+        icon: 'box',
+        description: 'Controla la visibilidad de categorías y productos'
+      },
+      {
+        id: 'orders',
+        label: 'Pedidos',
+        icon: 'message',
+        description: 'Configura el sistema de pedidos por WhatsApp'
+      },
+      {
+        id: 'rules',
+        label: 'Reglas',
+        icon: 'settings',
+        description: 'Establece las reglas de negocio y límites'
+      }
+    ]
+  } else {
+    return [
+      {
+        id: 'identity',
+        label: 'Diseño',
+        icon: 'palette',
+        description: 'Define el estilo visual de tu catálogo online'
+      },
+      {
+        id: 'catalog',
+        label: 'Catálogo',
+        icon: 'box',
+        description: 'Controla la visibilidad de categorías y productos'
+      },
+      {
+        id: 'orders',
+        label: 'Pedidos',
+        icon: 'message',
+        description: 'Configura el sistema de pedidos por WhatsApp'
+      },
+      {
+        id: 'rules',
+        label: 'Reglas',
+        icon: 'settings',
+        description: 'Establece las reglas de negocio y límites'
+      }
+    ]
   }
-]
+})
 
 const currentTabLabel = computed(() => {
-  const tab = tabs.find(t => t.id === activeTab.value)
+  const tab = tabs.value.find(t => t.id === activeTab.value)
   return tab ? tab.label : ''
 })
 
 const currentTabDescription = computed(() => {
-  const tab = tabs.find(t => t.id === activeTab.value)
+  const tab = tabs.value.find(t => t.id === activeTab.value)
   return tab ? tab.description : ''
 })
 
@@ -1039,6 +1754,21 @@ const isFashionStore = computed(() => {
   // Si no está en systemSettings, buscar en localStorage
   const storedType = localStorage.getItem('pending_store_type')
   return storedType === 'fashion'
+})
+
+// Sync activeTab with store type — immediate so it runs on first render
+watch(isFashionStore, (isFashion) => {
+  activeTab.value = isFashion ? 'identidad-visual' : 'identity'
+}, { immediate: true })
+
+// Preload all Google Fonts when the font modal opens
+watch(showFontModal, (open) => {
+  if (open) {
+    fontPairs.forEach(pair => {
+      loadGoogleFont(pair.heading)
+      loadGoogleFont(pair.body)
+    })
+  }
 })
 
 // Función helper para obtener plantilla válida según tipo de tienda
@@ -1120,12 +1850,44 @@ onMounted(async () => {
   
   // Validación final: Asegurar que la plantilla sea válida
   config.brandIdentity.template = getValidTemplate(config.brandIdentity.template)
-  
+
+  // Pre-poblar el caché del catálogo público con la config fresca
+  // Así cuando el iframe aparezca, renderiza instantáneamente sin spinner
+  try {
+    const cacheData = {
+      template: config.brandIdentity.template,
+      primary_color: config.brandIdentity.primaryColor,
+      logo_url: config.brandIdentity.logo || '',
+      banner_url: config.brandIdentity.banner || '',
+      whatsapp_number: config.ordersConfig.whatsappNumber || '',
+      currency_symbol: '$',
+      delivery_cost: parseFloat(config.businessRules.deliveryCost || 0),
+      min_order_value: parseFloat(config.businessRules.minimumOrder || 0),
+      custom_message: config.ordersConfig.customMessage || 'Hola, quiero hacer el siguiente pedido:',
+      store_name: appStore.systemSettings?.store_name || 'Mi Tienda',
+      ai_color_palette: aiBrandData.value?.color_palette || null,
+      ai_fonts: aiBrandData.value?.fonts || null,
+      ai_banner_texts: aiBrandData.value?.banner_texts || null,
+      ai_about_us: aiBrandData.value?.about_us || null,
+      ai_value_messages: aiBrandData.value?.value_messages || null,
+      ai_announcements: aiBrandData.value?.announcements || null,
+      ai_cross_sell_messages: aiBrandData.value?.cross_sell_messages || null,
+      ai_layout_config: aiBrandData.value?.layout_config || null
+    }
+    localStorage.setItem('pos_catalog_config_cache', JSON.stringify(cacheData))
+  } catch (e) {}
+
+  // Liberar el flag de inicialización ANTES de isLoading para que los watchers
+  // ya no tengan efecto secundario aunque algo cambie en el siguiente tick
+  isInitializing.value = false
   isLoading.value = false
 })
 
 // Validación: Desactivar catálogo automáticamente si no hay categorías O número WhatsApp
 watch(() => config.storeActive, async (newValue) => {
+  // Ignorar cambios durante la carga inicial (evita guardados falsos y recarga del iframe)
+  if (isInitializing.value) return
+
   if (newValue) {
     // Verificar categorías
     if (config.inventoryVisibility.visibleCategories.length === 0) {
@@ -1181,6 +1943,8 @@ watch(() => config.storeActive, async (newValue) => {
 
 // Validación inteligente al cambiar categorías
 watch(() => config.inventoryVisibility.visibleCategories.length, async (newLength, oldLength) => {
+  if (isInitializing.value) return
+
   // 1️⃣ Si se selecciona al menos una categoría, cerrar mensaje de alerta inmediatamente
   if (newLength > 0 && showWarningMessage.value) {
     showWarningMessage.value = false
@@ -1209,6 +1973,8 @@ watch(() => config.inventoryVisibility.visibleCategories.length, async (newLengt
 
 // Validación del número de WhatsApp
 watch(() => config.ordersConfig.whatsappNumber, (newValue) => {
+  if (isInitializing.value) return
+
   // Si se ingresa un número válido, cerrar mensaje de alerta si era de WhatsApp
   if (isValidWhatsappNumber(newValue) && showWarningMessage.value && warningType.value === 'whatsapp') {
     showWarningMessage.value = false
@@ -1404,7 +2170,32 @@ const saveConfiguration = async () => {
       setTimeout(() => {
         showSuccessToast.value = false
       }, 3000)
-      
+
+      // Actualizar caché local para que el catálogo cargue instantáneamente
+      try {
+        const cacheData = {
+          template: config.brandIdentity.template,
+          primary_color: config.brandIdentity.primaryColor,
+          logo_url: config.brandIdentity.logo || '',
+          banner_url: config.brandIdentity.banner || '',
+          whatsapp_number: config.ordersConfig.whatsappNumber || '',
+          currency_symbol: '$',
+          delivery_cost: parseFloat(config.businessRules.deliveryCost || 0),
+          min_order_value: parseFloat(config.businessRules.minimumOrder || 0),
+          custom_message: config.ordersConfig.customMessage || 'Hola, quiero hacer el siguiente pedido:',
+          store_name: appStore.systemSettings?.store_name || 'Mi Tienda',
+          ai_color_palette: aiBrandData.value?.color_palette || null,
+          ai_fonts: aiBrandData.value?.fonts || null,
+          ai_banner_texts: aiBrandData.value?.banner_texts || null,
+          ai_about_us: aiBrandData.value?.about_us || null,
+          ai_value_messages: aiBrandData.value?.value_messages || null,
+          ai_announcements: aiBrandData.value?.announcements || null,
+          ai_cross_sell_messages: aiBrandData.value?.cross_sell_messages || null,
+          ai_layout_config: aiBrandData.value?.layout_config || null
+        }
+        localStorage.setItem('pos_catalog_config_cache', JSON.stringify(cacheData))
+      } catch (e) {}
+
       // Recargar iframe automáticamente después de guardar
       refreshPreview()
     }
@@ -1516,6 +2307,42 @@ const applyAiColors = () => {
   }
 }
 
+// Regenerate only colors with refinement hint
+const regenerateColors = async () => {
+  if (isRegeneratingColors.value) return
+  isRegeneratingColors.value = true
+  try {
+    const combinedPrompt = aiBrandDescription.value.trim()
+      + (colorRefinementPrompt.value.trim() ? '. Preferencias de color adicionales: ' + colorRefinementPrompt.value.trim() : '')
+    const response = await apiClient.post('/web-catalog/ai-brand/generate', {
+      business_description: combinedPrompt
+    })
+    if (response.data.success) {
+      aiBrandData.value = {
+        ...aiBrandData.value,
+        color_palette: response.data.data.color_palette,
+        generated_at: new Date().toISOString()
+      }
+      if (response.data.data.color_palette?.primary) {
+        config.brandIdentity.primaryColor = response.data.data.color_palette.primary
+      }
+      showColorRefinement.value = false
+      colorRefinementPrompt.value = ''
+      toastMessage.title = 'Paleta regenerada'
+      toastMessage.description = 'Los colores se actualizaron con tus preferencias.'
+      showSuccessToast.value = true
+      setTimeout(() => showSuccessToast.value = false, 3000)
+    }
+  } catch (error) {
+    toastMessage.title = 'Error al regenerar'
+    toastMessage.description = 'No se pudo regenerar la paleta. Intenta de nuevo.'
+    showSuccessToast.value = true
+    setTimeout(() => showSuccessToast.value = false, 4000)
+  } finally {
+    isRegeneratingColors.value = false
+  }
+}
+
 // Apply AI recommended template
 const applyAiTemplate = () => {
   if (aiBrandData.value?.recommended_template) {
@@ -1604,6 +2431,11 @@ const stopVoiceRecording = () => {
   animation: slide-up 0.3s ease-out forwards;
 }
 
+@keyframes modalSlideIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 /* Simular viewport móvil real */
 .mobile-preview-viewport {
   width: 375px !important;
@@ -1613,5 +2445,13 @@ const stopVoiceRecording = () => {
 /* Forzar estilos móviles en la preview */
 .mobile-preview-viewport * {
   max-width: 100%;
+}
+
+/* Line clamp para el body preview en el modal */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>

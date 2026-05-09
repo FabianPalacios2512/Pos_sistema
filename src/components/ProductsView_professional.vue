@@ -501,6 +501,7 @@
                   <img v-if="getProductImage(product)"
                        :src="getProductImage(product)" 
                        :alt="product.name" 
+                       @error="(e) => handleImageError(e, product)"
                        class="w-full h-full object-cover">
                   <svg v-else class="w-6 h-6 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.75 7.5h16.5m-15.75 0l1.5-1.875A2.625 2.625 0 018.25 4.5h7.5a2.625 2.625 0 012.25 1.125l1.5 1.875"/>
@@ -2412,7 +2413,7 @@ const emit = defineEmits(['navigate', 'changeModule', 'change-module', 'openQuot
 const route = useRoute()
 const router = useRouter()
 
-// �x�️ Función utilitaria para manejo inteligente de imágenes
+// 🖼️ Función utilitaria para manejo inteligente de imágenes
 const getProductImage = (product) => {
   // Usar el origen actual (mismo puerto que el frontend/proxy)
   const baseUrl = window.location.origin

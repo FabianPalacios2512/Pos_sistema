@@ -572,6 +572,7 @@ const relatedProducts = computed(() => {
 const getImageUrl = (path) => {
   if (!path) return ''
   if (path.startsWith('http') || path.startsWith('data:')) return path
+  if (!path.includes('/')) return `/storage/products/${path}`
   return path.startsWith('/') ? path : `/${path}`
 }
 

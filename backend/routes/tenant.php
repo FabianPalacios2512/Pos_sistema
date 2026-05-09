@@ -36,27 +36,9 @@ Route::middleware([
         return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
     });
 
-    // Servir archivos de storage del tenant
-    Route::get('/storage/{path}', function ($path) {
-        // storage_path() ya está modificado por tenancy para apuntar al directorio del tenant
-        $path = storage_path("app/public/{$path}");
-
-        if (!file_exists($path)) {
-            abort(404);
-        }
-
-        $file = \Illuminate\Support\Facades\File::get($path);
-        $type = \Illuminate\Support\Facades\File::mimeType($path);
-
-        $response = \Illuminate\Support\Facades\Response::make($file, 200);
-        $response->header("Content-Type", $type);
-
-        return $response;
-    })->where('path', '.*');
-
     // Ruta de fallback para URLs con formato /storage/tenants/{id}/...
     // Sirve los archivos directamente (sin depender de symlinks) para mayor resiliencia.
-    // Esta ruta solo es alcanzada cuando el symlink no existe o está roto.
+    // Esta ruta debe ir ANTES de la genérica para evitar que sea opacada.
     Route::get('/storage/tenants/{tenantId}/{path}', function ($tenantId, $path) {
         // Validar que el tenantId corresponde al tenant activo (seguridad)
         if ((string) $tenantId !== (string) tenant('id')) {
@@ -75,6 +57,24 @@ Route::middleware([
         return \Illuminate\Support\Facades\Response::make($file, 200)
             ->header('Content-Type', $type);
     })->where(['tenantId' => '[^/]+', 'path' => '.*']);
+
+    // Servir archivos de storage del tenant
+    Route::get('/storage/{path}', function ($path) {
+        // storage_path() ya está modificado por tenancy para apuntar al directorio del tenant
+        $path = storage_path("app/public/{$path}");
+
+        if (!file_exists($path)) {
+            abort(404);
+        }
+
+        $file = \Illuminate\Support\Facades\File::get($path);
+        $type = \Illuminate\Support\Facades\File::mimeType($path);
+
+        $response = \Illuminate\Support\Facades\Response::make($file, 200);
+        $response->header("Content-Type", $type);
+
+        return $response;
+    })->where('path', '^(?!tenants/).*');
 });
 
 // Rutas públicas del catálogo (sin autenticación)

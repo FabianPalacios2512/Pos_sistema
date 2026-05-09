@@ -639,24 +639,41 @@ const checkWhatsAppStatus = async () => {
 const startWhatsAppStatusCheck = () => {
   if (whatsappCheckInterval) return
   
-  let errorCount = 0
-  const maxErrors = 3
+  let consecutiveFailures = 0
+  const maxConsecutiveFailures = 3
   
   // Verificar cada 3 segundos
   whatsappCheckInterval = setInterval(async () => {
     try {
-      await checkWhatsAppStatus()
-      errorCount = 0 // Reset contador si tiene éxito
+      const result = await whatsappService.getStatus()
       
-      // Si no está conectado, intentar obtener QR
-      if (!whatsappStatus.value.connected && !qrCode.value) {
-        await getQRCode()
+      if (result.success && result.status) {
+        consecutiveFailures = 0 // Reset contador si tiene éxito
+        whatsappStatus.value = result.status
+        
+        // Si se conectó, limpiar QR y detener intervals
+        if (result.status.connected) {
+          qrCode.value = ''
+          stopWhatsAppStatusCheck()
+          stopQRAutoRefresh()
+          return
+        }
+        
+        // Si no está conectado, intentar obtener QR
+        if (!qrCode.value) {
+          await getQRCode()
+        }
+      } else {
+        // Falla silenciosa (servicio no disponible) — incrementar contador
+        consecutiveFailures++
+        if (consecutiveFailures >= maxConsecutiveFailures) {
+          stopWhatsAppStatusCheck()
+          stopQRAutoRefresh()
+        }
       }
-    } catch (error) {
-      errorCount++
-      
-      // Si hay muchos errores consecutivos, detener el intervalo
-      if (errorCount >= maxErrors) {
+    } catch {
+      consecutiveFailures++
+      if (consecutiveFailures >= maxConsecutiveFailures) {
         stopWhatsAppStatusCheck()
         stopQRAutoRefresh()
       }

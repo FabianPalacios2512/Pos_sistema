@@ -91,7 +91,14 @@ async function handleManualLogout() {
 // Inicializar autenticación al cargar la app
 onMounted(async () => {
   const startTime = Date.now()
-  
+  const SPLASH_MIN_MS = 1200   // mínimo visual
+  const SPLASH_MAX_MS = 4000   // nunca bloquear más de 4s
+
+  // Ocultar splash tras el máximo sin importar qué
+  const splashFallbackTimer = setTimeout(() => {
+    showSplash.value = false
+  }, SPLASH_MAX_MS)
+
   await authStore.actions.initialize()
   
   // INICIALIZAR APPSTORE DESPUÉS DE LA AUTENTICACIÓN (incluye sesión de caja)
@@ -113,14 +120,10 @@ onMounted(async () => {
     }
   }
   
-  // TODO: Re-habilitar health-check cuando se arregle correctamente con tenancy
-  // El problema era que intentaba acceder a la DB del tenant sin middleware de tenancy
-  
-  // OCULTAR SPLASH SOLO DESPUÉS DE QUE TODO ESTÉ LISTO
-  // Garantizar mínimo 1.2 segundos para que se vea la animación completa
+  // OCULTAR SPLASH: mínimo visual respetado, cancelar el fallback
+  clearTimeout(splashFallbackTimer)
   const elapsedTime = Date.now() - startTime
-  const minimumDisplayTime = 1200
-  const remainingTime = Math.max(0, minimumDisplayTime - elapsedTime)
+  const remainingTime = Math.max(0, SPLASH_MIN_MS - elapsedTime)
   
   setTimeout(() => {
     showSplash.value = false

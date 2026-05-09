@@ -288,6 +288,20 @@ const loadGlobalBusinessDataForAI = async () => {
   }
 }
 
+/**
+ * Normaliza URLs de imágenes de productos.
+ * Casos soportados:
+ *  - URL completa (http/https) → devolver tal cual
+ *  - Ruta relativa con / (/storage/...) → devolver tal cual
+ *  - Nombre de archivo plano (sin /) → construir /storage/products/{nombre}
+ */
+export function normalizeImageUrl(url) {
+  if (!url) return null
+  if (url.startsWith('http') || url.startsWith('/')) return url
+  // Bare filename: asumir que está en storage/products/
+  return `/storage/products/${url}`
+}
+
 // Store global de la aplicación para datos precargados
 export const appStore = reactive({
   // Estados de carga
@@ -365,7 +379,7 @@ export const appStore = reactive({
               cost_price: parseFloat(product.cost_price || 0),
               category_name: product.category_name || 'Sin categoría',
               category_color: product.category_color || '#6b7280',
-              image_url: product.image || null
+              image_url: normalizeImageUrl(product.image || product.image_url)
             }
           })
         

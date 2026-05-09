@@ -76,9 +76,20 @@ class ProductController extends Controller
                 }
             }
 
+            // ✅ FIX: public/storage DEBE ser un symlink a storage/app/public, NO un directorio real.
+            // Si es un directorio real, las imágenes de los tenants no serán accesibles vía web (404).
             $storagePublicDir = public_path('storage');
             if (!is_dir($storagePublicDir) && !is_link($storagePublicDir)) {
-                @mkdir($storagePublicDir, 0755, true);
+                // Crear como SYMLINK (igual que php artisan storage:link)
+                $storageAppPublic = base_path('storage/app/public');
+                if (!is_dir($storageAppPublic)) {
+                    @mkdir($storageAppPublic, 0755, true);
+                }
+                if (!@symlink($storageAppPublic, $storagePublicDir)) {
+                    // Si symlink falla (ej: permisos), crear directorio como fallback
+                    \Log::warning("[Storage] No se pudo crear symlink public/storage -> storage/app/public. Creando directorio como fallback.");
+                    @mkdir($storagePublicDir, 0755, true);
+                }
             }
 
             $tenantsDir = public_path('storage/tenants');
@@ -86,7 +97,9 @@ class ProductController extends Controller
                 @mkdir($tenantsDir, 0755, true);
             }
 
-            @symlink($tenantStoragePath, $symlinkPath);
+            if (!@symlink($tenantStoragePath, $symlinkPath)) {
+                \Log::error("[Storage] No se pudo crear symlink de tenant: {$symlinkPath} -> {$tenantStoragePath}");
+            }
         } catch (\Exception $e) {
             \Log::error("[Storage] Error en ensureTenantStorageLink: {$e->getMessage()}");
         }
@@ -909,6 +922,11 @@ class ProductController extends Controller
                             'is_primary' => $currentMaxOrder === 0 && $index === 0,
                             'order' => $currentMaxOrder + $index + 1
                         ]);
+
+                        // Actualizar la URL de la imagen principal en el producto
+                        if ($index === 0) {
+                            $product->update(['image_url' => $url]);
+                        }
                     } catch (\Exception $e) {
                         \Log::error('[ProductController@update] Error guardando imagen', [
                             'error' => $e->getMessage(),
@@ -987,18 +1005,26 @@ class ProductController extends Controller
                         }
                     }
 
-                    // Actualizar stock total del producto
-                    $product->update([
+                    // Construir array de actualización final para el producto simple
+                    $finalUpdate = [
                         'current_stock' => $totalStock,
-                        'sale_price' => $salePrice,
-                        'image_url' => $request->input('image_url') // ✅ Guardar imagen
-                    ]);
+                        'sale_price' => $salePrice
+                    ];
+                    // Solo actualizar la imagen si viene explícitamente como texto (ej: URL externa o limpieza)
+                    // y no si acaba de subirse un archivo (lo cual ya actualizó la imagen en el paso 3)
+                    if ($request->has('image_url')) {
+                        $finalUpdate['image_url'] = $request->input('image_url');
+                    }
+                    
+                    // Actualizar stock total del producto
+                    $product->update($finalUpdate);
                     } else {
                         // Fallback: Si no viene warehouse_stocks, actualizar precio e imagen
-                        $product->update([
-                            'sale_price' => $salePrice,
-                            'image_url' => $request->input('image_url')
-                        ]);
+                        $fallbackUpdate = ['sale_price' => $salePrice];
+                        if ($request->has('image_url')) {
+                            $fallbackUpdate['image_url'] = $request->input('image_url');
+                        }
+                        $product->update($fallbackUpdate);
                     }
                 }
 
