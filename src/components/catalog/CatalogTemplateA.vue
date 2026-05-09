@@ -1,8 +1,8 @@
 ﻿<template>
-  <!-- PLANTILLA A: "MODA PREMIUM" - Estilo V�lez/Zara -->
+  <!-- PLANTILLA A: "MODA PREMIUM" - Estilo Vélez/Zara -->
   <div class="catalog-visual-story relative overflow-x-hidden min-h-screen" :style="themeVars">
     
-    <!-- TOP BAR: Ticker s�lido y elegante -->
+    <!-- TOP BAR: Ticker sólido y elegante -->
     <div
       class="fixed top-0 left-0 right-0 z-[60] h-8 flex items-center justify-center overflow-hidden border-b"
       :style="tickerBarStyle"
@@ -21,7 +21,7 @@
       </div>
     </div>
 
-    <!-- HEADER MODULAR: Switch entre los 5 estilos seg�n headerConfig -->
+    <!-- HEADER MODULAR: Switch entre los 5 estilos según headerConfig -->
 
     <!-- editorial-center: Alta moda, logo centrado serif -->
     <HeaderEditorialCenter
@@ -78,7 +78,7 @@
       @cart="router.push('/catalog/bolsa')"
     />
 
-    <!-- utility-search: Ferreter�a/cat�logo grande, barra b�squeda 2 filas -->
+    <!-- utility-search: Ferretería/catálogo grande, barra búsqueda 2 filas -->
     <HeaderUtilitySearch
       v-else-if="headerConfig.style === 'utility-search'"
       :storeName="storeName"
@@ -92,8 +92,8 @@
       @cart="router.push('/catalog/bolsa')"
     />
 
-    <!-- DEFAULT (null): Header original del sistema � Retail Fashion / Kharis-inspired -->
-    <!-- centered-serif: Distribuidora / Boutique � Kharis-style (componente externo) -->
+    <!-- DEFAULT (null): Header original del sistema — Retail Fashion / Kharis-inspired -->
+    <!-- centered-serif: Distribuidora / Boutique — Kharis-style (componente externo) -->
     <HeaderCenteredSerif
       v-else-if="headerConfig.style === 'centered-serif'"
       :storeName="storeName"
@@ -108,7 +108,7 @@
       @cart="router.push('/catalog/bolsa')"
     />
 
-    <!-- DEFAULT (null): Header original del sistema � Retail Fashion / Kharis-inspired -->
+    <!-- DEFAULT (null): Header original del sistema — Retail Fashion / Kharis-inspired -->
     <header
       v-else
       ref="stickyHeader"
@@ -116,12 +116,12 @@
       :style="{ backgroundColor: aiPalette.background || '#ffffff' }"
       style="box-shadow: 0 1px 3px rgba(0,0,0,0.08);"
     >
-      <!-- L�nea decorativa superior sutil -->
+      <!-- Línea decorativa superior sutil -->
       <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
       
       <div class="w-full px-4 lg:px-8 h-14 lg:h-[72px] flex items-center justify-between">
         
-        <!-- Left: Men� Hamburguesa (L�neas finas elegantes) -->
+        <!-- Left: Menú Hamburguesa (Líneas finas elegantes) -->
         <div class="flex items-center gap-2 w-[72px]">
           <button 
             @click="showMobileMenu = !showMobileMenu"
@@ -133,7 +133,7 @@
           </button>
         </div>
 
-        <!-- CENTER: Nombre del Comercio - Tipograf�a Serif Elegante -->
+        <!-- CENTER: Nombre del Comercio - Tipografía Serif Elegante -->
         <div class="flex-1 flex flex-col items-center justify-center lg:justify-start lg:flex-none lg:absolute lg:left-1/2 lg:-translate-x-1/2">
           <h1 
             class="text-[22px] lg:text-[30px] text-gray-900 leading-none"
@@ -145,7 +145,7 @@
 
         <!-- Right: Lupa + Bolsa (Elegantes, negro) -->
         <div class="flex items-center gap-0 w-[72px] justify-end">
-          <!-- Lupa M�vil -->
+          <!-- Lupa Móvil -->
           <button 
             @click="showMobileSearch = !showMobileSearch"
             class="lg:hidden w-10 h-10 flex items-center justify-center"
@@ -174,7 +174,7 @@
         </div>
       </div>
 
-      <!-- Desktop: Barra de B�squeda + Navegaci�n -->
+      <!-- Desktop: Barra de Búsqueda + Navegación -->
       <div class="hidden lg:flex justify-center border-t border-gray-100 py-2 px-8">
         <div class="relative w-full max-w-lg">
           <input 
@@ -190,17 +190,17 @@
         </div>
       </div>
 
-      <!-- L�nea decorativa inferior -->
+      <!-- Línea decorativa inferior -->
       <div class="h-[1px] w-full bg-gray-100"></div>
 
-      <!-- Barra de B�squeda M�vil Expandible -->
+      <!-- Barra de Búsqueda Móvil Expandible -->
       <Transition name="slide-down">
         <div v-if="showMobileSearch" class="lg:hidden px-4 py-3 bg-white border-b border-gray-100">
           <div class="relative">
             <input 
               v-model="searchQuery"
               type="text" 
-              placeholder="�Qu� est�s buscando?"
+              placeholder="?Qu? estás buscando?"
               class="w-full h-11 pl-10 pr-10 border rounded-full text-sm placeholder-gray-500 transition-all outline-none"
               :style="{ backgroundColor: aiPalette.background, borderColor: aiPalette.secondary, color: aiPalette.text_dark }"
               autofocus
@@ -216,9 +216,9 @@
       </Transition>
     </header>
 
-    <!-- HERO BANNER: Componente modular seg�n hero_style del layout AI -->
+    <!-- HERO BANNER: Componente modular según hero_style del layout AI -->
     <div :class="heroTopMargin">
-      <!-- EDITORIAL: Alta moda, full-bleed fotograf�a, tipograf�a serif -->
+      <!-- EDITORIAL: Alta moda, full-bleed fotografía, tipografía serif -->
       <HeroEditorial
         v-if="layoutConfig.hero_style === 'editorial' || layoutConfig.hero_style === 'full-bleed'"
         :headline="heroHeadlineDisplay"
@@ -247,7 +247,7 @@
         @cta="scrollToProducts"
       />
 
-      <!-- STREETWEAR: Urbano, asim�trico, texto sobre imagen -->
+      <!-- STREETWEAR: Urbano, asimétrico, texto sobre imagen -->
       <HeroStreetwear
         v-else-if="layoutConfig.hero_style === 'streetwear' || layoutConfig.hero_style === 'urban'"
         :headline="heroHeadlineDisplay"
@@ -260,7 +260,7 @@
         @cta="scrollToProducts"
       />
 
-      <!-- FOCUS: Conversi�n directa, copy + producto destacado -->
+      <!-- FOCUS: Conversión directa, copy + producto destacado -->
       <HeroFocus
         v-else-if="layoutConfig.hero_style === 'centered-minimal' || layoutConfig.hero_style === 'focus'"
         :headline="heroHeadlineDisplay"
@@ -338,7 +338,7 @@
       </div>
     </section>
 
-    <!-- TRUST STRIP: Sistema modular � aplica a todos los estilos de hero -->
+    <!-- TRUST STRIP: Sistema modular — aplica a todos los estilos de hero -->
     <div class="lg:ml-64">
       <TrustStripMarquee
         v-if="trustStripStyle === 'marquee'"
@@ -383,15 +383,15 @@
       />
     </div>
 
-    <!-- HOOK / SPOTLIGHT: Bloque pre-cat�logo modular (reemplaza Brand Story gen�rico) -->
+    <!-- HOOK / SPOTLIGHT: Bloque pre-catálogo modular (reemplaza Brand Story gen?rico) -->
     <div class="lg:ml-64">
-      <!-- editorial-story: Boutique / Lencer�a / Alta Costura -->
+      <!-- editorial-story: Boutique / Lencería / Alta Costura -->
       <HookEditorialStory
         v-if="hookStyle === 'editorial-story'"
         :headline="bannerHeadline"
         :body="hookBodyText"
         :label="storeConfig.category || 'Brand Story'"
-        ctaText="Ver Colecci�n"
+        ctaText="Ver Colección"
         :image="storyImageSlots[0]"
         :palette="aiPalette"
         :fonts="aiFonts"
@@ -402,7 +402,7 @@
         v-else-if="hookStyle === 'urban-lookbook'"
         :headline="bannerHeadline"
         :subheadline="storySnippet.slice(0, 60)"
-        :dropLabel="storeConfig.category || 'Nueva Colecci�n'"
+        :dropLabel="storeConfig.category || 'Nueva Colección'"
         ctaText="Shop Now"
         :images="storyImageSlots"
         :video="storeConfig.catalog_media?.lookbook_video || ''"
@@ -417,8 +417,8 @@
         :headline="bannerHeadline"
         :subheadline="hookBodyText.slice(0, 55)"
         :benefit="storeConfig.ai_banner_texts?.cta_secondary || 'Alto\nRendimiento'"
-        :label="storeConfig.category || 'Colecci�n 2026'"
-        ctaText="Ver Colecci�n"
+        :label="storeConfig.category || 'Colección 2026'"
+        ctaText="Ver Colección"
         :image="storyImageSlots[0]"
         :detailImage="storyImageSlots[1]"
         :palette="aiPalette"
@@ -427,13 +427,13 @@
       />
     </div>
 
-    <!-- BARRA STICKY: Filtrar + Ordenar (M�vil) - S�lida -->
+    <!-- BARRA STICKY: Filtrar + Ordenar (Móvil) - Sólida -->
     <div 
       class="lg:hidden sticky top-[90px] z-40 border-t border-b border-gray-200"
       :style="{ backgroundColor: aiPalette.background || '#ffffff', boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }"
     >
       <div class="flex">
-        <!-- Bot�n FILTRAR (50%) -->
+        <!-- Botón FILTRAR (50%) -->
         <button 
           @click="showMobileFilters = true"
           class="flex-1 h-11 flex items-center justify-center gap-2 text-[11px] font-semibold text-gray-700 uppercase tracking-[0.1em] transition-colors hover:bg-gray-50 active:bg-gray-100"
@@ -445,7 +445,7 @@
         </button>
         <!-- Separador central fino -->
         <div class="w-px h-6 bg-gray-200 self-center"></div>
-        <!-- Bot�n ORDENAR (50%) -->
+        <!-- Botón ORDENAR (50%) -->
         <button 
           @click="showSortModal = true"
           class="flex-1 h-11 flex items-center justify-center gap-2 text-[11px] font-semibold text-gray-700 uppercase tracking-[0.1em] transition-colors hover:bg-gray-50 active:bg-gray-100"
@@ -460,9 +460,9 @@
 
     <!-- SIDEBAR LATERAL (Desktop) - Premium Minimalista -->
     <aside v-if="!isMobilePreview" class="hidden lg:block fixed left-0 top-[154px] bottom-0 w-64 bg-white border-r border-gray-100 overflow-y-auto z-30 px-6 py-8">
-      <!-- Filtro por Categor�a - Minimalista con l�nea vertical -->
+      <!-- Filtro por Categoría - Minimalista con línea vertical -->
       <div class="mb-8">
-        <h3 class="text-xs font-bold text-gray-400 mb-5 uppercase tracking-widest">Categor�as</h3>
+        <h3 class="text-xs font-bold text-gray-400 mb-5 uppercase tracking-widest">Categorías</h3>
         <div class="space-y-0.5">
           <button
             @click="selectedCategory = null"
@@ -499,7 +499,7 @@
         </div>
       </div>
 
-      <!-- Filtro por Rango de Precio - Slider Simple (Solo M�ximo) -->
+      <!-- Filtro por Rango de Precio - Slider Simple (Solo Máximo) -->
       <div class="mb-8">
         <h3 class="text-xs font-bold text-gray-400 mb-5 uppercase tracking-widest">Precio</h3>
         <div class="space-y-4">
@@ -609,7 +609,7 @@
         </label>
       </div>
 
-      <!-- Bot�n Limpiar Filtros -->
+      <!-- Botón Limpiar Filtros -->
       <button
         v-if="selectedCategory || showOnlyAvailable || sortOrder"
         @click="clearFilters"
@@ -619,20 +619,20 @@
       </button>
     </aside>
 
-    <!-- �REA PRINCIPAL: Productos -->
+    <!-- ÁREA PRINCIPAL: Productos -->
     <section ref="productsSection" class="lg:ml-64 pt-3 px-4 lg:px-8 pb-8">
       
-      <!-- Header de Cat�logo -->
+      <!-- Header de Catálogo -->
       <div class="mb-5 pb-4 border-b border-gray-200 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p class="text-[10px] uppercase tracking-[0.22em] font-semibold" :style="{ color: aiPalette.primary }">Cat�logo Curado</p>
+          <p class="text-[10px] uppercase tracking-[0.22em] font-semibold" :style="{ color: aiPalette.primary }">Catálogo Curado</p>
           <h3 class="mt-1 text-2xl md:text-3xl text-gray-900" :style="{ fontFamily: aiFonts.heading + ', serif', fontWeight: 500 }">
             {{ selectedCategory !== null ? activeCategoryName : (bannerCtaText || 'Compra por estilo') }}
           </h3>
           <p class="mt-1 text-sm text-gray-500">
             {{ filteredProducts.length }} productos
             <span v-if="selectedCategory !== null || showOnlyAvailable || sortOrder" class="font-semibold" :style="{ color: aiPalette.primary }">
-              � filtrados
+              — filtrados
             </span>
           </p>
         </div>
@@ -680,7 +680,7 @@
                   </svg>
                 </div>
                 
-                <!-- Bot�n Agregar - Minimal -->
+                <!-- Botón Agregar - Minimal -->
                 <button
                   @click.stop="addToCart(product)"
                   :disabled="product.stock === 0"
@@ -717,7 +717,7 @@
 
               <!-- Product Info - Compacto y Alineado -->
               <div class="pt-3 pb-4 px-3">
-                <p class="text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-1 truncate">{{ product.category || 'Colecci�n' }}</p>
+                <p class="text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-1 truncate">{{ product.category || 'Colección' }}</p>
                 <h3 class="text-[13px] font-normal text-gray-700 truncate leading-snug mb-1" :style="{ fontFamily: aiFonts.heading + ', serif' }">
                   {{ product.name }}
                 </h3>
@@ -775,7 +775,7 @@
             </div>
 
             <div class="relative min-h-[260px] md:min-h-full">
-              <img v-if="storyImageSlots[0]" :src="storyImageSlots[0]" alt="Colecci�n principal" class="w-full h-full object-cover" />
+              <img v-if="storyImageSlots[0]" :src="storyImageSlots[0]" alt="Colección principal" class="w-full h-full object-cover" />
               <div v-else class="w-full h-full bg-gray-100"></div>
               <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent"></div>
             </div>
@@ -900,7 +900,7 @@
       </div>
     </Transition>
 
-    <!-- MOBILE FILTERS DRAWER (Solo M�vil) -->
+    <!-- MOBILE FILTERS DRAWER (Solo Móvil) -->
     <Transition name="fade">
       <div v-if="showMobileFilters" class="lg:hidden fixed inset-0 bg-black/50 z-[150]" @click="showMobileFilters = false"></div>
     </Transition>
@@ -1077,7 +1077,7 @@
       @confirm="handleQuantityConfirmed"
     />
 
-    <!-- Modal de Selecci�n de Variantes (Fashion) -->
+    <!-- Modal de Selección de Variantes (Fashion) -->
     <POSVariantSelector
       :show="showVariantModal"
       :product="selectedProductForVariants"
@@ -1164,10 +1164,10 @@ const showOnlyAvailable = ref(false) // Filtro de disponibilidad
 
 // Ticker de anuncios vertical - Use AI-generated or defaults
 const defaultAnnouncements = [
-  'Env�o Gratis en compras mayores a $150.000',
+  'Envío Gratis en compras mayores a $150.000',
   'Nuevas Colecciones Disponibles',
-  'Hasta 3 cuotas sin inter�s',
-  'Devoluciones gratis en 30 d�as'
+  'Hasta 3 cuotas sin interés',
+  'Devoluciones gratis en 30 días'
 ]
 const announcements = computed(() => {
   const aiAnnouncements = props.storeConfig.ai_announcements
@@ -1191,13 +1191,13 @@ const selectedProductForQuantity = ref(null)
 const showVariantModal = ref(false)
 const selectedProductForVariants = ref(null)
 
-// ?? Estados para UI Premium M�vil
+// ?? Estados para UI Premium Móvil
 const showMobileMenu = ref(false)
 const showMobileSearch = ref(false)
 const showMobileFilters = ref(false)
 const showSortModal = ref(false)
 
-// Color primario din�mico del storeConfig
+// Color primario dinámico del storeConfig
 const primaryColor = computed(() => props.storeConfig.primary_color || '#10B981')
 
 // AI color palette with resilient fallbacks
@@ -1237,13 +1237,13 @@ const aiFonts = computed(() => {
 // AI layout config - controls hero style, CTA variant, category layout
 const layoutConfig = computed(() => {
   const cfg = props.storeConfig.ai_layout_config || {}
-  // ?? TEST: descomenta UNA l�nea para probar cada hero
+  // ?? TEST: descomenta UNA línea para probar cada hero
   const TEST_HERO = null               // null = usa el valor real de la BD
-  // const TEST_HERO = 'editorial'        // HeroEditorial   � full-bleed moda/lifestyle
-  //const TEST_HERO = 'split-portrait'   // HeroSplit        � 50/50 color+foto
-  // const TEST_HERO = 'streetwear'       // HeroStreetwear  � urbano bold
-  // const TEST_HERO = 'centered-minimal' // HeroFocus        � conversi�n directa
-  // const TEST_HERO = 'portrait'         // HeroPortrait     � belleza/cabello, doble CTA + trust strip
+  // const TEST_HERO = 'editorial'        // HeroEditorial   — full-bleed moda/lifestyle
+  //const TEST_HERO = 'split-portrait'   // HeroSplit        — 50/50 color+foto
+  // const TEST_HERO = 'streetwear'       // HeroStreetwear  — urbano bold
+  // const TEST_HERO = 'centered-minimal' // HeroFocus        — conversión directa
+  // const TEST_HERO = 'portrait'         // HeroPortrait     — belleza/cabello, doble CTA + trust strip
 
   return {
     hero_style: TEST_HERO || cfg.hero_style || 'editorial',
@@ -1256,20 +1256,20 @@ const layoutConfig = computed(() => {
   }
 })
 
-// AI header config � controla qu� navbar se renderiza + su ticker y animaci�n
+// AI header config — controla qu? navbar se renderiza + su ticker y animación
 const headerConfig = computed(() => {
   const cfg = props.storeConfig.ai_layout_config || {}
-  // ?? TEST: descomenta UNA l�nea para probar cada header
+  // ?? TEST: descomenta UNA línea para probar cada header
    const TEST_HEADER = null                   // null = header original del sistema
-  // const TEST_HEADER = 'editorial-center'  // HeaderEditorialCenter � alta moda, logo centrado serif
-  // const TEST_HEADER = 'retail-left'       // HeaderRetailLeft      � consumo masivo, logo izquierda
-  // const TEST_HEADER = 'transparent-glass' // HeaderTransparentGlass � cosm�tica ? pair con portrait/editorial
-   // const TEST_HEADER = 'floating-pill'     // HeaderFloatingPill    � streetwear/tech, p�ldora flotante
-  // const TEST_HEADER = 'utility-search'    // HeaderUtilitySearch   � ferreter�a, barra b�squeda 2 filas
-  // const TEST_HEADER = 'centered-serif' // HeaderCenteredSerif � elegante, logo centrado serif, sin ticker (usa layoutConfig) 
+  // const TEST_HEADER = 'editorial-center'  // HeaderEditorialCenter — alta moda, logo centrado serif
+  // const TEST_HEADER = 'retail-left'       // HeaderRetailLeft      — consumo masivo, logo izquierda
+  // const TEST_HEADER = 'transparent-glass' // HeaderTransparentGlass — cosm?tica ? pair con portrait/editorial
+   // const TEST_HEADER = 'floating-pill'     // HeaderFloatingPill    — streetwear/tech, p?ldora flotante
+  // const TEST_HEADER = 'utility-search'    // HeaderUtilitySearch   — ferretería, barra búsqueda 2 filas
+  // const TEST_HEADER = 'centered-serif' // HeaderCenteredSerif — elegante, logo centrado serif, sin ticker (usa layoutConfig) 
   const style = TEST_HEADER || cfg.header_style || null
 
-  // Cada header dicta su propio ticker: estilo visual + animaci�n
+  // Cada header dicta su propio ticker: estilo visual + animación
   const presets = {
     'editorial-center':   { tickerStyle: 'muted-light',  tickerMode: 'slide-left'  },
     'retail-left':        { tickerStyle: 'soft-primary',  tickerMode: 'slide-left'  },
@@ -1286,10 +1286,10 @@ const headerConfig = computed(() => {
   }
 })
 
-// Espaciado din�mico encima del hero seg�n el tipo de header activo
+// Espaciado dinámico encima del hero según el tipo de header activo
 // - transparent-glass y floating-pill flotan sobre el hero (sin margen)
 // - utility-search tiene 2 filas (ticker 32px + header 92px = 124px)
-// - Resto de headers s�lidos: ticker 32px + header 56px = 88px mobile, 104px desktop
+// - Resto de headers sólidos: ticker 32px + header 56px = 88px mobile, 104px desktop
 const heroTopMargin = computed(() => {
   const style = headerConfig.value.style
   if (style === 'transparent-glass' || style === 'floating-pill') return 'mt-0'
@@ -1297,34 +1297,34 @@ const heroTopMargin = computed(() => {
   return 'mt-[88px] lg:mt-[104px]'
 })
 
-// Hook / Spotlight: bloque pre-cat�logo que reemplaza el Brand Story gen�rico
+// Hook / Spotlight: bloque pre-catálogo que reemplaza el Brand Story gen?rico
 const hookStyle = computed(() => {
   const cfg = props.storeConfig.ai_layout_config || {}
-  // ?? TEST: descomenta UNA l�nea para probar cada bloque
+  // ?? TEST: descomenta UNA línea para probar cada bloque
    const TEST_HOOK = null                    // null = usa el valor real de la BD
-  // const TEST_HOOK = 'editorial-story'    // HookEditorialStory  � boutique/lencer�a/alta costura
-  // const TEST_HOOK = 'urban-lookbook'     // HookUrbanLookbook   � streetwear/sneakers/drop
-  // const TEST_HOOK = 'dynamic-bento'      // HookDynamicBento    � deportivo/tech/consumo
+  // const TEST_HOOK = 'editorial-story'    // HookEditorialStory  — boutique/lencer?a/alta costura
+  // const TEST_HOOK = 'urban-lookbook'     // HookUrbanLookbook   — streetwear/sneakers/drop
+  // const TEST_HOOK = 'dynamic-bento'      // HookDynamicBento    — deportivo/tech/consumo
   return TEST_HOOK || cfg.hook_style || 'editorial-story' // editorial-story como default
 })
 
 // Texto del cuerpo del Hook (usa ai_about_us como fuente, truncado para el bloque)
 const hookBodyText = computed(() => {
   const about = (props.storeConfig.ai_about_us || '').trim()
-  if (!about) return 'Cada pieza es pensada con materiales de primera calidad. Tu comodidad y estilo son nuestra obsesi�n desde el primer boceto.'
+  if (!about) return 'Cada pieza es pensada con materiales de primera calidad. Tu comodidad y estilo son nuestra obsesión desde el primer boceto.'
   return about.length > 200 ? `${about.slice(0, 200).trim()}...` : about
 })
 
 // Trust Strip: estilo visual y datos normalizados desde ai_value_messages
 const trustStripStyle = computed(() => {
   const cfg = props.storeConfig.ai_layout_config || {}
-  // ?? TEST: descomenta UNA l�nea para probar cada estilo
+  // ?? TEST: descomenta UNA línea para probar cada estilo
    const TEST_TRUST_STRIP = null              // null = usa el valor real de la BD
-  // const TEST_TRUST_STRIP = 'dark-contrast'  // Kharis � fondo negro, texto blanco, scroll
-  // const TEST_TRUST_STRIP = 'minimal-border' // Boutique/Zara � blanco, borde fino
-  // const TEST_TRUST_STRIP = 'divided'        // Cosm�tica/Corp � gris sutil, divide-x
-  // const TEST_TRUST_STRIP = 'marquee'        // Streetwear � texto en loop infinito
-  // const TEST_TRUST_STRIP = 'soft-pills'     // Tech/R�pido � pastillas blancas
+  // const TEST_TRUST_STRIP = 'dark-contrast'  // Kharis — fondo negro, texto blanco, scroll
+  // const TEST_TRUST_STRIP = 'minimal-border' // Boutique/Zara — blanco, borde fino
+  // const TEST_TRUST_STRIP = 'divided'        // Cosm?tica/Corp — gris sutil, divide-x
+  // const TEST_TRUST_STRIP = 'marquee'        // Streetwear — texto en loop infinito
+  // const TEST_TRUST_STRIP = 'soft-pills'     // Tech/Rápido — pastillas blancas
   return TEST_TRUST_STRIP || cfg.trust_strip_style || null
 })
 
@@ -1339,10 +1339,10 @@ const trustStripItems = computed(() => {
     }))
   }
   return [
-    { icon: 'truck',  label: 'Env�o a todo el pa�s', sublabel: 'R�pido y seguro' },
+    { icon: 'truck',  label: 'Envío a todo el país', sublabel: 'Rápido y seguro' },
     { icon: 'shield', label: 'Pago 100% seguro',      sublabel: 'SSL encriptado' },
     { icon: 'star',   label: 'Calidad garantizada',   sublabel: 'Productos originales' },
-    { icon: 'chat',   label: 'Atenci�n personalizada', sublabel: 'Lun�S�b 8am�6pm' },
+    { icon: 'chat',   label: 'Atenci?n personalizada', sublabel: 'Lun–Sáb 8am–6pm' },
   ]
 })
 
@@ -1374,7 +1374,7 @@ const tickerTextColor = computed(() => {
     : aiPalette.value.text_dark
 })
 
-// Animaci�n del ticker seg�n el header
+// Animación del ticker según el header
 const tickerTransitionName = computed(() => {
   const mode = headerConfig.value.tickerMode
   if (mode === 'fade')        return 'ticker-fade'
@@ -1461,9 +1461,9 @@ const heroSubheadlineDisplay = computed(() => {
   return text.length > maxChars ? `${text.slice(0, maxChars - 3).trim()}...` : text
 })
 
-// Im�genes del carrusel � prioriza catalog_media.hero_images, luego banner_url, luego fallbacks
+// Imágenes del carrusel — prioriza catalog_media.hero_images, luego banner_url, luego fallbacks
 const carouselImages = computed(() => {
-  // 1. Im�genes subidas por el comerciante en el admin
+  // 1. Imágenes subidas por el comerciante en el admin
   const catalogMedia = props.storeConfig.catalog_media || {}
   const heroImages = Array.isArray(catalogMedia.hero_images)
     ? catalogMedia.hero_images.filter(Boolean)
@@ -1543,7 +1543,7 @@ const storyImageSlots = computed(() => {
 const storySnippet = computed(() => {
   const about = (props.storeConfig.ai_about_us || '').trim()
   if (!about) {
-    return 'Curamos piezas con dise�o, calidad y car�cter para que tu compra se sienta especial desde el primer vistazo.'
+    return 'Curamos piezas con diseño, calidad y carácter para que tu compra se sienta especial desde el primer vistazo.'
   }
   return about.length > 260 ? `${about.slice(0, 260).trim()}...` : about
 })
@@ -1556,7 +1556,7 @@ const categoryHighlights = computed(() => {
   catalogProducts.value.forEach((product) => {
     const rawId = product.category_id ?? product.category ?? 'sin-categoria'
     const id = String(rawId)
-    const name = product.category || product.category_name || 'Sin categor�a'
+    const name = product.category || product.category_name || 'Sin categoría'
 
     if (!countMap.has(id)) {
       countMap.set(id, { id: rawId, name, count: 0 })
@@ -1594,7 +1594,7 @@ const maxProductPrice = computed(() => {
 const filteredProducts = computed(() => {
   let products = catalogProducts.value
   
-  // Filtro por b�squeda
+  // Filtro por búsqueda
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase()
     products = products.filter(p => 
@@ -1603,7 +1603,7 @@ const filteredProducts = computed(() => {
     )
   }
   
-  // Filtro por categor�a seleccionada
+  // Filtro por categoría seleccionada
   if (selectedCategory.value !== null) {
     products = products.filter(p => p.category_id === selectedCategory.value)
   }
@@ -1613,7 +1613,7 @@ const filteredProducts = computed(() => {
     products = products.filter(p => p.stock && p.stock > 0)
   }
   
-  // Filtro por precio m�ximo
+  // Filtro por precio máximo
   if (priceRange.value.max < maxProductPrice.value) {
     products = products.filter(p => {
       const price = parseFloat(p.price || 0)
@@ -1648,7 +1648,7 @@ const cartTotal = computed(() => {
   return cartItems.value.reduce((sum, item) => sum + parseFloat(item.price), 0)
 })
 
-// Clases del grid seg�n el modo de vista
+// Clases del grid según el modo de vista
 const gridClasses = computed(() => {
   if (props.isMobilePreview) {
     return 'grid grid-cols-2 gap-3'
@@ -1656,7 +1656,7 @@ const gridClasses = computed(() => {
   return 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 lg:gap-5'
 })
 
-// Grid Premium para Moda (2 columnas en m�vil, m�ximo 4 en desktop)
+// Grid Premium para Moda (2 columnas en móvil, máximo 4 en desktop)
 const gridClassesPremium = computed(() => {
   if (props.isMobilePreview) {
     return 'grid grid-cols-2 gap-3 px-0'
@@ -1665,7 +1665,7 @@ const gridClassesPremium = computed(() => {
 })
 
 
-// M�todos
+// Métodos
 const formatPrice = (price) => {
   return parseFloat(price).toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 }
@@ -1897,7 +1897,7 @@ onUnmounted(() => {
   transform: translateX(-100%);
 }
 
-/* Animaci�n Carrusel de Anuncios */
+/* Animación Carrusel de Anuncios */
 @keyframes scroll-left {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
@@ -1907,7 +1907,7 @@ onUnmounted(() => {
   animation: scroll-left 20s linear infinite;
 }
 
-/* Transici�n Slide Down para b�squeda m�vil */
+/* Transici?n Slide Down para búsqueda móvil */
 .slide-down-enter-active,
 .slide-down-leave-active {
   transition: all 0.3s ease;
@@ -1978,7 +1978,7 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-/* Transici�n del Carrusel */
+/* Transici?n del Carrusel */
 .fade-slide-enter-active {
   transition: opacity 1.5s ease;
 }
@@ -1995,7 +1995,7 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-/* Animaci�n Fade In */
+/* Animación Fade In */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
@@ -2067,19 +2067,19 @@ onUnmounted(() => {
   }
 }
 
-/* Ticker: slide-left (default) � entra desde derecha, sale por izquierda */
+/* Ticker: slide-left (default) — entra desde derecha, sale por izquierda */
 .ticker-train-enter-active { transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
 .ticker-train-leave-active  { transition: all 0.5s cubic-bezier(0.7, 0, 0.84, 0); }
 .ticker-train-enter-from    { opacity: 0; transform: translateX(100%); }
 .ticker-train-leave-to      { opacity: 0; transform: translateX(-100%); }
 
-/* Ticker: fade � aparece y desaparece suavemente (transparent-glass) */
+/* Ticker: fade — aparece y desaparece suavemente (transparent-glass) */
 .ticker-fade-enter-active { transition: opacity 0.6s ease; }
 .ticker-fade-leave-active  { transition: opacity 0.4s ease; }
 .ticker-fade-enter-from    { opacity: 0; }
 .ticker-fade-leave-to      { opacity: 0; }
 
-/* Ticker: slide-down � entra desde arriba, sale hacia arriba (floating-pill) */
+/* Ticker: slide-down — entra desde arriba, sale hacia arriba (floating-pill) */
 .ticker-down-enter-active { transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
 .ticker-down-leave-active  { transition: all 0.4s cubic-bezier(0.7, 0, 0.84, 0); }
 .ticker-down-enter-from    { opacity: 0; transform: translateY(-100%); }
