@@ -269,13 +269,13 @@
         :palette="aiPalette"
         :fonts="aiFonts"
         :ctaText="bannerCtaText"
-        :badge="bannerCtaText ? 'Novedad' : 'Nueva Colecci�n'"
+        :badge="bannerCtaText ? 'Novedad' : 'Nueva Colección'"
         :productCount="catalogProducts.length"
         :isMobilePreview="isMobilePreview"
         @cta="scrollToProducts"
       />
 
-      <!-- PORTRAIT: Retrato full-bleed, tipograf�a mixta sans+serif, doble CTA rectangular + trust strip -->
+      <!-- PORTRAIT: Retrato full-bleed, tipografía mixta sans+serif, doble CTA rectangular + trust strip -->
       <HeroPortrait
         v-else-if="layoutConfig.hero_style === 'portrait'"
         :headline="heroHeadlineDisplay"
@@ -330,7 +330,7 @@
             </div>
           </div>
           <div class="px-2 sm:px-3 py-2 sm:py-2.5">
-            <p class="text-[8px] sm:text-[10px] uppercase tracking-[0.08em] mb-0.5 truncate" :style="{ color: aiPalette.primary + '99' }">{{ product.category || 'Colecci�n' }}</p>
+            <p class="text-[8px] sm:text-[10px] uppercase tracking-[0.08em] mb-0.5 truncate" :style="{ color: aiPalette.primary + '99' }">{{ product.category || 'Colección' }}</p>
             <h3 class="text-[11px] sm:text-sm leading-snug truncate" :style="{ fontFamily: aiFonts.heading + ', serif', fontWeight: 500, color: aiPalette.text_dark }">{{ product.name }}</h3>
             <p class="text-[11px] sm:text-sm font-bold mt-0.5" :style="{ color: aiPalette.text_dark }">{{ storeConfig.currency_symbol }}{{ formatPrice(product.price) }}</p>
           </div>
@@ -404,6 +404,8 @@
         :subheadline="storySnippet.slice(0, 60)"
         :dropLabel="storeConfig.category || 'Nueva Colecci�n'"
         ctaText="Shop Now"
+        :images="storyImageSlots"
+        :video="storeConfig.catalog_media?.lookbook_video || ''"
         :image="storyImageSlots[0]"
         :palette="aiPalette"
         :fonts="aiFonts"
@@ -785,7 +787,7 @@
     <!-- FOOTER: Powered by 105 POS -->
     <footer class="border-t py-8 text-center" :class="{ 'mb-16': cartCount > 0 }" :style="{ backgroundColor: aiPalette.background, borderColor: aiPalette.secondary }">
       <p class="text-xs text-gray-400 tracking-wide">
-        Tecnolog�a por
+        Tecnología por
         <a 
           href="https://105pos.pro/register" 
           target="_blank" 
@@ -795,7 +797,7 @@
       </p>
     </footer>
 
-    <!-- WHATSAPP BUTTON - En m�vil sube con carrito, en PC fijo -->
+    <!-- WHATSAPP BUTTON - En móvil sube con carrito, en PC fijo -->
     <a 
       v-if="storeConfig.whatsapp_number"
       :href="`https://wa.me/${storeConfig.whatsapp_number.replace(/[^0-9]/g, '')}?text=Hola, me interesa hacer un pedido`"
@@ -810,7 +812,7 @@
       </svg>
     </a>
 
-    <!-- STICKY BOTTOM ACTION BAR - Solo M�vil (Desktop usa Mini-Cart en Header) -->
+    <!-- STICKY BOTTOM ACTION BAR - Solo Móvil (Desktop usa Mini-Cart en Header) -->
     <Transition name="slide-up">
       <div 
         v-if="cartCount > 0"
@@ -824,7 +826,7 @@
           <p class="text-lg font-bold text-gray-900">{{ storeConfig.currency_symbol }}{{ formatPrice(cartTotal) }}</p>
         </div>
         
-        <!-- Derecha: Bot�n VER BOLSA -->
+        <!-- Derecha: Botón VER BOLSA -->
         <button 
           @click="router.push('/catalog/bolsa')"
           class="text-white px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors flex items-center gap-2"
@@ -838,7 +840,7 @@
       </div>
     </Transition>
 
-    <!-- OFF-CANVAS DRAWER MENU (Men� Lateral de Categor�as) -->
+    <!-- OFF-CANVAS DRAWER MENU (Menú Lateral de Categorías) -->
     <Transition name="fade">
       <div v-if="showMobileMenu" class="fixed inset-0 bg-black/50 z-[160]" @click="showMobileMenu = false"></div>
     </Transition>
@@ -850,7 +852,7 @@
             class="text-[15px] text-gray-900 tracking-[0.06em] uppercase"
             style="font-family: 'Playfair Display', 'Georgia', serif; font-weight: 600;"
           >
-            {{ storeConfig.store_name || 'Men�' }}
+            {{ storeConfig.store_name || 'Menú' }}
           </h2>
           <button 
             @click="showMobileMenu = false"
@@ -862,7 +864,7 @@
           </button>
         </div>
 
-        <!-- Categor�as -->
+        <!-- Categorías -->
         <nav class="flex-1 overflow-y-auto">
           <ul>
             <li>
@@ -871,7 +873,7 @@
                 class="w-full text-left px-5 py-4 text-sm font-medium transition-colors border-b border-gray-100 flex items-center justify-between"
                 :class="selectedCategory === null ? 'text-gray-900 bg-gray-50' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'"
               >
-                <span>Todas las categor�as</span>
+                <span>Todas las categorías</span>
                 <span v-if="selectedCategory === null" class="w-1.5 h-1.5 bg-gray-900 rounded-full"></span>
               </button>
             </li>
@@ -891,7 +893,7 @@
         <!-- Footer del drawer -->
         <div class="flex-shrink-0 px-5 py-4 border-t border-gray-100">
           <p class="text-[10px] text-gray-400 text-center tracking-wide">
-            Tecnolog�a por
+            Tecnología por
             <a href="https://105pos.pro/register" target="_blank" rel="noopener noreferrer" class="font-semibold text-gray-500">105 POS</a>
           </p>
         </div>
@@ -916,9 +918,9 @@
         
         <!-- Contenido de Filtros -->
         <div class="flex-1 overflow-y-auto px-6 py-5 space-y-6">
-          <!-- Categor�as -->
+          <!-- Categorías -->
           <div>
-            <h4 class="text-xs font-bold text-gray-400 mb-4 uppercase tracking-widest">Categor�as</h4>
+            <h4 class="text-xs font-bold text-gray-400 mb-4 uppercase tracking-widest">Categorías</h4>
             <div class="space-y-1">
               <button
                 @click="selectedCategory = null; showMobileFilters = false"
@@ -947,7 +949,7 @@
           
           <!-- Precio - Slider Simple -->
           <div>
-            <h4 class="text-xs font-bold text-gray-400 mb-4 uppercase tracking-widest">Precio m�ximo</h4>
+            <h4 class="text-xs font-bold text-gray-400 mb-4 uppercase tracking-widest">Precio máximo</h4>
             <div class="space-y-3">
               <div class="relative h-1.5 bg-gray-200 rounded-full">
                 <div 
@@ -982,7 +984,7 @@
           </div>
         </div>
         
-        <!-- Footer con bot�n -->
+        <!-- Footer con botón -->
         <div class="flex-shrink-0 px-6 py-4 border-t border-gray-100 bg-gray-50">
           <button 
             @click="showMobileFilters = false"
@@ -994,7 +996,7 @@
       </div>
     </Transition>
 
-    <!-- MOBILE SORT MODAL (Solo M�vil) -->
+    <!-- MOBILE SORT MODAL (Solo Móvil) -->
     <Transition name="fade">
       <div v-if="showSortModal" class="lg:hidden fixed inset-0 bg-black/50 z-[150]" @click="showSortModal = false"></div>
     </Transition>
@@ -1436,7 +1438,7 @@ const bannerCtaSecondary = computed(() => {
 
 // AI-generated banner texts with fallbacks
 const bannerHeadline = computed(() => {
-  return props.storeConfig.ai_banner_texts?.headline || 'Nueva Colecci�n'
+  return props.storeConfig.ai_banner_texts?.headline || 'Nueva Colección'
 })
 
 const bannerSubheadline = computed(() => {
@@ -1448,7 +1450,7 @@ const bannerCtaText = computed(() => {
 })
 
 const heroHeadlineDisplay = computed(() => {
-  const text = bannerHeadline.value || 'Nueva Colecci�n'
+  const text = bannerHeadline.value || 'Nueva Colección'
   const maxChars = layoutConfig.value.hero_content_density === 'compact' ? 58 : 76
   return text.length > maxChars ? `${text.slice(0, maxChars - 3).trim()}...` : text
 })
@@ -1568,15 +1570,15 @@ const categoryHighlights = computed(() => {
 })
 
 const activeCategoryName = computed(() => {
-  if (selectedCategory.value === null) return 'Toda la colecci�n'
+  if (selectedCategory.value === null) return 'Toda la colección' 
   const match = categoryHighlights.value.find(category => String(category.id) === String(selectedCategory.value))
-  return match?.name || 'Colecci�n seleccionada'
+  return match?.name || 'Colección seleccionada'
 })
 
 // Computed
 const storeName = computed(() => props.storeConfig.store_name || 'Mi Tienda')
 
-// Precios m�nimo y m�ximo de productos
+// Precios mínimo y máximo de productos
 const minProductPrice = computed(() => {
   const products = catalogProducts.value
   if (products.length === 0) return 0

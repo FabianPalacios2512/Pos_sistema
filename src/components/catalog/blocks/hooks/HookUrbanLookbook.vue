@@ -7,11 +7,23 @@
     <div class="relative">
       <!-- Imagen: portrait en móvil, cinematic en desktop -->
       <div class="aspect-[3/4] sm:aspect-[16/8] overflow-hidden">
-        <img
-          v-if="image"
-          :src="image"
-          :alt="headline"
+        <!-- Video cuando el medio activo es video -->
+        <video
+          v-if="activeMedia.type === 'video'"
+          :src="activeMedia.src"
+          autoplay
+          muted
+          loop
+          playsinline
           class="w-full h-full object-cover object-center"
+          style="filter: brightness(0.88);"
+        />
+        <!-- Imagen cuando el medio activo es imagen -->
+        <img
+          v-else-if="activeMedia.src"
+          :src="activeMedia.src"
+          :alt="headline"
+          class="w-full h-full object-cover object-center transition-opacity duration-700"
           style="filter: brightness(0.88);"
         />
         <div
@@ -59,6 +71,20 @@
           @mouseleave="e => { e.currentTarget.style.backgroundColor = palette.primary; e.currentTarget.style.color = primaryContrastText }"
         >{{ ctaText }}</button>
 
+        <!-- Indicadores de slide — solo si hay más de 1 medio -->
+        <div v-if="allMedia.length > 1" class="flex items-center gap-1.5 mt-4">
+          <button
+            v-for="(_, i) in allMedia"
+            :key="i"
+            @click="currentIndex = i"
+            class="h-[3px] rounded-full transition-all duration-300"
+            :style="{
+              width: i === currentIndex ? '20px' : '6px',
+              backgroundColor: i === currentIndex ? palette.primary : 'rgba(255,255,255,0.35)'
+            }"
+          />
+        </div>
+
       </div>
     </div>
 
@@ -82,7 +108,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps({
   headline:    { type: String, default: 'Nueva\nColección' },
@@ -90,12 +116,48 @@ const props = defineProps({
   dropLabel:   { type: String, default: 'Drop 01 — 2026' },
   ctaText:     { type: String, default: 'Shop Now' },
   image:       { type: String, default: '' },
+  images:      { type: Array, default: () => [] },
+  video:       { type: String, default: '' },
   stats:       { type: Array, default: () => [] },
   palette:     { type: Object, default: () => ({ primary: '#facc15', background: '#111111', text_dark: '#111111', secondary: '#27272a', text_light: '#ffffff' }) },
   fonts:       { type: Object, default: () => ({ heading: 'Montserrat', body: 'Montserrat' }) },
 })
 
 defineEmits(['cta'])
+
+// ── Carrusel de medios ──────────────────────────────────────────────────────
+const currentIndex = ref(0)
+let timer = null
+
+// Construye la lista ordenada: imágenes → video al final
+const allMedia = computed(() => {
+  const items = []
+  const imgs = props.images.filter(Boolean)
+  if (imgs.length > 0) {
+    imgs.forEach(src => items.push({ type: 'image', src }))
+  } else if (props.image) {
+    items.push({ type: 'image', src: props.image })
+  }
+  if (props.video) items.push({ type: 'video', src: props.video })
+  return items
+})
+
+const activeMedia = computed(() => allMedia.value[currentIndex.value] || { type: 'image', src: props.image })
+
+function advance() {
+  if (allMedia.value.length > 1) {
+    currentIndex.value = (currentIndex.value + 1) % allMedia.value.length
+  }
+}
+
+onMounted(() => {
+  if (allMedia.value.length > 1) {
+    timer = setInterval(advance, 4500)
+  }
+})
+
+onUnmounted(() => { if (timer) clearInterval(timer) })
+// ────────────────────────────────────────────────────────────────────────────
 
 // Helper W3C: calcula luminancia relativa de un color hex
 // Retorna true si el color es claro (necesita texto oscuro encima)

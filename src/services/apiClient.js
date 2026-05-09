@@ -181,13 +181,11 @@ apiClient.interceptors.response.use(
         case 500:
           // Error del servidor
           // Detectar si es error de base de datos/tenant inexistente
+          // Detectar SOLO si es error de base de datos del tenant inexistente (no errores SQL normales)
           if (data?.message && (
-            data.message.includes('database') ||
-            data.message.includes('Database') ||
-            data.message.includes('Connection refused') ||
-            data.message.includes('SQLSTATE') ||
             data.message.includes('Unknown database') ||
-            data.message.includes('tenant') && data.message.includes('not found')
+            data.message.includes('Connection refused') ||
+            (data.message.toLowerCase().includes('tenant') && data.message.toLowerCase().includes('not found'))
           )) {
             console.error('Error crítico: Base de datos o tenant no existe')
             console.error('Detalles:', data.message)
