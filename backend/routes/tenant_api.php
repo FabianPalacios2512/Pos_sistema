@@ -667,6 +667,8 @@ Route::post('/web-catalog/config', [\App\Http\Controllers\Api\WebCatalogConfigCo
 Route::post('/web-catalog/ai-brand/generate', [\App\Http\Controllers\Api\AiBrandController::class, 'generate']);
 Route::post('/web-catalog/ai-brand/apply', [\App\Http\Controllers\Api\AiBrandController::class, 'apply']);
 Route::get('/web-catalog/ai-brand/data', [\App\Http\Controllers\Api\AiBrandController::class, 'getAiBrandData']);
+Route::post('/web-catalog/ai-brand/reset', [\App\Http\Controllers\Api\AiBrandController::class, 'reset']);
+Route::post('/web-catalog/ai-brand/restore', [\App\Http\Controllers\Api\AiBrandController::class, 'restore']);
 // ==================== FIN AI BRAND ====================
 
 // ==================== FIN WEB CATALOG CONFIGURATION ====================

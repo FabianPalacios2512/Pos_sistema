@@ -11,10 +11,9 @@
         <TransitionGroup :name="tickerTransitionName" tag="div" class="relative w-full h-full">
           <span 
             :key="currentAnnouncement"
-            class="absolute inset-0 flex items-center justify-center gap-2 text-[11px] font-medium tracking-[0.08em] whitespace-nowrap px-4"
+            class="absolute inset-0 flex items-center justify-center gap-2 text-[11px] font-medium tracking-[0.06em] whitespace-nowrap px-4"
             :style="{ color: tickerTextColor }"
           >
-            <span class="w-1.5 h-1.5 rounded-full flex-shrink-0" :style="{ backgroundColor: aiPalette.primary }"></span>
             <span class="truncate max-w-[92vw]">{{ currentAnnouncementText }}</span>
           </span>
         </TransitionGroup>
@@ -108,6 +107,20 @@
       @cart="router.push('/catalog/bolsa')"
     />
 
+    <!-- ★ NUEVO: Dark Premium — bg-black + glass al scroll, íconos blancos -->
+    <HeaderDarkPremium
+      v-else-if="headerConfig.style === 'dark-premium'"
+      :storeName="storeName"
+      :logoUrl="storeConfig.logo_url"
+      :cartCount="cartCount"
+      v-model="searchQuery"
+      :palette="aiPalette"
+      :fonts="aiFonts"
+      class="fixed top-8 left-0 right-0 z-50"
+      @menu="showMobileMenu = true"
+      @cart="router.push('/catalog/bolsa')"
+    />
+
     <!-- DEFAULT (null): Header original del sistema — Retail Fashion / Kharis-inspired -->
     <header
       v-else
@@ -127,7 +140,7 @@
             @click="showMobileMenu = !showMobileMenu"
             class="lg:hidden w-10 h-10 flex items-center justify-center -ml-1"
           >
-            <svg class="w-[22px] h-[22px]" :style="{ color: aiPalette.text_dark }" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2">
+            <svg class="w-[22px] h-[22px]" :style="{ color: onBgTextColor }" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2">
               <path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" />
             </svg>
           </button>
@@ -136,8 +149,8 @@
         <!-- CENTER: Nombre del Comercio - Tipografía Serif Elegante -->
         <div class="flex-1 flex flex-col items-center justify-center lg:justify-start lg:flex-none lg:absolute lg:left-1/2 lg:-translate-x-1/2">
           <h1 
-            class="text-[22px] lg:text-[30px] text-gray-900 leading-none"
-            :style="{ fontFamily: aiFonts.heading + ', Georgia, Times New Roman, serif', fontWeight: 600, letterSpacing: layoutConfig.editorial_mood === 'luxury' ? '0.08em' : '0.02em' }"
+            class="text-[22px] lg:text-[30px] leading-none"
+            :style="{ fontFamily: aiFonts.heading + ', Georgia, Times New Roman, serif', fontWeight: 600, letterSpacing: layoutConfig.editorial_mood === 'luxury' ? '0.08em' : '0.02em', color: onBgTextColor }"
           >
             {{ storeName }}
           </h1>
@@ -150,7 +163,7 @@
             @click="showMobileSearch = !showMobileSearch"
             class="lg:hidden w-10 h-10 flex items-center justify-center"
           >
-            <svg class="w-[20px] h-[20px]" :style="{ color: aiPalette.text_dark }" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2">
+            <svg class="w-[20px] h-[20px]" :style="{ color: onBgTextColor }" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
             </svg>
           </button>
@@ -160,7 +173,7 @@
             @click="router.push('/catalog/bolsa')"
             class="relative w-10 h-10 flex items-center justify-center"
           >
-            <svg class="w-[20px] h-[20px]" :style="{ color: aiPalette.text_dark }" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2">
+            <svg class="w-[20px] h-[20px]" :style="{ color: onBgTextColor }" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
             </svg>
             <span 
@@ -291,6 +304,21 @@
         @ctaSecondary="scrollToProducts"
       />
 
+      <!-- ★ NUEVO: Dark Cinematic — h-screen noir, CTA blanco sólido -->
+      <HeroDarkCinematic
+        v-else-if="layoutConfig.hero_style === 'dark-cinematic'"
+        :headline="heroHeadlineDisplay"
+        :subheadline="heroSubheadlineDisplay"
+        :backgroundImage="currentHeroImage"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        :ctaText="bannerCtaText"
+        :ctaSecondaryText="bannerCtaSecondary"
+        :isMobilePreview="isMobilePreview"
+        @cta="scrollToProducts"
+        @ctaSecondary="scrollToProducts"
+      />
+
       <!-- FALLBACK: Editorial por defecto si hero_style no reconocido -->
       <HeroEditorial
         v-else
@@ -306,37 +334,6 @@
         @cta="scrollToProducts"
       />
     </div>
-
-    <!-- HERO PRODUCT SPOTLIGHT: Productos visibles desde el primer scroll -->
-    <!-- Oculto en portrait: la trust strip integrada reemplaza este bloque -->
-    <section v-if="heroProducts.length > 0 && layoutConfig.hero_style !== 'portrait'" class="relative z-20 -mt-6 sm:-mt-10 md:-mt-14 lg:ml-64 px-3 lg:px-8">
-      <div class="grid grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
-        <article
-          v-for="product in heroProducts"
-          :key="'hero-product-' + product.id"
-          @click="openProductDetails(product)"
-          class="group cursor-pointer rounded-xl sm:rounded-2xl overflow-hidden border shadow-lg shadow-black/15"
-          :style="{ backgroundColor: aiPalette.background, borderColor: aiPalette.secondary + '66' }"
-        >
-          <div class="relative h-[80px] sm:h-28 md:h-32 overflow-hidden">
-            <img
-              v-if="getProductImage(product)"
-              :src="getProductImage(product)"
-              :alt="product.name"
-              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div v-else class="w-full h-full bg-gray-100 flex items-center justify-center">
-              <svg class="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" /></svg>
-            </div>
-          </div>
-          <div class="px-2 sm:px-3 py-2 sm:py-2.5">
-            <p class="text-[8px] sm:text-[10px] uppercase tracking-[0.08em] mb-0.5 truncate" :style="{ color: aiPalette.primary + '99' }">{{ product.category || 'Colección' }}</p>
-            <h3 class="text-[11px] sm:text-sm leading-snug truncate" :style="{ fontFamily: aiFonts.heading + ', serif', fontWeight: 500, color: aiPalette.text_dark }">{{ product.name }}</h3>
-            <p class="text-[11px] sm:text-sm font-bold mt-0.5" :style="{ color: aiPalette.text_dark }">{{ storeConfig.currency_symbol }}{{ formatPrice(product.price) }}</p>
-          </div>
-        </article>
-      </div>
-    </section>
 
     <!-- TRUST STRIP: Sistema modular — aplica a todos los estilos de hero -->
     <div class="lg:ml-64">
@@ -425,18 +422,31 @@
         :fonts="aiFonts"
         @cta="scrollToProducts"
       />
+      <!-- ★ NUEVO: Dark Noir — fondo negro, imagen asimétrica 60/40, CTA outline sutil -->
+      <HookDarkNoir
+        v-else-if="hookStyle === 'dark-noir'"
+        :headline="bannerHeadline"
+        :body="hookBodyText"
+        :label="storeConfig.category || 'Brand Story'"
+        ctaText="Ver Colección"
+        :image="storyImageSlots[0]"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        :isMobilePreview="isMobilePreview"
+        @cta="scrollToProducts"
+      />
     </div>
 
     <!-- BARRA STICKY: Filtrar + Ordenar (Móvil) - Sólida -->
     <div 
-      class="lg:hidden sticky top-[90px] z-40 border-t border-b border-gray-200"
-      :style="{ backgroundColor: aiPalette.background || '#ffffff', boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }"
+      class="lg:hidden sticky top-[90px] z-40"
+      :style="{ backgroundColor: aiPalette.background || '#ffffff', borderTop: '1px solid var(--ai-border-subtle)', borderBottom: '1px solid var(--ai-border-subtle)', boxShadow: isBackgroundDark ? '0 2px 12px rgba(0,0,0,0.3)' : '0 2px 12px rgba(0,0,0,0.07)' }"
     >
       <div class="flex">
         <!-- Botón FILTRAR (50%) -->
         <button 
           @click="showMobileFilters = true"
-          class="flex-1 h-11 flex items-center justify-center gap-2 text-[11px] font-semibold text-gray-700 uppercase tracking-[0.1em] transition-colors hover:bg-gray-50 active:bg-gray-100"
+          class="filter-bar-btn flex-1 h-11 flex items-center justify-center gap-2 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors"
         >
           <svg class="w-[15px] h-[15px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.3">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
@@ -444,11 +454,11 @@
           FILTRAR
         </button>
         <!-- Separador central fino -->
-        <div class="w-px h-6 bg-gray-200 self-center"></div>
+        <div class="w-px h-6 self-center" style="background-color: var(--ai-border-subtle)"></div>
         <!-- Botón ORDENAR (50%) -->
         <button 
           @click="showSortModal = true"
-          class="flex-1 h-11 flex items-center justify-center gap-2 text-[11px] font-semibold text-gray-700 uppercase tracking-[0.1em] transition-colors hover:bg-gray-50 active:bg-gray-100"
+          class="filter-bar-btn flex-1 h-11 flex items-center justify-center gap-2 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors"
         >
           <svg class="w-[15px] h-[15px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.3">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
@@ -459,18 +469,16 @@
     </div>
 
     <!-- SIDEBAR LATERAL (Desktop) - Premium Minimalista -->
-    <aside v-if="!isMobilePreview" class="hidden lg:block fixed left-0 top-[154px] bottom-0 w-64 bg-white border-r border-gray-100 overflow-y-auto z-30 px-6 py-8">
+    <aside v-if="!isMobilePreview" class="hidden lg:block fixed left-0 top-[154px] bottom-0 w-64 overflow-y-auto z-30 px-6 py-8"
+      :style="{ backgroundColor: aiPalette.background || '#ffffff', borderRight: '1px solid var(--ai-border-subtle)' }">
       <!-- Filtro por Categoría - Minimalista con línea vertical -->
       <div class="mb-8">
-        <h3 class="text-xs font-bold text-gray-400 mb-5 uppercase tracking-widest">Categorías</h3>
+        <h3 class="text-xs font-bold mb-5 uppercase tracking-widest" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.4 }">Categorías</h3>
         <div class="space-y-0.5">
           <button
             @click="selectedCategory = null"
             class="w-full text-left py-2.5 text-sm transition-all duration-200 flex items-center gap-3 relative"
-            :class="selectedCategory === null 
-                ? 'font-semibold' 
-              : 'text-gray-500 hover:text-gray-900'"
-              :style="selectedCategory === null ? { color: aiPalette.text_dark } : {}"
+            :style="{ color: selectedCategory === null ? 'var(--ai-on-bg-text)' : 'color-mix(in srgb, var(--ai-on-bg-text) 45%, transparent)' }"
           >
             <span 
               class="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 transition-opacity duration-200"
@@ -484,10 +492,7 @@
             :key="cat.id"
             @click="selectedCategory = cat.id"
             class="w-full text-left py-2.5 text-sm transition-all duration-200 flex items-center gap-3 relative"
-            :class="selectedCategory === cat.id 
-                ? 'font-semibold' 
-              : 'text-gray-500 hover:text-gray-900'"
-              :style="selectedCategory === cat.id ? { color: aiPalette.text_dark } : {}"
+            :style="{ color: selectedCategory === cat.id ? 'var(--ai-on-bg-text)' : 'color-mix(in srgb, var(--ai-on-bg-text) 45%, transparent)' }"
           >
             <span 
               class="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 transition-opacity duration-200"
@@ -501,10 +506,10 @@
 
       <!-- Filtro por Rango de Precio - Slider Simple (Solo Máximo) -->
       <div class="mb-8">
-        <h3 class="text-xs font-bold text-gray-400 mb-5 uppercase tracking-widest">Precio</h3>
+        <h3 class="text-xs font-bold mb-5 uppercase tracking-widest" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.4 }">Precio</h3>
         <div class="space-y-4">
           <!-- Single Range Slider -->
-          <div class="relative h-1.5 bg-gray-200 rounded-full">
+          <div class="relative h-1.5 rounded-full" :style="{ backgroundColor: 'var(--ai-border-subtle)' }">
             <div 
               class="absolute left-0 h-full rounded-full transition-all"
               :style="{ backgroundColor: aiPalette.primary, width: ((priceRange.max - minProductPrice) / (maxProductPrice - minProductPrice)) * 100 + '%' }"
@@ -520,15 +525,15 @@
           </div>
           <!-- Valor del rango -->
           <div class="flex items-center justify-between text-sm">
-            <span class="text-gray-400">{{ storeConfig.currency_symbol }}0</span>
-            <span class="font-semibold" :style="{ color: aiPalette.text_dark }">Hasta {{ storeConfig.currency_symbol }}{{ formatPrice(priceRange.max) }}</span>
+            <span :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.4 }">{{ storeConfig.currency_symbol }}0</span>
+            <span class="font-semibold" :style="{ color: 'var(--ai-on-bg-text)' }">Hasta {{ storeConfig.currency_symbol }}{{ formatPrice(priceRange.max) }}</span>
           </div>
         </div>
       </div>
 
       <!-- Ordenar por -->
       <div class="mb-8">
-        <h3 class="text-xs font-bold text-gray-400 mb-5 uppercase tracking-widest">Ordenar por</h3>
+        <h3 class="text-xs font-bold mb-5 uppercase tracking-widest" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.4 }">Ordenar por</h3>
         <div class="space-y-3">
           <label class="flex items-center gap-3 cursor-pointer group">
             <div class="relative flex items-center">
@@ -543,7 +548,7 @@
               />
               <span class="absolute w-2 h-2 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" :style="{ backgroundColor: primaryColor }"></span>
             </div>
-            <span class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">Relevancia</span>
+            <span class="text-sm transition-colors" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.6 }">Relevancia</span>
           </label>
           
           <label class="flex items-center gap-3 cursor-pointer group">
@@ -557,7 +562,7 @@
               />
               <span class="absolute w-2 h-2 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" :style="{ backgroundColor: primaryColor }"></span>
             </div>
-            <span class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">Menor precio</span>
+            <span class="text-sm transition-colors" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.6 }">Menor precio</span>
           </label>
 
           <label class="flex items-center gap-3 cursor-pointer group">
@@ -571,7 +576,7 @@
               />
               <span class="absolute w-2 h-2 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" :style="{ backgroundColor: primaryColor }"></span>
             </div>
-            <span class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">Mayor precio</span>
+            <span class="text-sm transition-colors" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.6 }">Mayor precio</span>
           </label>
 
           <label class="flex items-center gap-3 cursor-pointer group">
@@ -585,14 +590,14 @@
               />
               <span class="absolute w-2 h-2 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" :style="{ backgroundColor: primaryColor }"></span>
             </div>
-            <span class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">Nombre (A-Z)</span>
+            <span class="text-sm transition-colors" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.6 }">Nombre (A-Z)</span>
           </label>
         </div>
       </div>
 
       <!-- Filtro de Disponibilidad -->
       <div>
-        <h3 class="text-xs font-bold text-gray-400 mb-4 uppercase tracking-widest">Filtros</h3>
+        <h3 class="text-xs font-bold mb-4 uppercase tracking-widest" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.4 }">Filtros</h3>
         <label class="flex items-center gap-3 cursor-pointer group">
           <div class="relative flex items-center">
             <input 
@@ -605,7 +610,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <span class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">Solo con stock</span>
+          <span class="text-sm transition-colors" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.6 }">Solo con stock</span>
         </label>
       </div>
 
@@ -623,13 +628,14 @@
     <section ref="productsSection" class="lg:ml-64 pt-3 px-4 lg:px-8 pb-8">
       
       <!-- Header de Catálogo -->
-      <div class="mb-5 pb-4 border-b border-gray-200 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+      <div class="mb-5 pb-4 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between"
+        :style="{ borderBottom: '1px solid var(--ai-border-subtle)' }">
         <div>
           <p class="text-[10px] uppercase tracking-[0.22em] font-semibold" :style="{ color: aiPalette.primary }">Catálogo Curado</p>
-          <h3 class="mt-1 text-2xl md:text-3xl text-gray-900" :style="{ fontFamily: aiFonts.heading + ', serif', fontWeight: 500 }">
+          <h3 class="mt-1 text-2xl md:text-3xl" :style="{ fontFamily: aiFonts.heading + ', serif', fontWeight: 500, color: 'var(--ai-on-bg-text)' }">
             {{ selectedCategory !== null ? activeCategoryName : (bannerCtaText || 'Compra por estilo') }}
           </h3>
-          <p class="mt-1 text-sm text-gray-500">
+          <p class="mt-1 text-sm" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.5 }">
             {{ filteredProducts.length }} productos
             <span v-if="selectedCategory !== null || showOnlyAvailable || sortOrder" class="font-semibold" :style="{ color: aiPalette.primary }">
               — filtrados
@@ -641,7 +647,7 @@
           v-if="selectedCategory !== null || showOnlyAvailable || sortOrder || searchQuery"
           @click="clearFilters"
           class="px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-[0.14em] border transition-colors"
-          :style="{ borderColor: aiPalette.secondary, color: aiPalette.text_dark }"
+          :style="{ borderColor: 'var(--ai-border-subtle)', color: 'var(--ai-on-bg-text)' }"
         >
           Reiniciar vista
         </button>
@@ -735,10 +741,10 @@
 
       <!-- Empty State Elegante -->
       <div v-if="filteredProducts.length === 0" class="text-center py-20">
-        <svg class="w-16 h-16 mx-auto text-gray-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
+        <svg class="w-16 h-16 mx-auto mb-4" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.15 }" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
         </svg>
-        <p class="text-gray-400 text-sm font-light tracking-wide">No hay productos disponibles</p>
+        <p class="text-sm font-light tracking-wide" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.4 }">No hay productos disponibles</p>
       </div>
     </section>
 
@@ -1117,10 +1123,10 @@ import axios from 'axios'
 import QuantityModal from './QuantityModal.vue'
 import POSVariantSelector from '../POSVariantSelector.vue'
 import { useCatalogCart } from '../../stores/catalogCart.js'
-import { HeroEditorial, HeroSplit, HeroStreetwear, HeroFocus, HeroPortrait } from './blocks/heroes/index.js'
-import { HeaderEditorialCenter, HeaderRetailLeft, HeaderTransparentGlass, HeaderRetailOverlay, HeaderUtilitySearch, HeaderCenteredSerif } from './blocks/headers/index.js'
+import { HeroEditorial, HeroSplit, HeroStreetwear, HeroFocus, HeroPortrait, HeroDarkCinematic } from './blocks/heroes/index.js'
+import { HeaderEditorialCenter, HeaderRetailLeft, HeaderTransparentGlass, HeaderRetailOverlay, HeaderUtilitySearch, HeaderCenteredSerif, HeaderDarkPremium } from './blocks/headers/index.js'
 import { TrustStripDarkContrast, TrustStripMinimalBorder, TrustStripDivided, TrustStripMarquee, TrustStripSoftPills } from './blocks/trust-strips/index.js'
-import { HookEditorialStory, HookUrbanLookbook, HookDynamicBento } from './blocks/hooks/index.js'
+import { HookEditorialStory, HookUrbanLookbook, HookDynamicBento, HookDarkNoir } from './blocks/hooks/index.js'
 import { productUrl } from '../../utils/slugify.js'
 
 const router = useRouter()
@@ -1213,6 +1219,22 @@ const aiPalette = computed(() => {
   }
 })
 
+// Luminancia percibida del fondo de la paleta (fórmula WCAG)
+// → true si el fondo es oscuro y el texto encima debe ser claro
+const isBackgroundDark = computed(() => {
+  const hex = (aiPalette.value.background || '#ffffff').replace('#', '')
+  if (hex.length !== 6) return false
+  const r = parseInt(hex.substring(0, 2), 16)
+  const g = parseInt(hex.substring(2, 4), 16)
+  const b = parseInt(hex.substring(4, 6), 16)
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.5
+})
+
+// Color de texto automático sobre el fondo principal — siempre legible (WCAG AA)
+const onBgTextColor = computed(() =>
+  isBackgroundDark.value ? (aiPalette.value.text_light || '#ffffff') : (aiPalette.value.text_dark || '#111111')
+)
+
 // Global theme variables for mobile + desktop layout
 const themeVars = computed(() => ({
   '--ai-primary': aiPalette.value.primary,
@@ -1223,6 +1245,9 @@ const themeVars = computed(() => ({
   '--ai-text-light': aiPalette.value.text_light,
   '--ai-font-heading': aiFonts.value.heading,
   '--ai-font-body': aiFonts.value.body,
+  '--ai-on-bg-text': onBgTextColor.value,
+  '--ai-hover-bg': isBackgroundDark.value ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.04)',
+  '--ai-border-subtle': isBackgroundDark.value ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.08)',
 }))
 
 // AI-generated fonts with fallbacks
@@ -1237,16 +1262,8 @@ const aiFonts = computed(() => {
 // AI layout config - controls hero style, CTA variant, category layout
 const layoutConfig = computed(() => {
   const cfg = props.storeConfig.ai_layout_config || {}
-  // ?? TEST: descomenta UNA línea para probar cada hero
-  const TEST_HERO = null               // null = usa el valor real de la BD
-  // const TEST_HERO = 'editorial'        // HeroEditorial   — full-bleed moda/lifestyle
-  //const TEST_HERO = 'split-portrait'   // HeroSplit        — 50/50 color+foto
-  // const TEST_HERO = 'streetwear'       // HeroStreetwear  — urbano bold
-  // const TEST_HERO = 'centered-minimal' // HeroFocus        — conversión directa
-  // const TEST_HERO = 'portrait'         // HeroPortrait     — belleza/cabello, doble CTA + trust strip
-
   return {
-    hero_style: TEST_HERO || cfg.hero_style || 'editorial',
+    hero_style: cfg.hero_style || 'editorial',
     hero_cta_style: cfg.hero_cta_style || 'single-outline',
     hero_text_position: cfg.hero_text_position || 'bottom-left',
     category_style: cfg.category_style || 'horizontal-pills',
@@ -1256,18 +1273,10 @@ const layoutConfig = computed(() => {
   }
 })
 
-// AI header config — controla qu? navbar se renderiza + su ticker y animación
+// AI header config — controla qué navbar se renderiza + su ticker y animación
 const headerConfig = computed(() => {
   const cfg = props.storeConfig.ai_layout_config || {}
-  // ?? TEST: descomenta UNA línea para probar cada header
-   const TEST_HEADER = null                   // null = header original del sistema
-  // const TEST_HEADER = 'editorial-center'  // HeaderEditorialCenter — alta moda, logo centrado serif
-  // const TEST_HEADER = 'retail-left'       // HeaderRetailLeft      — consumo masivo, logo izquierda
-  // const TEST_HEADER = 'transparent-glass' // HeaderTransparentGlass — cosm?tica ? pair con portrait/editorial
-   // const TEST_HEADER = 'floating-pill'     // HeaderFloatingPill    — streetwear/tech, p?ldora flotante
-  // const TEST_HEADER = 'utility-search'    // HeaderUtilitySearch   — ferretería, barra búsqueda 2 filas
-  // const TEST_HEADER = 'centered-serif' // HeaderCenteredSerif — elegante, logo centrado serif, sin ticker (usa layoutConfig) 
-  const style = TEST_HEADER || cfg.header_style || null
+  const style = cfg.header_style || null
 
   // Cada header dicta su propio ticker: estilo visual + animación
   const presets = {
@@ -1277,6 +1286,7 @@ const headerConfig = computed(() => {
     'floating-pill':      { tickerStyle: 'contrast-dark', tickerMode: 'slide-down'  },
     'utility-search':     { tickerStyle: 'muted-light',   tickerMode: 'slide-left'  },
     'centered-serif':     { tickerStyle: 'muted-light',   tickerMode: 'slide-left'  },
+    'dark-premium':       { tickerStyle: 'contrast-dark', tickerMode: 'fade'        },
   }
 
   return {
@@ -1300,12 +1310,7 @@ const heroTopMargin = computed(() => {
 // Hook / Spotlight: bloque pre-catálogo que reemplaza el Brand Story gen?rico
 const hookStyle = computed(() => {
   const cfg = props.storeConfig.ai_layout_config || {}
-  // ?? TEST: descomenta UNA línea para probar cada bloque
-   const TEST_HOOK = null                    // null = usa el valor real de la BD
-  // const TEST_HOOK = 'editorial-story'    // HookEditorialStory  — boutique/lencer?a/alta costura
-  // const TEST_HOOK = 'urban-lookbook'     // HookUrbanLookbook   — streetwear/sneakers/drop
-  // const TEST_HOOK = 'dynamic-bento'      // HookDynamicBento    — deportivo/tech/consumo
-  return TEST_HOOK || cfg.hook_style || 'editorial-story' // editorial-story como default
+  return cfg.hook_style || 'editorial-story'
 })
 
 // Texto del cuerpo del Hook (usa ai_about_us como fuente, truncado para el bloque)
@@ -1318,14 +1323,7 @@ const hookBodyText = computed(() => {
 // Trust Strip: estilo visual y datos normalizados desde ai_value_messages
 const trustStripStyle = computed(() => {
   const cfg = props.storeConfig.ai_layout_config || {}
-  // ?? TEST: descomenta UNA línea para probar cada estilo
-   const TEST_TRUST_STRIP = null              // null = usa el valor real de la BD
-  // const TEST_TRUST_STRIP = 'dark-contrast'  // Kharis — fondo negro, texto blanco, scroll
-  // const TEST_TRUST_STRIP = 'minimal-border' // Boutique/Zara — blanco, borde fino
-  // const TEST_TRUST_STRIP = 'divided'        // Cosm?tica/Corp — gris sutil, divide-x
-  // const TEST_TRUST_STRIP = 'marquee'        // Streetwear — texto en loop infinito
-  // const TEST_TRUST_STRIP = 'soft-pills'     // Tech/Rápido — pastillas blancas
-  return TEST_TRUST_STRIP || cfg.trust_strip_style || null
+  return cfg.trust_strip_style || null
 })
 
 const trustStripItems = computed(() => {
@@ -1510,8 +1508,8 @@ const heroProducts = computed(() => {
 const storyImageSlots = computed(() => {
   const catalogMedia = props.storeConfig.catalog_media || {}
   const hook = hookStyle.value
+  const storyImg = catalogMedia.story_image || ''
 
-  // Imágenes contextuales según el diseño activo
   if (hook === 'urban-lookbook') {
     const lookbookImgs = Array.isArray(catalogMedia.lookbook_images)
       ? catalogMedia.lookbook_images.filter(Boolean)
@@ -1523,20 +1521,20 @@ const storyImageSlots = computed(() => {
     return [
       catalogMedia.bento_main || '',
       catalogMedia.bento_detail || '',
-      carouselImages.value[0] || ''
+      storyImg || carouselImages.value[0] || ''
     ]
   }
   if (hook === 'editorial-story') {
     const editImg = catalogMedia.editorial_image || ''
-    if (editImg) return [editImg, carouselImages.value[0] || '', carouselImages.value[1] || '']
+    if (editImg) return [editImg, storyImg || carouselImages.value[0] || '', carouselImages.value[1] || '']
   }
 
-  // Fallback genérico: product images + carousel
+  // Fallback genérico: story_image primero, luego product images + carousel
   const productImages = catalogProducts.value
     .map(product => getProductImage(product))
     .filter(Boolean)
   const fallback = [...carouselImages.value]
-  const combined = [...productImages, ...fallback]
+  const combined = [storyImg, ...productImages, ...fallback].filter(Boolean)
   return [combined[0] || '', combined[1] || '', combined[2] || '']
 })
 
@@ -1877,6 +1875,18 @@ onUnmounted(() => {
 .catalog-visual-story h3,
 .catalog-visual-story h4 {
   font-family: var(--ai-font-heading), 'Playfair Display', 'Georgia', serif;
+}
+
+/* Botones de la barra Filtrar/Ordenar — adaptativos a paleta clara u oscura */
+.filter-bar-btn {
+  color: var(--ai-on-bg-text, #111111);
+}
+.filter-bar-btn:hover {
+  background-color: var(--ai-hover-bg, rgba(0,0,0,0.04));
+}
+.filter-bar-btn:active {
+  background-color: var(--ai-hover-bg, rgba(0,0,0,0.04));
+  opacity: 0.8;
 }
 
 .bg-brand {

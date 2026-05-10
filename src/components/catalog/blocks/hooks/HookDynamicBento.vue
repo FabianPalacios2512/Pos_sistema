@@ -73,7 +73,7 @@
           <!-- Mini badge de detalle -->
           <div
             class="absolute top-2 left-2 px-2 py-[3px] rounded text-[7.5px] font-bold uppercase tracking-wider"
-            :style="{ backgroundColor: palette.background, color: palette.text_dark }"
+            :style="{ backgroundColor: badgeBgColor, color: badgeTextColor }"
           >Detalle</div>
         </div>
 
@@ -92,8 +92,8 @@
         @click="$emit('cta')"
         class="flex-shrink-0 px-5 py-2.5 rounded-md text-[10px] font-black uppercase tracking-widest transition-opacity duration-150 hover:opacity-80 active:scale-95"
         :style="{
-          backgroundColor: palette.text_dark,
-          color: palette.text_light || '#ffffff',
+          backgroundColor: ctaBgColor,
+          color: ctaTextColor,
           fontFamily: fonts.body + ', sans-serif',
         }"
       >{{ ctaText }}</button>
@@ -138,5 +138,24 @@ const primaryContrastText = computed(() =>
 // Versión semitransparente del mismo color para el micro-label "Tecnología"
 const primaryContrastMuted = computed(() =>
   isLightColor(props.palette.primary) ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.6)'
+)
+
+// Fondo oscuro = luminancia < 50%
+const isBgDark = computed(() => !isLightColor(props.palette.background || '#f9fafb'))
+
+// Badge "Detalle" — visible en ambos modos
+const badgeBgColor = computed(() =>
+  isBgDark.value ? (props.palette.text_light || '#ffffff') : (props.palette.background || '#ffffff')
+)
+const badgeTextColor = computed(() =>
+  isBgDark.value ? '#111111' : (props.palette.text_dark || '#111827')
+)
+
+// Botón CTA — en modo oscuro usa primary (visible), en modo claro usa text_dark (clásico)
+const ctaBgColor = computed(() =>
+  isBgDark.value ? (props.palette.primary || '#3b82f6') : (props.palette.text_dark || '#111827')
+)
+const ctaTextColor = computed(() =>
+  isBgDark.value ? primaryContrastText.value : (props.palette.text_light || '#ffffff')
 )
 </script>

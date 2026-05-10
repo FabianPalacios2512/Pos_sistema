@@ -14,12 +14,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import CatalogTemplateSelector from '../components/catalog/CatalogTemplateSelector.vue'
 import apiClient from '../services/apiClient.js'
 
 // Clave de caché en localStorage para carga instantánea
 const CATALOG_CACHE_KEY = 'pos_catalog_config_cache'
+// Clave para preview temporal de diseño AI (usada desde WebCatalogConfig)
+const AI_PREVIEW_KEY = 'ai_design_preview'
 
 // Estado
 const configLoaded = ref(false)
@@ -58,8 +60,68 @@ const storeConfigForTemplate = computed(() => ({
   ai_value_messages: catalogConfig.value.ai_value_messages,
   ai_announcements: catalogConfig.value.ai_announcements,
   ai_cross_sell_messages: catalogConfig.value.ai_cross_sell_messages,
-  ai_layout_config: catalogConfig.value.ai_layout_config
+  ai_layout_config: catalogConfig.value.ai_layout_config,
+  catalog_media: catalogConfig.value.catalog_media
 }))
+
+// Leer un diseño AI temporal desde localStorage (preview desde WebCatalogConfig)
+const tryLoadAiPreview = () => {
+  try {
+    const urlParams = new URLSearchParams(window.location.search)
+    if (!urlParams.has('ai_preview')) return false
+    const raw = localStorage.getItem(AI_PREVIEW_KEY)
+    if (!raw) return false
+    const design = JSON.parse(raw)
+    // Leer datos de la tienda del payload del diseño o del caché real
+    let storeName = 'Mi Tienda'
+    let logoUrl = ''
+    try {
+      const cache = JSON.parse(localStorage.getItem(CATALOG_CACHE_KEY) || '{}')
+      storeName = design._store_name || cache.store_name || 'Mi Tienda'
+      logoUrl = design._logo_url || cache.logo_url || ''
+    } catch (e) {}
+    Object.assign(catalogConfig.value, {
+      template: 'visual-story',
+      store_name: storeName,
+      logo_url: logoUrl,
+      whatsapp_number: design._whatsapp || catalogConfig.value.whatsapp_number,
+      ai_color_palette: design.color_palette || null,
+      ai_fonts: design.fonts || null,
+      ai_banner_texts: design.banner_texts || null,
+      ai_announcements: design.announcements || null,
+      ai_layout_config: design.layout_config || null,
+      catalog_media: design._catalog_media || null,
+    })
+    configLoaded.value = true
+    return true
+  } catch (e) {}
+  return false
+}
+
+// Actualización en vivo desde WebCatalogConfig vía postMessage (sin recargar iframe)
+const handleAiPreviewMessage = (event) => {
+  if (event.origin !== window.location.origin) return
+  if (event.data?.type !== 'ai_preview_update') return
+  const design = event.data.design
+  if (!design) return
+  let storeName = design._store_name
+  let logoUrl = design._logo_url
+  if (!storeName) {
+    try { storeName = JSON.parse(localStorage.getItem(CATALOG_CACHE_KEY) || '{}').store_name || 'Mi Tienda' } catch (e) {}
+  }
+  Object.assign(catalogConfig.value, {
+    template: 'visual-story',
+    store_name: storeName || catalogConfig.value.store_name,
+    logo_url: logoUrl || catalogConfig.value.logo_url,
+    whatsapp_number: design._whatsapp || catalogConfig.value.whatsapp_number,
+    ai_color_palette: design.color_palette || null,
+    ai_fonts: design.fonts || null,
+    ai_banner_texts: design.banner_texts || null,
+    ai_announcements: design.announcements || null,
+    ai_layout_config: design.layout_config || null,
+    catalog_media: design._catalog_media || catalogConfig.value.catalog_media || null,
+  })
+}
 
 // Leer configuración guardada en caché (síncrono, sin esperar API)
 const tryLoadFromCache = () => {
@@ -102,7 +164,8 @@ const loadCatalogConfig = async () => {
         ai_value_messages: data.ai_value_messages || null,
         ai_announcements: data.ai_announcements || null,
         ai_cross_sell_messages: data.ai_cross_sell_messages || null,
-        ai_layout_config: data.ai_layout_config || null
+        ai_layout_config: data.ai_layout_config || null,
+        catalog_media: data.catalog_media || null
       }
       catalogConfig.value = newConfig
       // Guardar en caché para carga instantánea en la próxima visita
@@ -172,6 +235,13 @@ const loadVisibleCategories = async () => {
 
 // Lifecycle
 onMounted(async () => {
+  // Modo preview AI: solo diseño visual, sin llamadas API (evita timeouts)
+  if (tryLoadAiPreview()) {
+    window.addEventListener('message', handleAiPreviewMessage)
+    // No cargar productos/categorías en preview — el iframe debe ser instantáneo
+    return
+  }
+
   const hasCachedConfig = tryLoadFromCache()
 
   if (hasCachedConfig) {
@@ -186,5 +256,9 @@ onMounted(async () => {
     await loadCatalogConfig()
     await Promise.all([loadProducts(), loadVisibleCategories()])
   }
+})
+
+onUnmounted(() => {
+  window.removeEventListener('message', handleAiPreviewMessage)
 })
 </script>

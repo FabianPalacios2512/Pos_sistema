@@ -19,6 +19,9 @@ export { default as HeaderUtilitySearch }   from './HeaderUtilitySearch.vue'
 export { default as HeaderCenteredSerif }   from './HeaderCenteredSerif.vue'
 // Distribuidoras / Boutiques — nombre centrado serif + subtítulo, Kharis-inspired
 
+export { default as HeaderDarkPremium }     from './HeaderDarkPremium.vue'
+// Alta Costura / Tecnología Premium — bg-black sólido + glass al scroll, íconos blancos
+
 // ─── Mapeo para selección por IA ─────────────────────────────────────────────
 // 'editorial-center'   → HeaderEditorialCenter  (moda premium, boutique)
 // 'retail-left'        → HeaderRetailLeft        (masivo, funcional, minimarket)

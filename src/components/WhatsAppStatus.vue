@@ -68,15 +68,21 @@ const statusTextClass = computed(() => {
 })
 
 // Métodos
+let consecutiveFailures = 0
+
 const checkStatus = async () => {
   try {
     const result = await whatsappService.getStatus()
     if (result.success && result.status) {
       whatsappStatus.value = result.status
+      consecutiveFailures = 0
+    } else {
+      whatsappStatus.value = { connected: false }
+      consecutiveFailures++
     }
   } catch (error) {
-    // Error silencioso - no mostrar en consola
     whatsappStatus.value = { connected: false }
+    consecutiveFailures++
   }
 }
 
@@ -85,13 +91,20 @@ const updateStatus = (newStatus) => {
 }
 
 const startStatusCheck = () => {
-  // Verificar estado cada 5 segundos (más frecuente que antes)
-  statusCheckInterval.value = setInterval(checkStatus, 5000)
+  const scheduleNext = async () => {
+    await checkStatus()
+    if (!statusCheckInterval.value) return // fue detenido
+    // Backoff: 30s normal, hasta 120s si falla repetidamente
+    const delay = consecutiveFailures > 3 ? 120000 : 30000
+    statusCheckInterval.value = setTimeout(scheduleNext, delay)
+  }
+  // Usar setTimeout recursivo en vez de setInterval para aplicar backoff
+  statusCheckInterval.value = setTimeout(scheduleNext, 30000)
 }
 
 const stopStatusCheck = () => {
   if (statusCheckInterval.value) {
-    clearInterval(statusCheckInterval.value)
+    clearTimeout(statusCheckInterval.value)
     statusCheckInterval.value = null
   }
 }

@@ -16,13 +16,13 @@
         <!-- Título serif grande, saltos de línea respetados -->
         <h2
           class="text-[30px] lg:text-[40px] xl:text-[48px] leading-[1.08] font-semibold mb-5 whitespace-pre-line"
-          :style="{ fontFamily: fonts.heading + ', Georgia, \'Times New Roman\', serif', color: palette.text_dark }"
+          :style="{ fontFamily: fonts.heading + ', Georgia, \'Times New Roman\', serif', color: adaptiveTextColor }"
         >{{ headline }}</h2>
 
-        <!-- Párrafo con gris suave — máx ~60 chars por línea -->
+        <!-- Párrafo — color adaptativo al fondo -->
         <p
           class="text-[13.5px] leading-relaxed max-w-[320px] mb-9"
-          style="color: #6b7280;"
+          :style="{ color: adaptiveBodyColor }"
         >{{ body }}</p>
 
         <!-- CTA minimalista: texto + línea inferior + flecha -->
@@ -33,11 +33,11 @@
         >
           <span
             class="text-[10px] uppercase tracking-[0.28em] font-bold border-b pb-[3px] transition-opacity duration-200 group-hover:opacity-50"
-            :style="{ color: palette.text_dark, borderColor: palette.text_dark }"
+            :style="{ color: adaptiveTextColor, borderColor: adaptiveTextColor }"
           >{{ ctaText }}</span>
           <svg
             class="w-3 h-3 transition-transform duration-200 group-hover:translate-x-1"
-            :style="{ color: palette.text_dark }"
+            :style="{ color: adaptiveTextColor }"
             fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"
           >
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
@@ -72,7 +72,9 @@
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+
+const props = defineProps({
   headline: { type: String, default: 'Diseñada para\nsentirte única' },
   body:     { type: String, default: 'Cada pieza es pensada con materiales de primera calidad. Tu comodidad y estilo son nuestra obsesión desde el primer boceto.' },
   label:    { type: String, default: 'Brand Story' },
@@ -83,4 +85,28 @@ defineProps({
 })
 
 defineEmits(['cta'])
+
+// Detecta si el fondo es oscuro (luminancia percibida < 50%)
+const isBackgroundDark = computed(() => {
+  const hex = (props.palette.background || '#ffffff').replace('#', '')
+  if (hex.length !== 6) return false
+  const r = parseInt(hex.substring(0, 2), 16)
+  const g = parseInt(hex.substring(2, 4), 16)
+  const b = parseInt(hex.substring(4, 6), 16)
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.5
+})
+
+// Título y CTA: blanco sobre oscuro, oscuro sobre claro
+const adaptiveTextColor = computed(() =>
+  isBackgroundDark.value
+    ? (props.palette.text_light || '#ffffff')
+    : (props.palette.text_dark  || '#111827')
+)
+
+// Párrafo: versión más suave del texto adaptativo
+const adaptiveBodyColor = computed(() =>
+  isBackgroundDark.value
+    ? 'rgba(255,255,255,0.55)'
+    : '#6b7280'
+)
 </script>

@@ -58,20 +58,16 @@ const getWhatsAppClient = () => {
       headers: {
         'X-Tenant-Id': normalizedTenantId
       },
-      // Agregar timeout para evitar que el error tarde mucho
-      timeout: 10000
+      // Timeout corto: si el servicio no responde en 3s, falla rápido
+      timeout: 3000
     })
     
-    // Interceptor para silenciar errores de CORS en consola
+    // Interceptor para silenciar errores de red (ERR_CONNECTION_REFUSED, ERR_NETWORK, CORS)
     client.interceptors.response.use(
       response => response,
       error => {
-        // Silenciar errores de red/CORS en la consola del navegador
-        if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
-          // No loggear nada - servicio WhatsApp no disponible es esperado en producción
-          return Promise.reject({ silent: true, originalError: error })
-        }
-        return Promise.reject(error)
+        // El servicio WhatsApp puede no estar corriendo — es esperado, no es un error crítico
+        return Promise.reject({ silent: true, originalError: error })
       }
     )
     

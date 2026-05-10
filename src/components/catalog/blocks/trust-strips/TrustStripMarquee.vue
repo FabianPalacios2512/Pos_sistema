@@ -14,17 +14,17 @@
         <span
           v-for="(item, i) in items"
           :key="`${pass}-${i}`"
-          class="flex items-center gap-3 flex-shrink-0 py-2.5 px-3"
+          class="flex items-center gap-4 flex-shrink-0 py-2.5 px-2"
         >
           <span
-            class="text-[10px] uppercase font-bold tracking-[0.18em] whitespace-nowrap"
+            class="text-[10px] uppercase font-semibold tracking-[0.14em] whitespace-nowrap"
             :style="{ color: textColor }"
           >{{ item.label }}</span>
           <span
-            class="text-[10px] flex-shrink-0"
-            :style="{ color: accentColor }"
+            class="flex-shrink-0 w-px h-3 opacity-40"
+            :style="{ backgroundColor: textColor }"
             aria-hidden="true"
-          >✦</span>
+          ></span>
         </span>
       </template>
     </div>

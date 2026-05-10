@@ -1,10 +1,820 @@
 <template>
   <div class="h-full overflow-hidden">
-  <!-- Layout de 3 Columnas: Menú Lateral + Contenido + Preview - Gemini Style -->
-  <div class="flex overflow-hidden bg-[#f8f9fa] dark:bg-gradient-to-b dark:from-[#131314] dark:via-[#1e1f20] dark:to-[#131314] h-full">
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- ESTADO CARGANDO: mismo splash que la app                          -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <div v-if="catalogUiMode === 'loading'" class="h-full bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] flex items-center justify-center">
+    <div class="flex flex-col items-center justify-center space-y-6">
+      <img src="/logo.png" alt="105 POS" class="w-20 h-20 object-contain">
+      <h1 class="text-3xl font-bold text-slate-800 dark:text-white tracking-tight">105 POS</h1>
+      <svg class="w-8 h-8 text-slate-400 dark:text-slate-500 animate-spin" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- ONBOARDING: PANTALLA DE BIENVENIDA (primera vez, sin identidad)   -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <Transition
+    enter-active-class="transition-all duration-700 ease-out"
+    enter-from-class="opacity-0"
+    enter-to-class="opacity-100"
+    leave-active-class="transition-all duration-500 ease-in"
+    leave-from-class="opacity-100"
+    leave-to-class="opacity-0"
+  >
+  <div v-if="catalogUiMode === 'welcome'" class="h-full flex items-center justify-center bg-white dark:bg-[#0a0a0c] relative overflow-hidden">
+    <!-- Fondo: gradiente muy suave, casi imperceptible -->
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-indigo-50/40 dark:from-[#0a0a0c] dark:via-[#0f0f12] dark:to-[#0a0a0c]"></div>
+    </div>
+
+    <div class="relative z-10 max-w-3xl mx-auto px-8 text-center">
+
+      <!-- Icono desnudo — sin fondo, sin sombra de color -->
+      <div class="inline-flex items-center justify-center mb-10">
+        <svg class="w-20 h-20 text-gray-800 dark:text-zinc-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.0">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.375.375 0 00.375-.375v-1.5a.375.375 0 00-.375-.375h-3.75a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375z" />
+        </svg>
+      </div>
+
+      <!-- Título: sólido, tracking apretado, sin gradiente -->
+      <h1 class="text-[3.8rem] font-bold tracking-tight text-gray-900 dark:text-white leading-[1.05] mb-6">
+        Tu tienda online,<br>
+        <span class="text-[#1a73e8]">lista en minutos</span>
+      </h1>
+      <p class="text-[1.15rem] text-gray-500 dark:text-zinc-400 mb-14 leading-relaxed max-w-xl mx-auto">
+        Describe tu negocio con tus propias palabras y nuestra IA construirá una identidad visual completa para tu catálogo web — colores, tipografías, textos y más.
+      </p>
+
+      <!-- Feature icons: desnudos, sin contenedor -->
+      <div class="flex items-start justify-center gap-16 mb-14">
+        <div v-for="feat in [
+          { icon: 'M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z', label: 'IA Generativa' },
+          { icon: 'M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z', label: 'Menos de 30 seg' },
+          { icon: 'M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z M15 12a3 3 0 11-6 0 3 3 0 016 0z', label: 'Vista previa en vivo' }
+        ]" :key="feat.label" class="flex flex-col items-center gap-3">
+          <svg class="w-7 h-7 text-gray-700 dark:text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2">
+            <path stroke-linecap="round" stroke-linejoin="round" :d="feat.icon" />
+          </svg>
+          <span class="text-[13px] font-medium text-gray-500 dark:text-zinc-400 tracking-wide">{{ feat.label }}</span>
+        </div>
+      </div>
+
+      <!-- CTA: sólido, sin gradiente, con sombra limpia -->
+      <button
+        @click="catalogUiMode = 'brief-only'"
+        class="inline-flex items-center gap-3 px-10 py-[18px] bg-[#1a73e8] hover:bg-[#1557b0] text-white text-[17px] font-semibold rounded-2xl shadow-xl shadow-blue-500/25 transition-all duration-200 hover:shadow-blue-500/35 hover:-translate-y-px"
+      >
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+        </svg>
+        Crear mi tienda web ahora
+      </button>
+
+      <p class="mt-5 text-[13px] text-gray-400 dark:text-zinc-600 tracking-wide">Gratis · Sin necesidad de diseñador · Todo con IA</p>
+    </div>
+  </div>
+  </Transition>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- ONBOARDING: SOLO CHAT (usuario escribe su descripción)            -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <Transition
+    enter-active-class="transition-all duration-600 ease-out"
+    enter-from-class="opacity-0 translate-y-4"
+    enter-to-class="opacity-100 translate-y-0"
+    leave-active-class="transition-all duration-400 ease-in"
+    leave-from-class="opacity-100 translate-y-0"
+    leave-to-class="opacity-0 translate-y-4"
+  >
+  <div v-if="catalogUiMode === 'brief-only'" class="h-full flex flex-col items-center justify-center bg-white dark:bg-[#0a0a0c] px-6 relative overflow-hidden">
+    <!-- Fondo mínimo -->
+    <div class="absolute inset-0 pointer-events-none bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-[#0a0a0c] dark:to-[#0f0f12]"></div>
+
+    <div class="relative z-10 w-full max-w-3xl">
+      <!-- Header -->
+      <div class="text-center mb-10">
+        <!-- Badge discreta -->
+        <div class="inline-flex items-center gap-1.5 px-4 py-1.5 bg-gray-100 dark:bg-zinc-800 rounded-full mb-6">
+          <span class="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-zinc-500"></span>
+          <span class="text-[11px] text-gray-600 dark:text-zinc-400 uppercase tracking-widest font-semibold">IA lista para empezar</span>
+        </div>
+        <h2 class="text-[2.8rem] font-bold tracking-tight text-gray-900 dark:text-white mb-3">Cuéntame sobre tu negocio</h2>
+        <p class="text-[16px] text-gray-500 dark:text-zinc-400 leading-relaxed">Describe tu marca: estilo, público objetivo, colores que te gustan, qué vendes...</p>
+      </div>
+
+      <!-- Tarjeta del textarea: blanco puro, sombra editorial -->
+      <div class="bg-white dark:bg-[#111113] rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-[0_12px_40px_rgb(0,0,0,0.06)] dark:shadow-[0_12px_40px_rgb(0,0,0,0.4)] overflow-hidden">
+        <textarea
+          v-model="aiBrandDescription"
+          rows="10"
+          placeholder="Ejemplo: Tengo una tienda de ropa femenina, estilo romántico y boho. Mi clienta tiene entre 25 y 40 años. Me gustan los colores tierra, beige y rosado polvoso. Quiero que mi tienda se vea elegante pero accesible..."
+          class="w-full px-8 pt-8 pb-4 bg-transparent text-[16px] text-gray-900 dark:text-zinc-100 placeholder-gray-300 dark:placeholder-zinc-600 resize-none leading-relaxed focus:outline-none focus:ring-0"
+          @keydown.ctrl.enter="generateAiBrand"
+        ></textarea>
+        <!-- Footer del card -->
+        <div class="px-8 pb-6 flex items-center justify-between border-t border-gray-100 dark:border-zinc-800 pt-5">
+          <span class="text-[13px] text-gray-400 dark:text-zinc-600">{{ aiBrandDescription.length }} caracteres · Ctrl+Enter para generar</span>
+          <div class="flex items-center gap-2">
+            <!-- Voz -->
+            <button
+              @click="toggleVoiceRecording"
+              :title="isRecordingVoice ? 'Detener grabación' : 'Dictar con voz'"
+              class="w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-150"
+              :class="isRecordingVoice
+                ? 'bg-red-500 text-white'
+                : 'bg-gray-50 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300 border border-gray-200 dark:border-zinc-700'"
+            >
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+              </svg>
+            </button>
+            <!-- Generar -->
+            <button
+              @click="generateAiBrand"
+              :disabled="!aiBrandDescription || aiBrandDescription.trim().length < 10 || isGeneratingBrand"
+              class="inline-flex items-center gap-2.5 px-7 py-3 bg-[#1a73e8] hover:bg-[#1557b0] text-white text-[15px] font-semibold rounded-xl shadow-md shadow-blue-500/20 transition-all duration-150 disabled:opacity-35 disabled:cursor-not-allowed disabled:shadow-none"
+            >
+              <svg v-if="!isGeneratingBrand" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+              </svg>
+              <svg v-else class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+              {{ isGeneratingBrand ? aiGenerationProgress || 'Generando...' : 'Generar identidad' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress bar mientras genera -->
+      <div v-if="isGeneratingBrand" class="mt-5">
+        <div class="w-full bg-gray-100 dark:bg-zinc-800 rounded-full h-px overflow-hidden mb-2">
+          <div class="h-full bg-gray-800 dark:bg-zinc-300 rounded-full animate-[loading_2.5s_ease-in-out_infinite]" style="width: 70%"></div>
+        </div>
+        <p class="text-center text-[11px] text-gray-400 dark:text-zinc-600">{{ aiGenerationProgress }}</p>
+      </div>
+
+      <!-- Volver -->
+      <div class="text-center mt-7">
+        <button @click="catalogUiMode = 'welcome'" class="text-[11px] text-gray-400 dark:text-zinc-600 hover:text-gray-700 dark:hover:text-zinc-300 transition-colors tracking-wide">
+          ← Volver al inicio
+        </button>
+      </div>
+    </div>
+  </div>
+  </Transition>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- CHOOSING: Carrusel de 5 diseños generados por IA                 -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <div v-if="catalogUiMode === 'choosing'" class="h-full flex flex-col items-center justify-center bg-white dark:bg-[#0a0a0c] px-4 relative overflow-hidden">
+    <!-- Fondo mínimo -->
+    <div class="absolute inset-0 pointer-events-none bg-gradient-to-br from-slate-50 via-white to-indigo-50/20 dark:from-[#0a0a0c] dark:to-[#0f0f12]"></div>
+
+    <!-- Header -->
+    <div class="relative z-10 text-center mb-8 flex-shrink-0">
+      <div v-if="designsReady < 5" class="inline-flex items-center gap-2 px-4 py-1.5 bg-gray-100 dark:bg-zinc-800 rounded-full mb-5">
+        <svg class="animate-spin w-3 h-3 text-gray-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+        </svg>
+        <span class="text-[11px] text-gray-600 dark:text-zinc-400 uppercase tracking-widest font-semibold">Generando · {{ designsReady }}/5 listos</span>
+      </div>
+      <div v-else class="inline-flex items-center gap-2 px-4 py-1.5 bg-gray-100 dark:bg-zinc-800 rounded-full mb-5">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+        <span class="text-[11px] text-gray-600 dark:text-zinc-400 uppercase tracking-widest font-semibold">5 diseños únicos listos</span>
+      </div>
+      <h2 class="text-[2.4rem] font-bold tracking-tight text-gray-900 dark:text-white mb-2">Elige tu diseño favorito</h2>
+      <p class="text-[15px] text-gray-500 dark:text-zinc-400">La IA creó 5 identidades únicas para tu marca.</p>
+    </div>
+
+    <!-- Área principal: flechas + teléfono + moodboard -->
+    <div class="relative z-10 flex items-center gap-8 flex-shrink-0">
+
+      <!-- Flecha Anterior -->
+      <button
+        @click="currentDesignIdx = (currentDesignIdx - 1 + generatedDesigns.length) % generatedDesigns.length"
+        :disabled="generatedDesigns.length < 2"
+        class="w-12 h-12 rounded-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 shadow-md flex items-center justify-center text-gray-600 dark:text-zinc-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-600 hover:shadow-lg transition-all disabled:opacity-20 flex-shrink-0"
+      >
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+
+      <!-- TELÉFONO hiperrealista (375×740 escalado a 0.95 → 356×703) -->
+      <div style="width: 356px; height: 703px; position: relative; flex-shrink: 0;">
+        <div style="position: absolute; top: 0; left: 0; width: 375px; height: 740px; transform: scale(0.95); transform-origin: top left;">
+          <!-- Marco negro real del teléfono -->
+          <div class="absolute inset-0 rounded-[3rem] border-[12px] border-black shadow-2xl pointer-events-none z-50">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-36 h-6 bg-black rounded-b-2xl -mt-[12px]"></div>
+            <div class="absolute -left-[12px] top-24 w-1 h-10 bg-black rounded-l"></div>
+            <div class="absolute -left-[12px] top-36 w-1 h-14 bg-black rounded-l"></div>
+            <div class="absolute -right-[12px] top-28 w-1 h-16 bg-black rounded-r"></div>
+          </div>
+          <!-- Pantalla -->
+          <div class="w-full h-full overflow-hidden bg-white relative rounded-[2.4rem]" style="isolation: isolate; transform: translateZ(0);">
+            <div v-if="isChoosingIframeLoading" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white z-10">
+              <div class="w-5 h-5 border border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
+              <p class="text-[10px] text-gray-400 tracking-wide">Cargando diseño...</p>
+            </div>
+            <iframe
+              v-if="generatedDesigns[currentDesignIdx]"
+              ref="choosingIframeEl"
+              :key="choosingIframeKey"
+              :src="`${catalogUrl}?ai_preview=1`"
+              class="w-full h-full border-0"
+              style="width: 375px; height: 740px;"
+              title="Vista Previa del Diseño"
+              @load="isChoosingIframeLoading = false"
+            ></iframe>
+            <div v-else class="w-full h-full flex flex-col items-center justify-center gap-3 bg-gray-50 dark:bg-zinc-900">
+              <svg class="animate-spin w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
+              <p class="text-[10px] text-gray-400">Diseño {{ currentDesignIdx + 1 }} llegando...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Moodboard / Especificaciones — estilo Manual de Marca -->
+      <div v-if="generatedDesigns[currentDesignIdx]" class="w-56 space-y-3 flex-shrink-0">
+
+        <!-- Tipografías -->
+        <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 p-4">
+          <p class="text-[10px] text-gray-400 dark:text-zinc-500 uppercase tracking-widest font-semibold mb-3">Tipografías</p>
+          <p class="text-[15px] font-semibold text-gray-900 dark:text-white truncate"
+            :style="{ fontFamily: generatedDesigns[currentDesignIdx].fonts?.heading + ', serif' }"
+          >{{ generatedDesigns[currentDesignIdx].fonts?.heading }}</p>
+          <p class="text-[12px] text-gray-400 dark:text-zinc-500 truncate mt-1"
+            :style="{ fontFamily: generatedDesigns[currentDesignIdx].fonts?.body + ', sans-serif' }"
+          >{{ generatedDesigns[currentDesignIdx].fonts?.body }}</p>
+        </div>
+
+        <!-- Composición -->
+        <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 p-4 space-y-2">
+          <p class="text-[10px] text-gray-400 dark:text-zinc-500 uppercase tracking-widest font-semibold mb-3">Composición</p>
+          <div v-for="(val, key) in { Header: generatedDesigns[currentDesignIdx].layout_config?.header_style, Hero: generatedDesigns[currentDesignIdx].layout_config?.hero_style, Hook: generatedDesigns[currentDesignIdx].layout_config?.hook_style, Trust: generatedDesigns[currentDesignIdx].layout_config?.trust_strip_style }" :key="key" class="flex items-center gap-2">
+            <span class="text-[10px] text-gray-400 dark:text-zinc-500 w-10 flex-shrink-0">{{ key }}</span>
+            <span class="text-[10px] bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700 px-2 py-0.5 rounded truncate">{{ val || '—' }}</span>
+          </div>
+        </div>
+
+        <!-- Paleta -->
+        <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 p-4">
+          <p class="text-[10px] text-gray-400 dark:text-zinc-500 uppercase tracking-widest font-semibold mb-3">Paleta</p>
+          <div class="flex gap-2 flex-wrap">
+            <div
+              v-for="(clr, key) in generatedDesigns[currentDesignIdx].color_palette"
+              :key="key"
+              class="w-8 h-8 rounded-lg shadow-sm ring-1 ring-gray-200/60 dark:ring-zinc-700/40"
+              :style="{ backgroundColor: clr }"
+              :title="key + ': ' + clr"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flecha Siguiente -->
+      <button
+        @click="currentDesignIdx = (currentDesignIdx + 1) % generatedDesigns.length"
+        :disabled="generatedDesigns.length < 2"
+        class="w-12 h-12 rounded-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 shadow-md flex items-center justify-center text-gray-600 dark:text-zinc-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-600 hover:shadow-lg transition-all disabled:opacity-20 flex-shrink-0"
+      >
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Dots + contador -->
+    <div class="relative z-10 flex flex-col items-center gap-2.5 mt-6 flex-shrink-0">
+      <div class="flex items-center gap-1.5">
+        <button
+          v-for="(design, i) in generatedDesigns"
+          :key="i"
+          @click="currentDesignIdx = i"
+          class="transition-all duration-200 rounded-full"
+          :class="i === currentDesignIdx ? 'w-5 h-1.5 bg-gray-800 dark:bg-zinc-200' : 'w-1.5 h-1.5 bg-gray-200 dark:bg-zinc-700 hover:bg-gray-400 dark:hover:bg-zinc-500'"
+        ></button>
+        <button
+          v-for="j in (5 - generatedDesigns.length)"
+          :key="'ph-' + j"
+          disabled
+          class="w-1.5 h-1.5 rounded-full bg-gray-100 dark:bg-zinc-800 cursor-default"
+        ></button>
+      </div>
+      <p class="text-[10px] text-gray-400 dark:text-zinc-600 tracking-wide">{{ currentDesignIdx + 1 }} / {{ generatedDesigns.length }}</p>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="relative z-10 flex flex-col items-center gap-3 mt-6 mb-8 flex-shrink-0 w-full max-w-sm">
+      <button
+        @click="chooseDesign(currentDesignIdx)"
+        :disabled="!generatedDesigns[currentDesignIdx] || isChoosingApplying"
+        class="w-full py-4 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 font-semibold text-[15px] rounded-xl shadow-md shadow-black/10 transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2.5"
+      >
+        <svg v-if="!isChoosingApplying" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+        </svg>
+        <svg v-else class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+        </svg>
+        {{ isChoosingApplying ? 'Aplicando...' : 'Elegir este diseño' }}
+      </button>
+      <button
+        @click="() => { try { localStorage.removeItem('ai_design_preview') } catch(e) {}; catalogUiMode = 'brief-only' }"
+        class="text-[13px] text-gray-400 dark:text-zinc-600 hover:text-gray-700 dark:hover:text-zinc-300 transition-colors tracking-wide"
+      >
+        ← Cambiar descripción y regenerar
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- UPLOAD IMAGES: Paso de subida de imágenes del hook elegido        -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <div v-if="catalogUiMode === 'upload-images'" class="h-full flex flex-col bg-white dark:bg-[#0a0a0c] overflow-hidden">
+
+    <!-- ── HEADER ──────────────────────────────────────────────────────── -->
+    <div class="flex-shrink-0 px-8 py-4 flex items-center justify-between border-b border-gray-200 dark:border-zinc-800">
+      <button
+        @click="catalogUiMode = 'choosing'"
+        class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-zinc-300 hover:text-black dark:hover:text-white hover:underline transition-colors"
+      >
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Cambiar diseño
+      </button>
+
+      <!-- Progress pill: sección X de 3 -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-1.5">
+          <div v-for="s in 3" :key="s" class="rounded-full transition-all duration-300 cursor-pointer"
+            :class="s <= uploadSubStep ? 'w-8 h-[3px] bg-gray-900 dark:bg-white' : 'w-5 h-[3px] bg-gray-200 dark:bg-zinc-700'"
+            @click="uploadSubStep = s">
+          </div>
+        </div>
+        <span class="text-xs font-medium text-gray-500 dark:text-zinc-400">Fotos {{ uploadSubStep }} de 3</span>
+      </div>
+
+      <button
+        @click="saveAndExitOnboarding"
+        :disabled="isOnboardingImagesSaving"
+        class="text-sm font-medium text-gray-700 dark:text-zinc-300 hover:text-black dark:hover:text-white hover:underline transition-colors disabled:opacity-40"
+      >
+        Guardar y retomar después
+      </button>
+    </div>
+
+    <!-- ── Breadcrumb de pasos ─────────────────────────────────────────── -->
+    <div class="flex-shrink-0 px-8 py-2.5 flex items-center gap-2 bg-gray-50/70 dark:bg-zinc-900/50 border-b border-gray-100 dark:border-zinc-900">
+      <button @click="uploadSubStep = 1"
+        class="flex items-center gap-1.5 text-xs font-medium transition-colors"
+        :class="uploadSubStep === 1 ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-zinc-600 hover:text-gray-600 dark:hover:text-zinc-400'">
+        <div class="w-4 h-4 rounded-full text-[10px] flex items-center justify-center border transition-colors"
+          :class="uploadSubStep === 1 ? 'bg-gray-900 dark:bg-white border-gray-900 dark:border-white text-white dark:text-gray-900' : uploadSubStep > 1 ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-gray-300 dark:border-zinc-600 text-gray-400'">
+          <svg v-if="uploadSubStep > 1" class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          <span v-else>1</span>
+        </div>
+        Portada del banner
+      </button>
+      <svg class="w-3 h-3 text-gray-300 dark:text-zinc-700 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      <button @click="uploadSubStep = 2"
+        class="flex items-center gap-1.5 text-xs font-medium transition-colors"
+        :class="uploadSubStep === 2 ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-zinc-600 hover:text-gray-600 dark:hover:text-zinc-400'">
+        <div class="w-4 h-4 rounded-full text-[10px] flex items-center justify-center border transition-colors"
+          :class="uploadSubStep === 2 ? 'bg-gray-900 dark:bg-white border-gray-900 dark:border-white text-white dark:text-gray-900' : uploadSubStep > 2 ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-gray-300 dark:border-zinc-600 text-gray-400'">
+          <svg v-if="uploadSubStep > 2" class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          <span v-else>2</span>
+        </div>
+        Bloque especial
+      </button>
+      <svg class="w-3 h-3 text-gray-300 dark:text-zinc-700 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      <button @click="uploadSubStep = 3"
+        class="flex items-center gap-1.5 text-xs font-medium transition-colors"
+        :class="uploadSubStep === 3 ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-zinc-600 hover:text-gray-600 dark:hover:text-zinc-400'">
+        <div class="w-4 h-4 rounded-full text-[10px] flex items-center justify-center border transition-colors"
+          :class="uploadSubStep === 3 ? 'bg-gray-900 dark:bg-white border-gray-900 dark:border-white text-white dark:text-gray-900' : 'border-gray-300 dark:border-zinc-600 text-gray-400'">
+          3
+        </div>
+        Historia visual
+      </button>
+      <!-- Nota de tranquilidad -->
+      <span class="ml-auto text-[11px] text-gray-400 dark:text-zinc-600 italic">Todas las fotos son opcionales. Tu tienda funciona igual sin ellas.</span>
+    </div>
+
+    <!-- ── Contenido principal: panel izquierdo + preview ─────────────── -->
+    <div class="flex-1 flex overflow-hidden">
+
+      <!-- IZQUIERDA -->
+      <div class="w-[450px] flex-shrink-0 flex flex-col px-8 py-7 overflow-y-auto border-r border-gray-200 dark:border-zinc-800">
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- PASO 1: Fotos del banner / carrusel hero                     -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <template v-if="uploadSubStep === 1">
+          <div class="mb-6">
+            <div class="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-zinc-500 mb-2">Sección 1 de 3 · Portada del banner</div>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Fotos del banner principal</h2>
+            <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed">
+              Estas fotos rotan como carrusel en la parte superior de tu tienda. Sube hasta 3 — la primera es la más importante. Si no tienes fotos ahora, puedes agregarlas después.
+            </p>
+          </div>
+
+          <!-- 3 slots hero en columnas, formato retrato -->
+          <div class="flex gap-2.5 mb-5" style="height: 280px;">
+            <div
+              v-for="i in 3" :key="'h'+i"
+              @click="triggerOnboardingFile('hero_images', i-1)"
+              @dragover.prevent
+              @drop.prevent="e => { const f = e.dataTransfer.files[0]; if (f) { const ev = { target: { files: [f], value: '' } }; handleOnboardingFile(ev, 'hero_images', i-1) } }"
+              class="group relative flex-1 rounded-lg border-2 border-dashed cursor-pointer transition-all duration-200 overflow-hidden"
+              :class="onboardingImages.hero_images[i-1]
+                ? 'border-gray-200 dark:border-zinc-700'
+                : 'border-gray-300 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-900/60 hover:bg-gray-100 dark:hover:bg-zinc-800/50 hover:border-gray-400 dark:hover:border-zinc-500'"
+            >
+              <template v-if="onboardingImages.hero_images[i-1]">
+                <img :src="onboardingImages.hero_images[i-1]" class="w-full h-full object-cover" />
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
+                  <span class="opacity-0 group-hover:opacity-100 text-white text-[11px] font-medium bg-black/60 px-3 py-1.5 rounded-full transition-all">Cambiar</span>
+                </div>
+                <button @click.stop="onboardingImages.hero_images[i-1] = ''; updateOnboardingPreview()"
+                  class="absolute top-2 right-2 w-6 h-6 bg-black/50 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-all shadow-sm">
+                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+                <div class="absolute bottom-2 left-2 bg-black/50 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">{{ i === 1 ? 'Foto 1' : i === 2 ? 'Foto 2' : 'Foto 3' }}</div>
+              </template>
+              <template v-else>
+                <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 p-3">
+                  <div class="w-10 h-10 rounded-full border-2 border-dashed border-gray-300 dark:border-zinc-600 group-hover:border-gray-500 flex items-center justify-center transition-colors flex-shrink-0">
+                    <svg class="w-4 h-4 text-gray-500 dark:text-zinc-400 group-hover:text-gray-700 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                  </div>
+                  <div class="text-center">
+                    <p class="text-xs font-semibold text-gray-600 dark:text-zinc-400 group-hover:text-gray-800 transition-colors">{{ i === 1 ? 'Foto principal' : i === 2 ? 'Foto 2' : 'Foto 3' }}</p>
+                    <p class="text-[10px] text-gray-400 dark:text-zinc-500 mt-0.5">JPG o PNG</p>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+          <p class="text-xs text-gray-400 dark:text-zinc-500 mb-6">Arrastra o haz clic en cada celda · máx. 2MB por foto</p>
+          <!-- Hidden inputs -->
+          <input v-for="i in 3" :key="'ih'+i" :ref="el => { if (el) ob_hero[i-1] = el }" type="file" class="hidden" accept="image/*" @change="e => handleOnboardingFile(e, 'hero_images', i-1)" />
+
+          <!-- CTAs -->
+          <div class="mt-auto space-y-2.5">
+            <button @click="uploadSubStep = 2; saveOnboardingDraft()"
+              class="w-full py-4 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 font-bold text-base rounded-xl shadow-md shadow-black/10 transition-all flex items-center justify-center gap-2.5">
+              Siguiente: Bloque especial
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+            </button>
+            <button @click="uploadSubStep = 2" class="w-full py-2 text-sm text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300 hover:underline transition-colors text-center">
+              Omitir esta sección →
+            </button>
+          </div>
+        </template>
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- PASO 2: Fotos del hook (bloque especial)                     -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <template v-else-if="uploadSubStep === 2">
+          <div class="mb-6">
+            <div class="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-zinc-500 mb-2">Sección 2 de 3 · Bloque especial</div>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Foto del bloque destacado</h2>
+            <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed">
+              Tu diseño incluye un bloque especial que aparece justo después del banner.
+              <span v-if="onboardingHookStyle === 'editorial-story'"> Es una gran foto editorial que acompaña tu mensaje principal.</span>
+              <span v-else-if="onboardingHookStyle === 'urban-lookbook'"> Es un carrusel de hasta 3 fotos en pantalla completa — perfecto para mostrar outfits o productos.</span>
+              <span v-else-if="onboardingHookStyle === 'dynamic-bento'"> Es una cuadrícula de hasta 3 fotos en panel — destaca tus mejores productos o colecciones.</span>
+            </p>
+          </div>
+
+          <!-- ── editorial-story: 1 zona retrato ── -->
+          <template v-if="onboardingHookStyle === 'editorial-story'">
+            <div
+              @click="triggerOnboardingFile('editorial_image')"
+              @dragover.prevent
+              @drop.prevent="e => { const f = e.dataTransfer.files[0]; if (f) { const ev = { target: { files: [f], value: '' } }; handleOnboardingFile(ev, 'editorial_image') } }"
+              class="group relative w-full rounded-lg border-2 border-dashed cursor-pointer transition-all duration-200 overflow-hidden mb-3"
+              :class="onboardingImages.editorial_image ? 'border-gray-200 dark:border-zinc-700' : 'border-gray-300 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-900/60 hover:bg-gray-100 dark:hover:bg-zinc-800/50 hover:border-gray-400 dark:hover:border-zinc-500'"
+              style="aspect-ratio: 3/4;"
+            >
+              <template v-if="onboardingImages.editorial_image">
+                <img :src="onboardingImages.editorial_image" class="w-full h-full object-cover" />
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
+                  <span class="opacity-0 group-hover:opacity-100 text-white text-sm font-medium bg-black/60 px-4 py-2 rounded-full transition-all">Cambiar foto</span>
+                </div>
+                <button @click.stop="onboardingImages.editorial_image = ''; updateOnboardingPreview()"
+                  class="absolute top-3 right-3 w-8 h-8 bg-black/50 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-all shadow-md">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+              </template>
+              <template v-else>
+                <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 text-center">
+                  <div v-if="aiBrandData?.banner_texts?.headline" class="space-y-1">
+                    <p class="text-sm font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">{{ aiBrandData.banner_texts.headline }}</p>
+                    <p v-if="aiBrandData?.banner_texts?.subheadline" class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-widest">{{ aiBrandData.banner_texts.subheadline }}</p>
+                  </div>
+                  <div class="flex flex-col items-center gap-2">
+                    <div class="w-12 h-12 rounded-full border-2 border-dashed border-gray-300 dark:border-zinc-600 group-hover:border-gray-500 flex items-center justify-center transition-colors">
+                      <svg class="w-5 h-5 text-gray-500 dark:text-zinc-400 group-hover:text-gray-700 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-gray-700 dark:text-zinc-300 group-hover:text-gray-900 transition-colors">Subir foto aquí</p>
+                    <p class="text-xs text-gray-400 dark:text-zinc-500">Formato retrato recomendado · JPG, PNG</p>
+                  </div>
+                </div>
+              </template>
+            </div>
+            <input ref="ob_editorial" type="file" class="hidden" accept="image/*" @change="e => handleOnboardingFile(e, 'editorial_image')" />
+          </template>
+
+          <!-- ── urban-lookbook: 3 columnas ── -->
+          <template v-else-if="onboardingHookStyle === 'urban-lookbook'">
+            <div class="flex gap-2.5 mb-2" style="height: 280px;">
+              <div
+                v-for="i in 3" :key="'lk'+i"
+                @click="triggerOnboardingFile('lookbook_images', i-1)"
+                @dragover.prevent
+                @drop.prevent="e => { const f = e.dataTransfer.files[0]; if (f) { const ev = { target: { files: [f], value: '' } }; handleOnboardingFile(ev, 'lookbook_images', i-1) } }"
+                class="group relative flex-1 rounded-lg border-2 border-dashed cursor-pointer transition-all duration-200 overflow-hidden"
+                :class="onboardingImages.lookbook_images[i-1] ? 'border-gray-200 dark:border-zinc-700' : 'border-gray-300 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-900/60 hover:bg-gray-100 dark:hover:bg-zinc-800/50 hover:border-gray-400 dark:hover:border-zinc-500'"
+              >
+                <template v-if="onboardingImages.lookbook_images[i-1]">
+                  <img :src="onboardingImages.lookbook_images[i-1]" class="w-full h-full object-cover" />
+                  <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
+                    <span class="opacity-0 group-hover:opacity-100 text-white text-[11px] font-medium bg-black/60 px-3 py-1.5 rounded-full transition-all">Cambiar</span>
+                  </div>
+                  <button @click.stop="onboardingImages.lookbook_images[i-1] = ''; updateOnboardingPreview()"
+                    class="absolute top-2 right-2 w-6 h-6 bg-black/50 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-all">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </button>
+                  <div class="absolute bottom-2 left-2 bg-black/50 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">{{ i === 1 ? 'Slide 1' : i === 2 ? 'Slide 2' : 'Slide 3' }}</div>
+                </template>
+                <template v-else>
+                  <div class="absolute inset-0 flex flex-col items-center justify-center gap-2 p-3">
+                    <div class="w-9 h-9 rounded-full border-2 border-dashed border-gray-300 dark:border-zinc-600 group-hover:border-gray-500 flex items-center justify-center transition-colors flex-shrink-0">
+                      <svg class="w-4 h-4 text-gray-500 dark:text-zinc-400 group-hover:text-gray-700 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                    </div>
+                    <p class="text-[11px] font-semibold text-gray-600 dark:text-zinc-400 text-center">{{ i === 1 ? 'Slide principal' : 'Slide ' + i }}</p>
+                  </div>
+                </template>
+              </div>
+            </div>
+            <input v-for="i in 3" :key="'ilk'+i" :ref="el => { if (el) ob_lookbook[i-1] = el }" type="file" class="hidden" accept="image/*" @change="e => handleOnboardingFile(e, 'lookbook_images', i-1)" />
+          </template>
+
+          <!-- ── dynamic-bento: grilla bento ── -->
+          <template v-else-if="onboardingHookStyle === 'dynamic-bento'">
+            <!-- Celda principal grande -->
+            <div
+              @click="triggerOnboardingFile('bento_main')"
+              @dragover.prevent
+              @drop.prevent="e => { const f = e.dataTransfer.files[0]; if (f) { const ev = { target: { files: [f], value: '' } }; handleOnboardingFile(ev, 'bento_main') } }"
+              class="group relative w-full rounded-lg border-2 border-dashed cursor-pointer transition-all duration-200 overflow-hidden mb-2.5"
+              :class="onboardingImages.bento_main ? 'border-gray-200 dark:border-zinc-700' : 'border-gray-300 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-900/60 hover:bg-gray-100 dark:hover:bg-zinc-800/50 hover:border-gray-400 dark:hover:border-zinc-500'"
+              style="height: 180px;"
+            >
+              <template v-if="onboardingImages.bento_main">
+                <img :src="onboardingImages.bento_main" class="w-full h-full object-cover" />
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
+                  <span class="opacity-0 group-hover:opacity-100 text-white text-sm font-medium bg-black/60 px-4 py-2 rounded-full transition-all">Cambiar</span>
+                </div>
+                <button @click.stop="onboardingImages.bento_main = ''; updateOnboardingPreview()"
+                  class="absolute top-3 right-3 w-8 h-8 bg-black/50 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-all shadow-md">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+              </template>
+              <template v-else>
+                <div class="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                  <div v-if="aiBrandData?.banner_texts?.headline" class="text-xs font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wider text-center px-4">{{ aiBrandData.banner_texts.headline }}</div>
+                  <div class="flex flex-col items-center gap-1.5">
+                    <div class="w-10 h-10 rounded-full border-2 border-dashed border-gray-300 dark:border-zinc-600 group-hover:border-gray-500 flex items-center justify-center transition-colors">
+                      <svg class="w-4 h-4 text-gray-500 dark:text-zinc-400 group-hover:text-gray-700 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                    </div>
+                    <p class="text-xs font-semibold text-gray-600 dark:text-zinc-400">Imagen principal del panel</p>
+                  </div>
+                </div>
+              </template>
+            </div>
+            <input ref="ob_bento_main" type="file" class="hidden" accept="image/*" @change="e => handleOnboardingFile(e, 'bento_main')" />
+
+            <!-- Fila de 3 celdas: texto AI + bento_detail + bento_secondary -->
+            <div class="flex gap-2.5" style="height: 130px;">
+              <!-- Celda texto AI -->
+              <div class="w-[36%] flex-shrink-0 rounded-lg border border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900/40 flex flex-col justify-end p-3 overflow-hidden">
+                <p v-if="aiBrandData?.banner_texts?.subheadline" class="text-[10px] font-semibold uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-1 leading-tight">{{ aiBrandData.banner_texts.subheadline }}</p>
+                <p v-if="aiBrandData?.banner_texts?.cta_text" class="text-[10px] font-medium text-gray-500 dark:text-zinc-500 border border-gray-200 dark:border-zinc-700 rounded-full px-2.5 py-0.5 inline-block w-fit">{{ aiBrandData.banner_texts.cta_text }}</p>
+                <p v-if="!aiBrandData?.banner_texts" class="text-[10px] text-gray-400 dark:text-zinc-600 uppercase tracking-widest">Texto del diseño</p>
+              </div>
+              <!-- bento_detail -->
+              <div
+                @click="triggerOnboardingFile('bento_detail')"
+                @dragover.prevent
+                @drop.prevent="e => { const f = e.dataTransfer.files[0]; if (f) { const ev = { target: { files: [f], value: '' } }; handleOnboardingFile(ev, 'bento_detail') } }"
+                class="group relative flex-1 rounded-lg border-2 border-dashed cursor-pointer transition-all duration-200 overflow-hidden"
+                :class="onboardingImages.bento_detail ? 'border-gray-200 dark:border-zinc-700' : 'border-gray-300 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-900/60 hover:bg-gray-100 dark:hover:bg-zinc-800/50 hover:border-gray-400 dark:hover:border-zinc-500'"
+              >
+                <template v-if="onboardingImages.bento_detail">
+                  <img :src="onboardingImages.bento_detail" class="w-full h-full object-cover" />
+                  <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
+                    <span class="opacity-0 group-hover:opacity-100 text-white text-[11px] font-medium bg-black/60 px-3 py-1.5 rounded-full transition-all">Cambiar</span>
+                  </div>
+                  <button @click.stop="onboardingImages.bento_detail = ''; updateOnboardingPreview()"
+                    class="absolute top-2 right-2 w-5 h-5 bg-black/50 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-all">
+                    <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </button>
+                </template>
+                <template v-else>
+                  <div class="absolute inset-0 flex flex-col items-center justify-center gap-1.5">
+                    <div class="w-7 h-7 rounded-full border-2 border-dashed border-gray-300 dark:border-zinc-600 group-hover:border-gray-500 flex items-center justify-center transition-colors">
+                      <svg class="w-3 h-3 text-gray-500 dark:text-zinc-400 group-hover:text-gray-700 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                    </div>
+                    <p class="text-[10px] font-semibold text-gray-500 dark:text-zinc-400">Detalle</p>
+                  </div>
+                </template>
+              </div>
+              <input ref="ob_bento_detail" type="file" class="hidden" accept="image/*" @change="e => handleOnboardingFile(e, 'bento_detail')" />
+              <!-- bento_secondary -->
+              <div
+                @click="triggerOnboardingFile('bento_secondary')"
+                @dragover.prevent
+                @drop.prevent="e => { const f = e.dataTransfer.files[0]; if (f) { const ev = { target: { files: [f], value: '' } }; handleOnboardingFile(ev, 'bento_secondary') } }"
+                class="group relative flex-1 rounded-lg border-2 border-dashed cursor-pointer transition-all duration-200 overflow-hidden"
+                :class="onboardingImages.bento_secondary ? 'border-gray-200 dark:border-zinc-700' : 'border-gray-300 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-900/60 hover:bg-gray-100 dark:hover:bg-zinc-800/50 hover:border-gray-400 dark:hover:border-zinc-500'"
+              >
+                <template v-if="onboardingImages.bento_secondary">
+                  <img :src="onboardingImages.bento_secondary" class="w-full h-full object-cover" />
+                  <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
+                    <span class="opacity-0 group-hover:opacity-100 text-white text-[11px] font-medium bg-black/60 px-3 py-1.5 rounded-full transition-all">Cambiar</span>
+                  </div>
+                  <button @click.stop="onboardingImages.bento_secondary = ''; updateOnboardingPreview()"
+                    class="absolute top-2 right-2 w-5 h-5 bg-black/50 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-all">
+                    <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </button>
+                </template>
+                <template v-else>
+                  <div class="absolute inset-0 flex flex-col items-center justify-center gap-1.5">
+                    <div class="w-7 h-7 rounded-full border-2 border-dashed border-gray-300 dark:border-zinc-600 group-hover:border-gray-500 flex items-center justify-center transition-colors">
+                      <svg class="w-3 h-3 text-gray-500 dark:text-zinc-400 group-hover:text-gray-700 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                    </div>
+                    <p class="text-[10px] font-semibold text-gray-500 dark:text-zinc-400">Acento</p>
+                  </div>
+                </template>
+              </div>
+              <input ref="ob_bento_secondary" type="file" class="hidden" accept="image/*" @change="e => handleOnboardingFile(e, 'bento_secondary')" />
+            </div>
+          </template>
+
+          <!-- CTAs paso 2 -->
+          <div class="mt-6 space-y-2.5">
+            <button @click="uploadSubStep = 3; saveOnboardingDraft()"
+              class="w-full py-4 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 font-bold text-base rounded-xl shadow-md shadow-black/10 transition-all flex items-center justify-center gap-2.5">
+              Siguiente: Historia visual
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+            </button>
+            <div class="flex items-center justify-between">
+              <button @click="uploadSubStep = 1" class="text-sm text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300 hover:underline transition-colors">← Anterior</button>
+              <button @click="uploadSubStep = 3" class="text-sm text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300 hover:underline transition-colors">Omitir esta sección →</button>
+            </div>
+          </div>
+        </template>
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- PASO 3: Historia visual (story_image)                        -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <template v-else-if="uploadSubStep === 3">
+          <div class="mb-6">
+            <div class="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-zinc-500 mb-2">Sección 3 de 3 · Historia visual</div>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">La foto de tu colección</h2>
+            <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed">
+              Esta foto aparece en la sección de colección de tu tienda y le da personalidad a tu marca. Usa una imagen que cuente quién eres: un ambiente, una modelo, o tu producto estrella.
+            </p>
+          </div>
+
+          <!-- 1 zona retrato -->
+          <div
+            @click="triggerOnboardingFile('story_image')"
+            @dragover.prevent
+            @drop.prevent="e => { const f = e.dataTransfer.files[0]; if (f) { const ev = { target: { files: [f], value: '' } }; handleOnboardingFile(ev, 'story_image') } }"
+            class="group relative w-full rounded-lg border-2 border-dashed cursor-pointer transition-all duration-200 overflow-hidden mb-4"
+            :class="onboardingImages.story_image ? 'border-gray-200 dark:border-zinc-700' : 'border-gray-300 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-900/60 hover:bg-gray-100 dark:hover:bg-zinc-800/50 hover:border-gray-400 dark:hover:border-zinc-500'"
+            style="aspect-ratio: 4/3;"
+          >
+            <template v-if="onboardingImages.story_image">
+              <img :src="onboardingImages.story_image" class="w-full h-full object-cover" />
+              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
+                <span class="opacity-0 group-hover:opacity-100 text-white text-sm font-medium bg-black/60 px-4 py-2 rounded-full transition-all">Cambiar foto</span>
+              </div>
+              <button @click.stop="onboardingImages.story_image = ''; updateOnboardingPreview()"
+                class="absolute top-3 right-3 w-8 h-8 bg-black/50 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-all shadow-md">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </template>
+            <template v-else>
+              <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 text-center">
+                <div class="flex flex-col items-center gap-2">
+                  <div class="w-14 h-14 rounded-full border-2 border-dashed border-gray-300 dark:border-zinc-600 group-hover:border-gray-500 flex items-center justify-center transition-colors">
+                    <svg class="w-6 h-6 text-gray-500 dark:text-zinc-400 group-hover:text-gray-700 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                  </div>
+                  <p class="text-sm font-semibold text-gray-700 dark:text-zinc-300 group-hover:text-gray-900 transition-colors">Subir foto aquí</p>
+                  <p class="text-xs text-gray-500 dark:text-zinc-500">JPG o PNG · arrastra o haz clic · máx. 2MB</p>
+                </div>
+              </div>
+            </template>
+          </div>
+          <input ref="ob_story" type="file" class="hidden" accept="image/*" @change="e => handleOnboardingFile(e, 'story_image')" />
+
+          <!-- CTAs paso 3 / final -->
+          <div class="mt-auto space-y-2.5">
+            <button
+              @click="finishOnboarding"
+              :disabled="isOnboardingImagesSaving"
+              class="w-full py-4 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 font-bold text-lg rounded-xl shadow-lg shadow-black/15 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+            >
+              <svg v-if="!isOnboardingImagesSaving" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+              </svg>
+              <svg v-else class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
+              {{ isOnboardingImagesSaving ? 'Guardando...' : '¡Ir a mi tienda!' }}
+            </button>
+            <div class="flex items-center justify-between">
+              <button @click="uploadSubStep = 2" :disabled="isOnboardingImagesSaving" class="text-sm text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300 hover:underline transition-colors disabled:opacity-30">← Anterior</button>
+              <button @click="skipOnboarding" :disabled="isOnboardingImagesSaving" class="text-sm text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300 hover:underline transition-colors disabled:opacity-30">Omitir y entrar →</button>
+            </div>
+          </div>
+        </template>
+
+      </div>
+
+      <!-- ── DERECHA: Preview en teléfono ─────────────────────────────── -->
+      <div class="flex-1 flex items-center justify-center relative overflow-hidden bg-gray-50 dark:bg-[#0d0d0f]">
+        <div class="absolute inset-0 pointer-events-none bg-gradient-to-br from-slate-50/80 via-white/50 to-indigo-50/30 dark:from-[#0d0d0f] dark:to-[#0a0a0c]"></div>
+
+        <div class="relative" style="width: 356px; height: 703px;">
+          <div style="position: absolute; top: 0; left: 0; width: 375px; height: 740px; transform: scale(0.95); transform-origin: top left;">
+            <div class="absolute inset-0 rounded-[3rem] border-[12px] border-black shadow-2xl pointer-events-none z-50">
+              <div class="absolute top-0 left-1/2 -translate-x-1/2 w-36 h-6 bg-black rounded-b-2xl -mt-[12px]"></div>
+              <div class="absolute -left-[12px] top-24 w-1 h-10 bg-black rounded-l"></div>
+              <div class="absolute -left-[12px] top-36 w-1 h-14 bg-black rounded-l"></div>
+              <div class="absolute -right-[12px] top-28 w-1 h-16 bg-black rounded-r"></div>
+            </div>
+            <div class="w-full h-full overflow-hidden bg-white relative rounded-[2.4rem]" style="isolation: isolate; transform: translateZ(0);">
+              <div v-if="isOnboardingPreviewLoading" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white z-10">
+                <div class="w-5 h-5 border border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
+                <p class="text-[10px] text-gray-400 tracking-wide">Actualizando preview...</p>
+              </div>
+              <iframe
+                ref="onboardingPreviewEl"
+                :key="onboardingPreviewKey"
+                :src="`${catalogUrl}?ai_preview=1`"
+                class="w-full h-full border-0"
+                style="width: 375px; height: 740px;"
+                title="Vista Previa"
+                @load="isOnboardingPreviewLoading = false"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hint flotante -->
+        <div class="absolute bottom-8 left-0 right-0 flex justify-center pointer-events-none">
+          <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm border border-gray-200 dark:border-zinc-700 rounded-full shadow-md">
+            <svg class="w-3.5 h-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+            </svg>
+            <span class="text-xs font-medium text-gray-600 dark:text-zinc-400">El preview se actualiza en tiempo real</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- PANEL COMPLETO: 3 COLUMNAS (solo cuando ya hay identidad creada)  -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <div v-if="catalogUiMode === 'configured'" class="flex overflow-hidden bg-[#f8f9fa] dark:bg-gradient-to-b dark:from-[#131314] dark:via-[#1e1f20] dark:to-[#131314] h-full">
     
     <!-- SIDEBAR IZQUIERDO - Menú de Navegación - Gemini -->
-    <aside class="w-52 bg-white dark:bg-[#1e1f20] border-r border-[#e8eaed] dark:border-[#3a3a3f] flex flex-col" style="min-height: 0;">
+    <Transition
+      enter-active-class="transition-all duration-500 ease-out"
+      enter-from-class="opacity-0 -translate-x-8"
+      enter-to-class="opacity-100 translate-x-0"
+    >
+    <aside v-if="showConfigPanel" class="w-52 bg-white dark:bg-[#1e1f20] border-r border-[#e8eaed] dark:border-[#3a3a3f] flex flex-col" style="min-height: 0;">
       <!-- Header Sidebar - Gemini -->
       <div class="px-4 py-3 border-b border-[#e8eaed] dark:border-[#3a3a3f] flex-shrink-0">
         <div class="flex items-center gap-2 mb-3">
@@ -82,7 +892,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </div>
-          <span class="text-sm font-medium">{{ tab.label }}</span>
+          <span class="text-[15px] font-medium">{{ tab.label }}</span>
         </button>
       </nav>
       
@@ -121,11 +931,44 @@
           </svg>
           Ver Página
         </button>
+
+        <!-- Separador -->
+        <div class="border-t border-[#e8eaed] dark:border-[#3a3a3f] my-1"></div>
+
+        <!-- Cargar Plantilla + Restablecer -->
+        <div class="grid grid-cols-2 gap-1.5">
+          <button
+            @click="showRestoreModal = true; restoreData = null; restoreFileName = ''"
+            class="px-2 py-2 bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 text-[#5f6368] dark:text-[#9aa0a6] hover:text-blue-600 dark:hover:text-blue-400 text-[11px] font-medium rounded-full transition-all duration-150 flex items-center justify-center gap-1 border border-transparent hover:border-blue-100 dark:hover:border-blue-900/30"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+            </svg>
+            Cargar
+          </button>
+
+          <button
+            @click="resetAiBrand"
+            :disabled="!aiBrandData && !aiBrandDescription"
+            class="px-2 py-2 bg-transparent hover:bg-red-50 dark:hover:bg-red-900/20 text-[#5f6368] dark:text-[#9aa0a6] hover:text-red-600 dark:hover:text-red-400 text-[11px] font-medium rounded-full transition-all duration-150 flex items-center justify-center gap-1 disabled:opacity-30 disabled:cursor-not-allowed border border-transparent hover:border-red-100 dark:hover:border-red-900/30"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+            Restablecer
+          </button>
+        </div>
       </div>
     </aside>
+    </Transition>
     
     <!-- CONTENIDO CENTRAL - Gemini -->
-    <main class="flex-1 flex flex-col overflow-hidden bg-[#f8f9fa] dark:bg-transparent">
+    <Transition
+      enter-active-class="transition-all duration-500 ease-out delay-100"
+      enter-from-class="opacity-0 translate-y-6"
+      enter-to-class="opacity-100 translate-y-0"
+    >
+    <main v-if="showConfigPanel" class="flex-1 flex flex-col overflow-hidden bg-[#f8f9fa] dark:bg-transparent">
 
       <!-- Sticky Action Bar -->
       <div class="flex-shrink-0 px-8 py-3 bg-white/95 dark:bg-[#1e1f20]/95 backdrop-blur-sm border-b border-[#e8eaed] dark:border-[#3a3a3f] flex items-center justify-between z-10 shadow-[0_1px_0_0_rgba(0,0,0,0.06)]">
@@ -151,7 +994,7 @@
 
       <!-- Área de contenido con scroll independiente -->
       <div class="flex-1 overflow-y-auto">
-      <div class="p-8 space-y-6 max-w-5xl mx-auto">
+      <div class="px-5 py-6 md:px-8 space-y-6 max-w-7xl mx-auto w-full">
         
         <!-- Barra de Advertencia - Configuración Incompleta - Gemini -->
         <div v-if="showWarningMessage" 
@@ -183,85 +1026,74 @@
           <div v-if="activeTab === 'identidad-visual'" class="space-y-5 animate-fade-in pb-10">
 
             <!-- 01: BRIEF DE MARCA -->
-            <div class="bg-white dark:bg-[#1e1f20] rounded-xl border border-gray-100 dark:border-[#2a2a30] overflow-hidden shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.3)] transition-shadow duration-200">
-              <div class="px-6 py-5 border-b border-gray-100 dark:border-[#2a2a30] flex items-center justify-between">
-                <div>
-                  <p class="text-xs font-bold tracking-widest text-[#9aa0a6] uppercase mb-0.5">01</p>
-                  <h3 class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Brief de Marca</h3>
-                </div>
-                <span v-if="aiBrandData" class="flex items-center gap-1.5 text-sm text-[#1e8e3e] dark:text-[#81c995] font-medium">
-                  <span class="relative flex w-2 h-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#1e8e3e] dark:bg-[#81c995] opacity-40"></span>
-                    <span class="relative inline-flex rounded-full w-2 h-2 bg-[#1e8e3e] dark:bg-[#81c995]"></span>
-                  </span>
-                  Generado
-                </span>
+            <div class="bg-white dark:bg-[#1e1f20] rounded-xl border border-gray-100 dark:border-[#2a2a30] p-6 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.3)] transition-shadow duration-200" :class="isLoading ? 'animate-pulse' : ''">
+              <p class="text-[15px] text-gray-700 dark:text-gray-300 mb-4">Cuéntanos sobre tu negocio en tus propias palabras. Nuestra IA hará el resto.</p>
+
+              <!-- Clean textarea -->
+              <textarea
+                v-model="aiBrandDescription"
+                rows="5"
+                placeholder="Describe tu marca: estilo, público objetivo, valores, estética visual... Cuanto más detallado, mejor será el resultado."
+                class="w-full p-4 min-h-[120px] bg-white dark:bg-[#282a2c] text-base text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 border border-gray-200 dark:border-[#3a3a3f] rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent resize-none leading-relaxed transition-all duration-200"
+                :disabled="isGeneratingBrand || isLoading"
+                maxlength="2000"
+              ></textarea>
+
+              <!-- Character counter below textarea -->
+              <p class="text-xs text-gray-400 dark:text-gray-500 mt-2 text-right select-none">{{ aiBrandDescription.length }}/2000</p>
+
+              <!-- Actions row -->
+              <div class="flex items-center justify-end gap-3 mt-4">
+                <!-- Mic button -->
+                <button
+                  @click="isRecordingVoice ? stopVoiceRecording() : startVoiceRecording()"
+                  :class="isRecordingVoice
+                    ? 'bg-[#ea4335] text-white animate-pulse shadow-[0_0_12px_rgba(234,67,53,0.4)]'
+                    : 'bg-gray-100 dark:bg-[#2a2a30] text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#3a3a3f]'"
+                  class="w-10 h-10 rounded-lg flex items-center justify-center transition-all flex-shrink-0"
+                  :title="isRecordingVoice ? 'Detener grabación' : 'Dictar descripción'"
+                  :disabled="isLoading"
+                >
+                  <svg v-if="!isRecordingVoice" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+                  </svg>
+                  <svg v-else class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 7.5A2.25 2.25 0 017.5 5.25h9a2.25 2.25 0 012.25 2.25v9a2.25 2.25 0 01-2.25 2.25h-9a2.25 2.25 0 01-2.25-2.25v-9z" />
+                  </svg>
+                </button>
+
+                <!-- AI Generate button -->
+                <button
+                  @click="generateAiBrand"
+                  :disabled="isGeneratingBrand || aiBrandDescription.trim().length < 10 || isLoading"
+                  class="px-6 py-2.5 bg-gray-900 hover:bg-black dark:bg-white dark:hover:bg-gray-100 text-white dark:text-black text-sm font-medium rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg v-if="!isGeneratingBrand" class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+                  </svg>
+                  <svg v-else class="animate-spin w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  {{ isGeneratingBrand ? 'Creando la magia de tu tienda...' : 'Generar Identidad con IA' }}
+                </button>
               </div>
-              <div class="p-5">
-                <!-- Fused intelligent input container -->
-                <div class="relative rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] bg-[#f8f9fa] dark:bg-[#282a2c] overflow-hidden focus-within:border-[#1a73e8]/50 dark:focus-within:border-[#8ab4f8]/40 focus-within:shadow-[0_0_0_3px_rgba(26,115,232,0.08)] transition-all duration-200">
-                  <!-- Character counter -->
-                  <div class="absolute top-3.5 right-4 text-xs text-[#9aa0a6] pointer-events-none z-10 select-none">{{ aiBrandDescription.length }}/2000</div>
-                  <!-- Textarea - no border, blends into container -->
-                  <textarea
-                    v-model="aiBrandDescription"
-                    rows="5"
-                    placeholder="Describe tu marca: estilo, público objetivo, valores, estética visual... Cuanto más detallado, mejor será el resultado."
-                    class="w-full px-5 pt-4 pb-3 bg-transparent text-base text-[#1e1f20] dark:text-[#e3e3e3] placeholder-[#b0b4ba] dark:placeholder-[#5f6368] focus:outline-none resize-none leading-relaxed"
-                    :disabled="isGeneratingBrand"
-                    maxlength="2000"
-                  ></textarea>
-                  <!-- Inner divider -->
-                  <div class="h-px bg-[#e8eaed] dark:bg-[#3a3a3f]"></div>
-                  <!-- Action toolbar fused at bottom -->
-                  <div class="flex items-center gap-2.5 px-4 py-3">
-                    <!-- AI Generate button - premium dark gradient -->
-                    <button
-                      @click="generateAiBrand"
-                      :disabled="isGeneratingBrand || aiBrandDescription.trim().length < 10"
-                      class="flex-1 px-4 py-2.5 bg-gradient-to-r from-[#0d0d1f] via-[#151535] to-[#0d1528] hover:from-[#080812] hover:via-[#0f0f28] hover:to-[#08101e] dark:from-[#c8d6f5] dark:via-[#b0c4f0] dark:to-[#a0b8eb] dark:hover:from-[#d8e6ff] dark:hover:to-[#b8cffa] text-white dark:text-[#0d0d1f] text-sm font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_2px_14px_rgba(13,13,31,0.3)] hover:shadow-[0_3px_22px_rgba(13,13,31,0.42)] dark:shadow-[0_2px_14px_rgba(160,184,235,0.18)]"
-                    >
-                      <svg v-if="!isGeneratingBrand" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-                      </svg>
-                      <svg v-else class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      {{ isGeneratingBrand ? aiGenerationProgress || 'Generando...' : 'Generar Identidad con IA' }}
-                    </button>
-                    <!-- Mic button -->
-                    <button
-                      @click="isRecordingVoice ? stopVoiceRecording() : startVoiceRecording()"
-                      :class="isRecordingVoice
-                        ? 'bg-[#ea4335] text-white animate-pulse shadow-[0_0_12px_rgba(234,67,53,0.4)]'
-                        : 'bg-white dark:bg-[#1e1f20] text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#f0f4f9] dark:hover:bg-[#3a3a3f] border border-[#e8eaed] dark:border-[#3a3a3f]'"
-                      class="w-10 h-10 rounded-xl flex items-center justify-center transition-all flex-shrink-0 shadow-sm"
-                      :title="isRecordingVoice ? 'Detener grabación' : 'Dictar descripción'"
-                    >
-                      <svg v-if="!isRecordingVoice" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
-                      </svg>
-                      <svg v-else class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 7.5A2.25 2.25 0 017.5 5.25h9a2.25 2.25 0 012.25 2.25v9a2.25 2.25 0 01-2.25 2.25h-9a2.25 2.25 0 01-2.25-2.25v-9z" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-                <!-- Recording status -->
-                <p v-if="isRecordingVoice" class="text-sm text-[#ea4335] dark:text-[#f28b82] flex items-center gap-1.5 mt-3">
-                  <span class="w-2 h-2 bg-[#ea4335] rounded-full animate-pulse"></span>
-                  Grabando... Habla sobre tu negocio y presiona el botón para terminar.
-                </p>
-              </div>
+
+              <!-- Recording status -->
+              <p v-if="isRecordingVoice" class="text-[15px] text-[#ea4335] dark:text-[#f28b82] flex items-center gap-1.5 mt-3">
+                <span class="w-2 h-2 bg-[#ea4335] rounded-full animate-pulse"></span>
+                Grabando... Habla sobre tu negocio y presiona el botón para terminar.
+              </p>
             </div>
 
+            <!-- Contenedor Grid para Color y Tipografía -->
+            <div :class="[aiBrandData?.fonts ? 'grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch' : '', isGeneratingBrand ? 'opacity-50 blur-[2px] pointer-events-none transition-all duration-500' : 'transition-all duration-500']">
             <!-- 02: IDENTIDAD DE COLOR -->
-            <div class="bg-white dark:bg-[#1e1f20] rounded-xl border border-gray-100 dark:border-[#2a2a30] overflow-hidden shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.3)] transition-shadow duration-200">
+            <div class="bg-white dark:bg-[#1e1f20] rounded-xl border border-gray-100 dark:border-[#2a2a30] overflow-hidden shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.3)] transition-shadow duration-200 h-full flex flex-col" :class="isLoading ? 'animate-pulse' : ''">
               <div class="px-6 py-5 border-b border-gray-100 dark:border-[#2a2a30] flex items-center justify-between">
                 <div>
-                  <p class="text-xs font-bold tracking-widest text-[#9aa0a6] uppercase mb-0.5">02</p>
-                  <h3 class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Identidad de Color</h3>
+                  <p class="text-xs font-bold tracking-widest text-gray-500 dark:text-gray-400 uppercase mb-0.5">02</p>
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Identidad de Color</h3>
                 </div>
                 <!-- Pencil: toggle refinement panel -->
                 <button
@@ -279,9 +1111,9 @@
                   Refinar
                 </button>
               </div>
-              <div class="p-6">
+              <div class="p-6 flex-1 flex flex-col">
                 <!-- Color Primario Manual — siempre visible -->
-                <p class="text-sm font-semibold text-[#9aa0a6] uppercase tracking-wider mb-3">Color Principal</p>
+                <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-3">Color Principal</p>
                 <div class="flex items-center gap-4 p-4 border border-gray-100 dark:border-[#2a2a30] rounded-xl bg-gray-50 dark:bg-[#282a2c]">
                   <!-- Circular color swatch — hides ugly native square -->
                   <label class="relative cursor-pointer flex-shrink-0">
@@ -292,10 +1124,10 @@
                     <input
                       type="text"
                       v-model="config.brandIdentity.primaryColor"
-                      class="w-32 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-[#3a3a3f] text-sm font-mono text-gray-900 dark:text-[#e3e3e3] bg-white dark:bg-[#1e1f20] focus:outline-none focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-600 uppercase"
+                      class="w-32 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-[#3a3a3f] text-[15px] font-mono text-gray-900 dark:text-[#e3e3e3] bg-white dark:bg-[#1e1f20] focus:outline-none focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-600 uppercase"
                       placeholder="#000000"
                     />
-                    <p class="text-xs font-medium text-gray-400 dark:text-[#9aa0a6] mt-1.5">Aplicado en botones, acentos y llamadas a la acción</p>
+                    <p class="text-[13px] font-medium text-gray-600 dark:text-gray-400 mt-1.5">Aplicado en botones, acentos y llamadas a la acción</p>
                   </div>
                 </div>
 
@@ -303,7 +1135,7 @@
                 <template v-if="aiBrandData?.color_palette">
                   <div class="mt-5 pt-5 border-t border-gray-100 dark:border-[#2a2a30]">
                     <div class="flex items-center justify-between mb-4">
-                      <p class="text-sm font-semibold text-[#9aa0a6] uppercase tracking-wider">Paleta IA</p>
+                      <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Paleta IA</p>
                       <button
                         @click="applyAiColors"
                         class="text-sm font-medium px-3 py-1.5 rounded-full border border-gray-100 dark:border-[#3a3a3f] text-gray-400 dark:text-[#9aa0a6] hover:border-gray-300 dark:hover:border-[#5f6368] hover:text-gray-700 dark:hover:text-[#e3e3e3] transition-colors"
@@ -312,19 +1144,20 @@
                       </button>
                     </div>
                     <div class="flex gap-2">
-                      <div
-                        v-for="(color, key) in aiBrandData.color_palette"
-                        :key="key"
-                        class="flex-1 group cursor-pointer"
-                        :title="color"
-                      >
+                      <template v-for="(color, key) in aiBrandData.color_palette" :key="key">
+                        <div
+                          v-if="!['text_dark', 'text_light', 'TEXT_DARK', 'TEXT_LIGHT'].includes(key.toLowerCase())"
+                          class="flex-1 group cursor-pointer"
+                          :title="color"
+                        >
                         <div
                           class="h-14 rounded-xl mb-1.5 transition-transform group-hover:scale-105 shadow-sm"
                           :style="{ backgroundColor: color }"
                         ></div>
-                        <p class="text-[11px] text-center text-gray-400 dark:text-[#9aa0a6] uppercase tracking-wider font-medium truncate">{{ key.replace('_', '\u00a0') }}</p>
-                        <p class="text-[11px] text-center font-mono text-gray-500 dark:text-[#9aa0a6] uppercase tracking-wider truncate">{{ color }}</p>
+                        <p class="text-[11px] text-center text-gray-700 dark:text-gray-300 uppercase tracking-wider font-medium truncate">{{ key.replace('_', '\u00a0') }}</p>
+                        <p class="text-[11px] text-center font-mono text-gray-600 dark:text-gray-400 uppercase tracking-wider truncate">{{ color }}</p>
                       </div>
+                      </template>
                     </div>
                   </div>
 
@@ -341,14 +1174,14 @@
                       <div class="relative rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] bg-[#f8f9fa] dark:bg-[#282a2c] overflow-hidden focus-within:border-[#1a73e8]/50 dark:focus-within:border-[#8ab4f8]/40 focus-within:shadow-[0_0_0_3px_rgba(26,115,232,0.08)] transition-all duration-200">
                         <!-- Label strip -->
                         <div class="px-5 pt-4 pb-0">
-                          <p class="text-xs font-semibold text-[#9aa0a6] uppercase tracking-wider">Guía para la IA</p>
+                          <p class="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Guía para la IA</p>
                         </div>
                         <!-- Borderless textarea -->
                         <textarea
                           v-model="colorRefinementPrompt"
                           rows="3"
                           placeholder="Ej: Quiero tonos tierra más cálidos, menos saturación. Prefiero paleta seria y minimalista con acentos dorados..."
-                          class="w-full px-5 pt-3 pb-3 bg-transparent text-base text-[#1e1f20] dark:text-[#e3e3e3] placeholder-[#b0b4ba] dark:placeholder-[#5f6368] focus:outline-none resize-none leading-relaxed"
+                          class="w-full px-5 pt-3 pb-3 bg-transparent text-[15px] text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none resize-none leading-relaxed"
                           :disabled="isRegeneratingColors"
                         ></textarea>
                         <!-- Divider -->
@@ -384,11 +1217,11 @@
             </div>
 
             <!-- 03: TIPOGRAFÍA (Solo cuando hay datos de IA) -->
-            <div v-if="aiBrandData?.fonts" class="bg-white dark:bg-[#1e1f20] rounded-xl border border-gray-100 dark:border-[#2a2a30] overflow-hidden shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.3)] transition-shadow duration-200">
+            <div v-if="aiBrandData?.fonts" class="bg-white dark:bg-[#1e1f20] rounded-xl border border-gray-100 dark:border-[#2a2a30] overflow-hidden shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.3)] transition-shadow duration-200 h-full flex flex-col" :class="isLoading ? 'animate-pulse' : ''">
               <div class="px-6 py-5 border-b border-gray-100 dark:border-[#2a2a30] flex items-center justify-between">
                 <div>
-                  <p class="text-xs font-bold tracking-widest text-[#9aa0a6] uppercase mb-0.5">03</p>
-                  <h3 class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Tipografía</h3>
+                  <p class="text-xs font-bold tracking-widest text-gray-500 dark:text-gray-400 uppercase mb-0.5">03</p>
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Tipografía</h3>
                 </div>
                 <button
                   @click="showFontModal = true"
@@ -401,7 +1234,7 @@
                   Modificar
                 </button>
               </div>
-              <div class="p-6">
+              <div class="p-6 flex-1 flex flex-col">
                 <div class="grid grid-cols-2 gap-4">
                   <div class="p-5 rounded-xl border border-gray-100 dark:border-[#2a2a30] bg-gray-50 dark:bg-[#282a2c]">
                     <p class="text-[11px] font-medium text-gray-500 dark:text-[#9aa0a6] uppercase tracking-wider mb-3">Títulos</p>
@@ -409,32 +1242,33 @@
                     <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] font-medium">{{ aiBrandData.fonts.heading }}</p>
                   </div>
                   <div class="p-5 rounded-xl border border-gray-100 dark:border-[#2a2a30] bg-gray-50 dark:bg-[#282a2c]">
-                    <p class="text-[11px] font-medium text-gray-500 dark:text-[#9aa0a6] uppercase tracking-wider mb-3">Cuerpo</p>
-                    <p class="text-base text-[#1e1f20] dark:text-[#e3e3e3] leading-relaxed mb-2" :style="{ fontFamily: aiBrandData.fonts.body + ', sans-serif' }">Texto base</p>
-                    <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] font-medium">{{ aiBrandData.fonts.body }}</p>
+                    <p class="text-[11px] font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-3">Cuerpo</p>
+                    <p class="text-[15px] text-gray-900 dark:text-white leading-relaxed mb-2" :style="{ fontFamily: aiBrandData.fonts.body + ', sans-serif' }">Texto base</p>
+                    <p class="text-[13px] text-gray-700 dark:text-gray-300 font-medium">{{ aiBrandData.fonts.body }}</p>
                   </div>
                 </div>
-                <p v-if="aiBrandData.fonts.style_rationale" class="text-sm text-[#9aa0a6] mt-4 leading-relaxed italic border-l-2 border-[#e8eaed] dark:border-[#3a3a3f] pl-3">
+                <p v-if="aiBrandData.fonts.style_rationale" class="text-[15px] text-gray-700 dark:text-gray-300 mt-4 leading-relaxed italic border-l-2 border-[#e8eaed] dark:border-[#3a3a3f] pl-3">
                   {{ aiBrandData.fonts.style_rationale }}
                 </p>
               </div>
             </div>
+            </div> <!-- End Grid Contenedor -->
 
             <!-- 04 / 03: ACTIVOS VISUALES -->
-            <div class="bg-white dark:bg-[#1e1f20] rounded-xl border border-gray-100 dark:border-[#2a2a30] overflow-hidden shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.3)] transition-shadow duration-200">
+            <div class="bg-white dark:bg-[#1e1f20] rounded-xl border border-gray-100 dark:border-[#2a2a30] overflow-hidden shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.3)] transition-all duration-500" :class="[isLoading ? 'animate-pulse' : '', isGeneratingBrand ? 'opacity-50 blur-[2px] pointer-events-none' : '']">
               <div class="px-6 py-5 border-b border-gray-100 dark:border-[#2a2a30]">
-                <p class="text-xs font-bold tracking-widest text-[#9aa0a6] uppercase mb-0.5">{{ aiBrandData?.fonts ? '04' : '03' }}</p>
-                <h3 class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Activos Visuales</h3>
+                <p class="text-xs font-bold tracking-widest text-gray-500 dark:text-gray-400 uppercase mb-0.5">{{ aiBrandData?.fonts ? '04' : '03' }}</p>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Activos Visuales</h3>
               </div>
               <div class="p-6">
                 <!-- Fila 1: Logo + Hero Imagen 1 -->
                 <div class="grid grid-cols-2 gap-5">
                   <!-- Logotipo -->
                   <div class="space-y-2">
-                    <p class="text-sm font-semibold text-[#9aa0a6] uppercase tracking-wider">Logotipo</p>
+                    <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Logotipo</p>
                     <div
                       @click="triggerFileUpload('logo')"
-                      class="relative w-full h-28 border-2 border-dashed border-gray-200 dark:border-[#3a3a3f] rounded-xl hover:bg-gray-50 dark:hover:bg-[#282a2c] hover:border-gray-300 dark:hover:border-[#5f6368] transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
+                      class="relative w-full h-28 border-2 border-dashed border-gray-300 dark:border-[#4a4a4f] rounded-xl hover:bg-gray-50 dark:hover:bg-[#282a2c] hover:border-gray-400 dark:hover:border-gray-500 transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
                     >
                       <div v-if="config.brandIdentity.logo" class="absolute inset-0 p-3 flex items-center justify-center">
                         <img :src="config.brandIdentity.logo" class="max-w-full max-h-full object-contain" />
@@ -442,7 +1276,7 @@
                           <button @click.stop="config.brandIdentity.logo = ''" class="text-white text-xs font-medium px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full transition-colors">Eliminar</button>
                         </div>
                       </div>
-                      <div v-else class="flex flex-col items-center gap-2 text-[#9aa0a6] group-hover:text-[#5f6368] dark:group-hover:text-[#e3e3e3] transition-colors">
+                      <div v-else class="flex flex-col items-center gap-2 text-gray-500 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-200 transition-colors">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                         </svg>
@@ -454,10 +1288,10 @@
 
                   <!-- Hero imagen 1 (campo legacy banner_url mantenido por compatibilidad) -->
                   <div class="space-y-2">
-                    <p class="text-sm font-semibold text-[#9aa0a6] uppercase tracking-wider">Hero – Imagen Principal</p>
+                    <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Hero – Imagen Principal</p>
                     <div
                       @click="triggerFileUpload('hero_image', 0)"
-                      class="relative w-full h-28 border-2 border-dashed border-gray-200 dark:border-[#3a3a3f] rounded-xl hover:bg-gray-50 dark:hover:bg-[#282a2c] hover:border-gray-300 dark:hover:border-[#5f6368] transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
+                      class="relative w-full h-28 border-2 border-dashed border-gray-300 dark:border-[#4a4a4f] rounded-xl hover:bg-gray-50 dark:hover:bg-[#282a2c] hover:border-gray-400 dark:hover:border-gray-500 transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
                     >
                       <div v-if="config.catalogMedia.hero_images[0]" class="absolute inset-0 overflow-hidden rounded-xl">
                         <img :src="config.catalogMedia.hero_images[0]" class="w-full h-full object-cover" />
@@ -465,7 +1299,7 @@
                           <button @click.stop="config.catalogMedia.hero_images[0] = ''" class="text-white text-xs font-medium px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full transition-colors">Eliminar</button>
                         </div>
                       </div>
-                      <div v-else class="flex flex-col items-center gap-2 text-[#9aa0a6] group-hover:text-[#5f6368] dark:group-hover:text-[#e3e3e3] transition-colors">
+                      <div v-else class="flex flex-col items-center gap-2 text-gray-500 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-200 transition-colors">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                         </svg>
@@ -484,8 +1318,8 @@
                 <div class="mt-5 pt-5 border-t border-gray-100 dark:border-[#2a2a30]">
                   <div class="flex items-center justify-between mb-3">
                     <div>
-                      <p class="text-sm font-semibold text-[#9aa0a6] uppercase tracking-wider">Carrusel del Hero</p>
-                      <p class="text-xs text-[#9aa0a6] mt-0.5">Opcional · hasta 2 fotos adicionales que rotan con la principal</p>
+                      <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Carrusel del Hero</p>
+                      <p class="text-[13px] text-gray-500 dark:text-gray-400 mt-0.5">Opcional · hasta 2 fotos adicionales que rotan con la principal</p>
                     </div>
                     <span class="text-xs font-medium text-[#9aa0a6] bg-[#f8f9fa] dark:bg-[#282a2c] px-2 py-1 rounded-full border border-[#e8eaed] dark:border-[#3a3a3f]">
                       {{ config.catalogMedia.hero_images.filter(Boolean).length }}/3
@@ -493,10 +1327,10 @@
                   </div>
                   <div class="grid grid-cols-2 gap-3">
                     <div v-for="idx in [1, 2]" :key="'hero-extra-'+idx" class="space-y-1.5">
-                      <p class="text-[11px] font-medium text-[#9aa0a6] uppercase tracking-wider">Foto {{ idx + 1 }}</p>
+                      <p class="text-[11px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Foto {{ idx + 1 }}</p>
                       <div
                         @click="triggerFileUpload('hero_image', idx)"
-                        class="relative w-full h-24 border-2 border-dashed border-gray-200 dark:border-[#3a3a3f] rounded-xl hover:bg-gray-50 dark:hover:bg-[#282a2c] hover:border-gray-300 dark:hover:border-[#5f6368] transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
+                        class="relative w-full h-24 border-2 border-dashed border-gray-300 dark:border-[#4a4a4f] rounded-xl hover:bg-gray-50 dark:hover:bg-[#282a2c] hover:border-gray-400 dark:hover:border-gray-500 transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
                       >
                         <div v-if="config.catalogMedia.hero_images[idx]" class="absolute inset-0 overflow-hidden rounded-xl">
                           <img :src="config.catalogMedia.hero_images[idx]" class="w-full h-full object-cover" />
@@ -504,7 +1338,7 @@
                             <button @click.stop="config.catalogMedia.hero_images[idx] = ''" class="text-white text-xs font-medium px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full transition-colors">Eliminar</button>
                           </div>
                         </div>
-                        <div v-else class="flex flex-col items-center gap-1.5 text-[#9aa0a6] group-hover:text-[#5f6368] dark:group-hover:text-[#e3e3e3] transition-colors">
+                        <div v-else class="flex flex-col items-center gap-1.5 text-gray-500 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-200 transition-colors">
                           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                           </svg>
@@ -529,8 +1363,8 @@
             >
               <div class="px-6 py-5 border-b border-gray-100 dark:border-[#2a2a30] flex items-center justify-between">
                 <div>
-                  <p class="text-xs font-bold tracking-widest text-[#9aa0a6] uppercase mb-0.5">Medios del Diseño</p>
-                  <h3 class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">
+                  <p class="text-xs font-bold tracking-widest text-gray-500 dark:text-gray-400 uppercase mb-0.5">Medios del Diseño</p>
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                     {{ activeHookStyle === 'urban-lookbook' ? 'Urban Lookbook' : activeHookStyle === 'dynamic-bento' ? 'Dynamic Bento' : 'Editorial Story' }}
                   </h3>
                   <p class="text-xs text-[#9aa0a6] mt-1">
@@ -559,12 +1393,12 @@
                 <template v-if="activeHookStyle === 'urban-lookbook'">
                   <div class="grid grid-cols-2 gap-4">
                     <div v-for="idx in [0,1,2,3]" :key="'lkb-'+idx" class="space-y-1.5">
-                      <p class="text-[11px] font-medium text-[#9aa0a6] uppercase tracking-wider">
+                      <p class="text-[11px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         {{ idx === 0 ? 'Imagen Principal' : `Imagen ${idx + 1}` }}
                       </p>
                       <div
                         @click="triggerFileUpload('lookbook_image', idx)"
-                        class="relative w-full h-32 border-2 border-dashed border-gray-200 dark:border-[#3a3a3f] rounded-xl hover:bg-gray-50 dark:hover:bg-[#282a2c] hover:border-violet-300 dark:hover:border-violet-700 transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
+                        class="relative w-full h-32 border-2 border-dashed border-gray-300 dark:border-[#4a4a4f] rounded-xl hover:bg-gray-50 dark:hover:bg-[#282a2c] hover:border-violet-400 dark:hover:border-violet-600 transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
                       >
                         <div v-if="config.catalogMedia.lookbook_images[idx]" class="absolute inset-0 overflow-hidden rounded-xl">
                           <img :src="config.catalogMedia.lookbook_images[idx]" class="w-full h-full object-cover" />
@@ -572,7 +1406,7 @@
                             <button @click.stop="config.catalogMedia.lookbook_images[idx] = ''" class="text-white text-xs font-medium px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full transition-colors">Eliminar</button>
                           </div>
                         </div>
-                        <div v-else class="flex flex-col items-center gap-2 text-[#9aa0a6] group-hover:text-violet-500 transition-colors">
+                        <div v-else class="flex flex-col items-center gap-2 text-gray-500 dark:text-gray-400 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
                           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                           </svg>
@@ -591,14 +1425,14 @@
                   <div class="mt-5 pt-5 border-t border-gray-100 dark:border-[#2a2a30]">
                     <div class="flex items-center justify-between mb-3">
                       <div>
-                        <p class="text-sm font-semibold text-[#9aa0a6] uppercase tracking-wider">Video Opcional</p>
-                        <p class="text-xs text-[#9aa0a6] mt-0.5">MP4 · MOV · WebM · máx. 50 MB · se muestra como 5to elemento del carrusel</p>
+                        <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Video Opcional</p>
+                        <p class="text-[13px] text-gray-500 dark:text-gray-400 mt-0.5">MP4 · MOV · WebM · máx. 50 MB · se muestra como 5to elemento del carrusel</p>
                       </div>
                       <span v-if="config.catalogMedia.lookbook_video" class="text-[10px] text-violet-600 dark:text-violet-400 font-semibold">Cargado ✓</span>
                     </div>
                     <div
                       @click="triggerFileUpload('lookbook_video')"
-                      class="relative w-full h-20 border-2 border-dashed border-gray-200 dark:border-[#3a3a3f] rounded-xl hover:bg-gray-50 dark:hover:bg-[#282a2c] hover:border-violet-300 dark:hover:border-violet-700 transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center gap-3 px-5 overflow-hidden"
+                      class="relative w-full h-20 border-2 border-dashed border-gray-300 dark:border-[#4a4a4f] rounded-xl hover:bg-gray-50 dark:hover:bg-[#282a2c] hover:border-violet-400 dark:hover:border-violet-600 transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center gap-3 px-5 overflow-hidden"
                     >
                       <div v-if="config.catalogMedia.lookbook_video" class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-950 border border-violet-100 dark:border-violet-800 flex items-center justify-center flex-shrink-0">
@@ -611,13 +1445,13 @@
                           <button @click.stop="config.catalogMedia.lookbook_video = ''" class="text-xs text-[#ea4335] dark:text-[#f28b82] hover:underline">Eliminar</button>
                         </div>
                       </div>
-                      <div v-else class="flex items-center gap-3 text-[#9aa0a6] group-hover:text-violet-500 transition-colors">
+                      <div v-else class="flex items-center gap-3 text-gray-500 dark:text-gray-400 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
                         </svg>
                         <div>
                           <p class="text-sm font-medium">Subir video opcional</p>
-                          <p class="text-xs">MP4, MOV o WebM</p>
+                          <p class="text-[13px]">MP4, MOV o WebM</p>
                         </div>
                       </div>
                       <input ref="lookbookVideoInput" type="file" class="hidden" accept="video/*" @change="(e) => handleFileUpload(e, 'lookbook_video')" />
@@ -630,11 +1464,11 @@
                   <div class="grid grid-cols-2 gap-5">
                     <!-- Imagen principal (grande, lifestyle) -->
                     <div class="space-y-2">
-                      <p class="text-sm font-semibold text-[#9aa0a6] uppercase tracking-wider">Imagen Lifestyle</p>
-                      <p class="text-xs text-[#9aa0a6]">Foto grande que ocupa 2/3 del bento · retrato o acción deportiva</p>
+                      <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Imagen Lifestyle</p>
+                      <p class="text-[13px] text-gray-500 dark:text-gray-400">Foto grande que ocupa 2/3 del bento · retrato o acción deportiva</p>
                       <div
                         @click="triggerFileUpload('bento_main')"
-                        class="relative w-full h-36 border-2 border-dashed border-gray-200 dark:border-[#3a3a3f] rounded-xl hover:border-blue-300 dark:hover:border-blue-700 hover:bg-gray-50 dark:hover:bg-[#282a2c] transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
+                        class="relative w-full h-36 border-2 border-dashed border-gray-300 dark:border-[#4a4a4f] rounded-xl hover:border-blue-400 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-[#282a2c] transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
                       >
                         <div v-if="config.catalogMedia.bento_main" class="absolute inset-0 overflow-hidden rounded-xl">
                           <img :src="config.catalogMedia.bento_main" class="w-full h-full object-cover" />
@@ -642,7 +1476,7 @@
                             <button @click.stop="config.catalogMedia.bento_main = ''" class="text-white text-xs font-medium px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full transition-colors">Eliminar</button>
                           </div>
                         </div>
-                        <div v-else class="flex flex-col items-center gap-2 text-[#9aa0a6] group-hover:text-blue-500 transition-colors">
+                        <div v-else class="flex flex-col items-center gap-2 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                           <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                           </svg>
@@ -654,11 +1488,11 @@
 
                     <!-- Imagen detalle (producto de cerca) -->
                     <div class="space-y-2">
-                      <p class="text-sm font-semibold text-[#9aa0a6] uppercase tracking-wider">Imagen Detalle</p>
-                      <p class="text-xs text-[#9aa0a6]">Primer plano de producto · textura, material o detalle técnico</p>
+                      <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Imagen Detalle</p>
+                      <p class="text-[13px] text-gray-500 dark:text-gray-400">Primer plano de producto · textura, material o detalle técnico</p>
                       <div
                         @click="triggerFileUpload('bento_detail')"
-                        class="relative w-full h-36 border-2 border-dashed border-gray-200 dark:border-[#3a3a3f] rounded-xl hover:border-blue-300 dark:hover:border-blue-700 hover:bg-gray-50 dark:hover:bg-[#282a2c] transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
+                        class="relative w-full h-36 border-2 border-dashed border-gray-300 dark:border-[#4a4a4f] rounded-xl hover:border-blue-400 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-[#282a2c] transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
                       >
                         <div v-if="config.catalogMedia.bento_detail" class="absolute inset-0 overflow-hidden rounded-xl">
                           <img :src="config.catalogMedia.bento_detail" class="w-full h-full object-cover" />
@@ -666,7 +1500,7 @@
                             <button @click.stop="config.catalogMedia.bento_detail = ''" class="text-white text-xs font-medium px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full transition-colors">Eliminar</button>
                           </div>
                         </div>
-                        <div v-else class="flex flex-col items-center gap-2 text-[#9aa0a6] group-hover:text-blue-500 transition-colors">
+                        <div v-else class="flex flex-col items-center gap-2 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                           <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6" />
                           </svg>
@@ -681,11 +1515,11 @@
                 <!-- ══ EDITORIAL STORY: 1 imagen inspiracional ══ -->
                 <template v-else-if="activeHookStyle === 'editorial-story'">
                   <div class="space-y-2">
-                    <p class="text-sm font-semibold text-[#9aa0a6] uppercase tracking-wider">Imagen Inspiracional</p>
-                    <p class="text-xs text-[#9aa0a6]">Foto que acompaña el relato de marca · proporción vertical 3:4 recomendada</p>
+                    <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Imagen Inspiracional</p>
+                    <p class="text-[13px] text-gray-500 dark:text-gray-400">Foto que acompaña el relato de marca · proporción vertical 3:4 recomendada</p>
                     <div
                       @click="triggerFileUpload('editorial_image')"
-                      class="relative w-full h-52 border-2 border-dashed border-gray-200 dark:border-[#3a3a3f] rounded-xl hover:border-amber-300 dark:hover:border-amber-700 hover:bg-gray-50 dark:hover:bg-[#282a2c] transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
+                      class="relative w-full h-52 border-2 border-dashed border-gray-300 dark:border-[#4a4a4f] rounded-xl hover:border-amber-400 dark:hover:border-amber-600 hover:bg-gray-50 dark:hover:bg-[#282a2c] transition-all cursor-pointer group bg-white dark:bg-[#1e1f20] flex items-center justify-center overflow-hidden"
                     >
                       <div v-if="config.catalogMedia.editorial_image" class="absolute inset-0 overflow-hidden rounded-xl">
                         <img :src="config.catalogMedia.editorial_image" class="w-full h-full object-cover" />
@@ -693,13 +1527,13 @@
                           <button @click.stop="config.catalogMedia.editorial_image = ''" class="text-white text-xs font-medium px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full transition-colors">Eliminar</button>
                         </div>
                       </div>
-                      <div v-else class="flex flex-col items-center gap-3 text-[#9aa0a6] group-hover:text-amber-500 transition-colors">
+                      <div v-else class="flex flex-col items-center gap-3 text-gray-500 dark:text-gray-400 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                         <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                         </svg>
                         <div class="text-center">
                           <p class="text-sm font-medium">Subir imagen editorial</p>
-                          <p class="text-xs mt-0.5">Retrato · ambiente · still life · 3:4 ideal</p>
+                          <p class="text-[13px] mt-0.5">Retrato · ambiente · still life · 3:4 ideal</p>
                         </div>
                       </div>
                       <input ref="editorialImageInput" type="file" class="hidden" accept="image/*" @change="(e) => handleFileUpload(e, 'editorial_image')" />
@@ -707,85 +1541,6 @@
                   </div>
                 </template>
 
-              </div>
-            </div>
-
-            <!-- 05 / 04: PLANTILLA DE TIENDA (Solo templates de moda) -->
-            <div class="bg-white dark:bg-[#1e1f20] rounded-xl border border-gray-100 dark:border-[#2a2a30] overflow-hidden shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.3)] transition-shadow duration-200">
-              <div class="px-6 py-5 border-b border-gray-100 dark:border-[#2a2a30] flex items-center justify-between">
-                <div>
-                  <p class="text-xs font-bold tracking-widest text-[#9aa0a6] uppercase mb-0.5">{{ aiBrandData?.fonts ? '05' : '04' }}</p>
-                  <h3 class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Plantilla de Tienda</h3>
-                </div>
-                <span v-if="aiBrandData?.recommended_template" class="text-sm text-[#9aa0a6]">
-                  IA recomienda:
-                  <button @click="applyAiTemplate" class="font-medium text-[#1a73e8] dark:text-[#8ab4f8] hover:underline ml-0.5">
-                    {{ aiBrandData.recommended_template === 'visual-story' ? 'Historia Visual' : 'Urban Streetwear' }}
-                  </button>
-                </span>
-              </div>
-              <div class="p-6">
-                <div class="grid grid-cols-2 gap-4">
-
-                  <!-- Historia Visual -->
-                  <button
-                    @click="config.brandIdentity.template = 'visual-story'"
-                    class="group relative p-5 rounded-xl border-2 transition-all duration-200 text-left"
-                    :class="config.brandIdentity.template === 'visual-story'
-                      ? 'border-[#1e1f20] dark:border-[#e3e3e3] bg-[#1e1f20] dark:bg-[#e3e3e3]'
-                      : 'border-[#e8eaed] dark:border-[#3a3a3f] hover:border-[#c0c4c8] dark:hover:border-[#5f6368] bg-white dark:bg-[#282a2c]'"
-                  >
-                    <!-- Wireframe visual -->
-                    <div class="w-full h-16 rounded-lg overflow-hidden mb-4 flex flex-col gap-1">
-                      <div class="flex-1 rounded-sm" :class="config.brandIdentity.template === 'visual-story' ? 'bg-white/15 dark:bg-black/15' : 'bg-[#f0f4f9] dark:bg-[#3a3a3f]'"></div>
-                      <div class="h-4 grid grid-cols-3 gap-1">
-                        <div class="rounded-sm" :class="config.brandIdentity.template === 'visual-story' ? 'bg-white/15 dark:bg-black/15' : 'bg-[#f0f4f9] dark:bg-[#3a3a3f]'"></div>
-                        <div class="rounded-sm" :class="config.brandIdentity.template === 'visual-story' ? 'bg-white/15 dark:bg-black/15' : 'bg-[#f0f4f9] dark:bg-[#3a3a3f]'"></div>
-                        <div class="rounded-sm" :class="config.brandIdentity.template === 'visual-story' ? 'bg-white/15 dark:bg-black/15' : 'bg-[#f0f4f9] dark:bg-[#3a3a3f]'"></div>
-                      </div>
-                    </div>
-                    <p class="text-sm font-semibold mb-0.5" :class="config.brandIdentity.template === 'visual-story' ? 'text-white dark:text-[#1e1f20]' : 'text-[#1e1f20] dark:text-[#e3e3e3]'">
-                      Historia Visual
-                    </p>
-                    <p class="text-sm" :class="config.brandIdentity.template === 'visual-story' ? 'text-white/60 dark:text-[#1e1f20]/60' : 'text-[#9aa0a6]'">
-                      Boutique · Editorial
-                    </p>
-                    <div v-if="config.brandIdentity.template === 'visual-story'" class="absolute top-3.5 right-3.5 w-4 h-4 rounded-full bg-white dark:bg-[#1e1f20] flex items-center justify-center">
-                      <svg class="w-2.5 h-2.5 text-[#1e1f20] dark:text-[#e3e3e3]" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                      </svg>
-                    </div>
-                  </button>
-
-                  <!-- Urban Streetwear -->
-                  <button
-                    @click="config.brandIdentity.template = 'urban-street'"
-                    class="group relative p-5 rounded-xl border-2 transition-all duration-200 text-left"
-                    :class="config.brandIdentity.template === 'urban-street'
-                      ? 'border-[#1e1f20] dark:border-[#e3e3e3] bg-[#1e1f20] dark:bg-[#e3e3e3]'
-                      : 'border-[#e8eaed] dark:border-[#3a3a3f] hover:border-[#c0c4c8] dark:hover:border-[#5f6368] bg-white dark:bg-[#282a2c]'"
-                  >
-                    <!-- Wireframe grid visual -->
-                    <div class="w-full h-16 rounded-lg overflow-hidden mb-4 grid grid-cols-2 gap-1">
-                      <div class="rounded-sm" :class="config.brandIdentity.template === 'urban-street' ? 'bg-white/15 dark:bg-black/15' : 'bg-[#f0f4f9] dark:bg-[#3a3a3f]'"></div>
-                      <div class="rounded-sm" :class="config.brandIdentity.template === 'urban-street' ? 'bg-white/15 dark:bg-black/15' : 'bg-[#f0f4f9] dark:bg-[#3a3a3f]'"></div>
-                      <div class="rounded-sm" :class="config.brandIdentity.template === 'urban-street' ? 'bg-white/15 dark:bg-black/15' : 'bg-[#f0f4f9] dark:bg-[#3a3a3f]'"></div>
-                      <div class="rounded-sm" :class="config.brandIdentity.template === 'urban-street' ? 'bg-white/15 dark:bg-black/15' : 'bg-[#f0f4f9] dark:bg-[#3a3a3f]'"></div>
-                    </div>
-                    <p class="text-sm font-semibold mb-0.5" :class="config.brandIdentity.template === 'urban-street' ? 'text-white dark:text-[#1e1f20]' : 'text-[#1e1f20] dark:text-[#e3e3e3]'">
-                      Urban Streetwear
-                    </p>
-                    <p class="text-sm" :class="config.brandIdentity.template === 'urban-street' ? 'text-white/60 dark:text-[#1e1f20]/60' : 'text-[#9aa0a6]'">
-                      Urbano · Premium
-                    </p>
-                    <div v-if="config.brandIdentity.template === 'urban-street'" class="absolute top-3.5 right-3.5 w-4 h-4 rounded-full bg-white dark:bg-[#1e1f20] flex items-center justify-center">
-                      <svg class="w-2.5 h-2.5 text-[#1e1f20] dark:text-[#e3e3e3]" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                      </svg>
-                    </div>
-                  </button>
-
-                </div>
               </div>
             </div>
 
@@ -1529,10 +2284,16 @@
       </div> <!-- Cierra p-8 space-y-6 max-w-5xl mx-auto -->
       </div> <!-- Cierra overflow-y-auto scroll area -->
     </main>
+    </Transition>
     
     <!-- PREVIEW DERECHO - Solo Vista Móvil (Fija) - Gemini -->
-    <aside class="flex-shrink-0 w-[560px] bg-white dark:bg-[#1e1f20] border-l border-[#e8eaed] dark:border-[#3a3a3f] flex flex-col overflow-hidden">
-      <div class="flex-1 flex flex-col overflow-hidden py-6 px-6">
+    <Transition
+      enter-active-class="transition-all duration-700 ease-out"
+      enter-from-class="opacity-0 translate-x-10"
+      enter-to-class="opacity-100 translate-x-0"
+    >
+    <aside v-if="showPreviewPanel" class="flex-shrink-0 w-[440px] bg-white dark:bg-[#1e1f20] border-l border-[#e8eaed] dark:border-[#3a3a3f] flex flex-col overflow-hidden">
+      <div class="flex-1 flex flex-col overflow-hidden py-4 px-4">
         <div class="flex flex-col h-full">
           <!-- Preview Header - Gemini -->
           <div class="flex-shrink-0 mb-5 flex items-center justify-between">
@@ -1553,7 +2314,7 @@
           </div>
         
           <!-- Marco de Dispositivo Móvil con Iframe Real -->
-          <div class="flex-1 flex items-start justify-center overflow-hidden pt-2">
+          <div class="flex-1 flex items-center justify-center overflow-hidden">
             <div 
               class="relative bg-white transition-all duration-300 overflow-hidden isolate rounded-[3rem] shadow-2xl dark:shadow-black/80 flex-shrink-0"
               style="container-type: inline-size; width: 375px; height: 740px; transform: scale(0.95); transform-origin: top center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.1);"
@@ -1591,8 +2352,9 @@
         </div>
       </div>
     </aside>
+    </Transition>
 
-  </div> <!-- Cierra flex h-full -->
+  </div> <!-- Cierra flex h-full (configured) -->
 
   <!-- ======================================================= -->
   <!-- MODAL: Selector de Pares Tipográficos                   -->
@@ -1701,6 +2463,233 @@
     </Transition>
   </Teleport>
 
+  <!-- ======================================================= -->
+  <!-- MODAL: Restablecer Identidad Visual                     -->
+  <!-- ======================================================= -->
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition duration-250 ease-out"
+      enter-from-class="opacity-0 scale-95"
+      enter-to-class="opacity-100 scale-100"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="opacity-100 scale-100"
+      leave-to-class="opacity-0 scale-95"
+    >
+      <div
+        v-if="showResetModal"
+        class="fixed inset-0 z-[9999] flex items-center justify-center p-6"
+      >
+        <!-- Backdrop premium -->
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-md" @click="showResetModal = false"></div>
+
+        <!-- Panel -->
+        <div class="relative bg-white dark:bg-[#18181b] rounded-3xl shadow-[0_40px_80px_-12px_rgba(0,0,0,0.5)] dark:shadow-[0_40px_80px_-12px_rgba(0,0,0,0.9)] border border-[#e8eaed] dark:border-[#27272a] w-full max-w-2xl flex flex-col overflow-hidden">
+
+          <!-- Paso 1: Copia de seguridad -->
+          <template v-if="resetStep === 1">
+            <!-- Header con borde inferior -->
+            <div class="px-10 pt-10 pb-7 border-b border-[#f0f2f5] dark:border-[#27272a]">
+              <!-- Pill de paso -->
+              <div class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-950/60 border border-amber-100 dark:border-amber-900/40 rounded-full mb-5">
+                <span class="w-2 h-2 rounded-full bg-amber-500 dark:bg-amber-400"></span>
+                <span class="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-widest">Paso 1 de 2</span>
+              </div>
+              <h2 class="text-2xl font-bold text-[#1e1f20] dark:text-white mb-2">Guarda una copia antes de continuar</h2>
+              <p class="text-[15px] text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">
+                Tu identidad visual actual — colores, tipografías, textos y configuración — puede descargarse como archivo de respaldo. Si en el futuro quieres volver, solo tienes que cargarlo.
+              </p>
+            </div>
+
+            <!-- Cuerpo: tarjeta visual de lo que se va a perder -->
+            <div class="px-10 py-7">
+              <div class="rounded-2xl border border-[#e8eaed] dark:border-[#27272a] overflow-hidden">
+                <div class="px-5 py-3.5 bg-[#f8f9fa] dark:bg-[#27272a] border-b border-[#e8eaed] dark:border-[#3a3a3f]">
+                  <p class="text-xs font-bold text-[#9aa0a6] uppercase tracking-widest">Se restablecerá</p>
+                </div>
+                <div class="px-5 py-4 grid grid-cols-2 gap-3">
+                  <div v-for="item in ['Paleta de colores IA', 'Tipografías', 'Textos del banner', 'Mensajes de valor', 'Anuncios', 'Configuración visual']" :key="item"
+                    class="flex items-center gap-2.5 text-sm text-[#5f6368] dark:text-[#9aa0a6]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#dadce0] dark:bg-[#3a3a3f] flex-shrink-0"></span>
+                    {{ item }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="px-10 pb-10 flex flex-col gap-3">
+              <button
+                @click="downloadBackupAndContinue"
+                :disabled="isDownloadingBackup"
+                class="w-full px-6 py-4 bg-[#1e1f20] dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-[#1e1f20] text-[15px] font-semibold rounded-2xl transition-all duration-200 flex items-center justify-center gap-2.5 disabled:opacity-50 shadow-lg shadow-black/10"
+              >
+                <svg v-if="!isDownloadingBackup" class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+                <svg v-else class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                Descargar copia y continuar
+              </button>
+
+              <button
+                @click="resetStep = 2"
+                class="w-full px-6 py-3.5 bg-transparent hover:bg-[#f8f9fa] dark:hover:bg-[#27272a] text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#1e1f20] dark:hover:text-white text-[15px] font-medium rounded-2xl border border-[#e8eaed] dark:border-[#27272a] transition-all duration-200"
+              >
+                Continuar sin guardar copia
+              </button>
+
+              <button
+                @click="showResetModal = false"
+                class="w-full px-6 py-2.5 text-sm text-[#9aa0a6] hover:text-[#5f6368] dark:hover:text-[#e3e3e3] transition-colors"
+              >
+                Cancelar
+              </button>
+            </div>
+          </template>
+
+          <!-- Paso 2: Confirmación final -->
+          <template v-else-if="resetStep === 2">
+            <div class="px-10 pt-10 pb-7 border-b border-[#f0f2f5] dark:border-[#27272a]">
+              <div class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 dark:bg-red-950/60 border border-red-100 dark:border-red-900/40 rounded-full mb-5">
+                <span class="w-2 h-2 rounded-full bg-red-500 dark:bg-red-400"></span>
+                <span class="text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-widest">Paso 2 de 2 · Irreversible</span>
+              </div>
+              <h2 class="text-2xl font-bold text-[#1e1f20] dark:text-white mb-2">¿Confirmar restablecimiento?</h2>
+              <p class="text-[15px] text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">
+                Tu tienda volverá a los valores por defecto. La identidad generada por IA se eliminará permanentemente.
+              </p>
+            </div>
+
+            <div class="px-10 py-7">
+              <div class="rounded-2xl bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/40 px-5 py-4 flex items-start gap-3">
+                <svg class="w-5 h-5 text-red-500 dark:text-red-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                </svg>
+                <p class="text-sm text-red-700 dark:text-red-400 leading-relaxed">Esta acción <strong>no se puede deshacer</strong>. Si no descargaste una copia de seguridad, perderás toda tu identidad visual permanentemente.</p>
+              </div>
+            </div>
+
+            <div class="px-10 pb-10 flex flex-col gap-3">
+              <button
+                @click="executeReset"
+                :disabled="isResetting"
+                class="w-full px-6 py-4 bg-red-600 hover:bg-red-700 text-white text-[15px] font-semibold rounded-2xl transition-all duration-200 flex items-center justify-center gap-2.5 disabled:opacity-50 shadow-lg shadow-red-600/20"
+              >
+                <svg v-if="!isResetting" class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+                <svg v-else class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                {{ isResetting ? 'Restableciendo...' : 'Sí, restablecer todo' }}
+              </button>
+
+              <button
+                @click="resetStep = 1"
+                class="w-full px-6 py-3.5 bg-transparent hover:bg-[#f8f9fa] dark:hover:bg-[#27272a] text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#1e1f20] dark:hover:text-white text-[15px] font-medium rounded-2xl border border-[#e8eaed] dark:border-[#27272a] transition-all duration-200"
+              >
+                ← Volver y descargar copia
+              </button>
+            </div>
+          </template>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+
+  <!-- ======================================================= -->
+  <!-- MODAL: Cargar Plantilla de Copia de Seguridad           -->
+  <!-- ======================================================= -->
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition duration-250 ease-out"
+      enter-from-class="opacity-0 scale-95"
+      enter-to-class="opacity-100 scale-100"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="opacity-100 scale-100"
+      leave-to-class="opacity-0 scale-95"
+    >
+      <div
+        v-if="showRestoreModal"
+        class="fixed inset-0 z-[9999] flex items-center justify-center p-6"
+      >
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-md" @click="showRestoreModal = false"></div>
+        <div
+          class="relative bg-white dark:bg-[#18181b] rounded-3xl shadow-[0_40px_80px_-12px_rgba(0,0,0,0.5)] dark:shadow-[0_40px_80px_-12px_rgba(0,0,0,0.9)] border border-[#e8eaed] dark:border-[#27272a] w-full max-w-2xl overflow-hidden"
+        >
+          <!-- Header -->
+          <div class="px-10 pt-10 pb-7 border-b border-[#f0f2f5] dark:border-[#27272a]">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 dark:bg-blue-950/60 border border-blue-100 dark:border-blue-900/40 rounded-full mb-5">
+              <span class="w-2 h-2 rounded-full bg-blue-500 dark:bg-blue-400"></span>
+              <span class="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-widest">Restaurar plantilla</span>
+            </div>
+            <h2 class="text-2xl font-bold text-[#1e1f20] dark:text-white mb-2">Cargar copia de seguridad</h2>
+            <p class="text-[15px] text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">
+              Selecciona el archivo <code class="text-sm bg-[#f0f4f9] dark:bg-[#27272a] px-1.5 py-0.5 rounded font-mono">.json</code> que exportaste antes. Tu tienda quedará exactamente igual a como estaba en ese momento.
+            </p>
+          </div>
+
+          <!-- Drop zone -->
+          <div class="px-10 py-7">
+            <div
+              class="group border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all duration-200"
+              :class="restoreData
+                ? 'border-[#1a73e8] dark:border-[#8ab4f8] bg-blue-50/50 dark:bg-blue-950/20'
+                : 'border-[#dadce0] dark:border-[#3a3a3f] hover:border-[#1a73e8] dark:hover:border-[#8ab4f8] hover:bg-[#f8f9fa] dark:hover:bg-[#27272a]/50'"
+              @click="backupFileInput?.click()"
+              @dragover.prevent
+              @drop.prevent="handleBackupDrop"
+            >
+              <template v-if="restoreData">
+                <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center mx-auto mb-3">
+                  <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                </div>
+                <p class="text-base font-semibold text-[#1e1f20] dark:text-white">{{ restoreFileName }}</p>
+                <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-1">Archivo listo para restaurar · <button class="text-[#1a73e8] dark:text-[#8ab4f8] underline" @click.stop="restoreData = null; restoreFileName = ''">Cambiar</button></p>
+              </template>
+              <template v-else>
+                <svg class="w-10 h-10 text-[#dadce0] dark:text-[#3a3a3f] mx-auto mb-3 group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                </svg>
+                <p class="text-[15px] font-medium text-[#5f6368] dark:text-[#9aa0a6]">Haz clic o arrastra tu archivo aquí</p>
+                <p class="text-sm text-[#9aa0a6] dark:text-[#5f6368] mt-1">Archivos <code class="font-mono">.json</code> de copia de seguridad</p>
+              </template>
+            </div>
+            <input ref="backupFileInput" type="file" accept=".json" class="hidden" @change="handleBackupFileSelect" />
+          </div>
+
+          <div class="px-10 pb-10 flex flex-col gap-3">
+            <button
+              @click="executeRestore"
+              :disabled="!restoreData || isRestoring"
+              class="w-full px-6 py-4 bg-[#1a73e8] hover:bg-[#1557b0] text-white text-[15px] font-semibold rounded-2xl transition-all duration-200 flex items-center justify-center gap-2.5 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-blue-600/20"
+            >
+              <svg v-if="!isRestoring" class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+              </svg>
+              <svg v-else class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+              {{ isRestoring ? 'Restaurando identidad...' : 'Restaurar esta plantilla' }}
+            </button>
+            <button
+              @click="showRestoreModal = false; restoreData = null; restoreFileName = ''"
+              class="w-full px-6 py-2.5 text-sm text-[#9aa0a6] hover:text-[#5f6368] dark:hover:text-[#e3e3e3] transition-colors"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+
   <!-- Toast de Éxito -->
   <Transition
     enter-active-class="transition duration-300 ease-out"
@@ -1712,11 +2701,17 @@
   >
     <div 
       v-if="showSuccessToast" 
-      class="fixed bottom-6 right-6 bg-[#1e8e3e] text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 z-50 border border-[#1e8e3e]/50"
+      :class="toastIsError
+        ? 'bg-red-600 border-red-500/50'
+        : 'bg-[#1e8e3e] border-[#1e8e3e]/50'"
+      class="fixed bottom-6 right-6 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 z-[99999] border"
     >
       <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <svg v-if="!toastIsError" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+        <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </div>
       <div>
@@ -1754,7 +2749,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['navigate', 'changeModule', 'openQuotationInPos', 'refresh'])
+const emit = defineEmits(['navigate', 'changeModule', 'openQuotationInPos', 'openReturnInPos', 'refresh'])
 
 // Refs
 const logoInput = ref(null)
@@ -1777,6 +2772,7 @@ const catalogUrl = computed(() => {
 // State
 const isSaving = ref(false)
 const showSuccessToast = ref(false)
+const toastIsError = ref(false)
 const toastMessage = reactive({
   title: '¡Guardado!',
   description: 'Vista previa actualizada.'
@@ -1795,10 +2791,261 @@ const isRecordingVoice = ref(false)
 const voiceRecognition = ref(null)
 const aiGenerationProgress = ref('')
 
+// Store name reactive computed (used in choosing phone preview)
+const storeName = computed(() => appStore.systemSettings?.store_name || 'Mi Tienda')
+
+// Onboarding UX State
+// 'loading' → esperando servidor | 'welcome' → sin identidad | 'brief-only' → chat activo
+// 'choosing' → carrusel de 5 diseños | 'configured' → con identidad, panel 3 columnas
+const catalogUiMode = ref('loading')
+const showConfigPanel = ref(false)   // animates in after AI generation
+const showPreviewPanel = ref(false)  // loads last for wow effect
+
+// ── Choosing mode: carousel de diseños ──────────────────────────────────
+const generatedDesigns = ref([])    // array de hasta 5 diseños generados
+const currentDesignIdx = ref(0)     // índice activo en el carrusel
+const designsReady = ref(0)         // cuántos diseños han llegado (para progress)
+const isChoosingApplying = ref(false) // aplicando el diseño elegido
+const choosingIframeKey = ref(0)    // incrementar para forzar recarga del iframe
+const isChoosingIframeLoading = ref(true) // spinner mientras carga el iframe
+const choosingIframeEl = ref(null)          // ref al elemento iframe
+
+// ── Upload-images mode: paso de subida de imágenes del hook ─────────────
+const ONBOARDING_DRAFT_KEY = 'ai_onboarding_draft'
+const uploadSubStep = ref(1) // 1=hero, 2=hook, 3=historia
+const onboardingImages = ref({
+  // Paso 1: Hero / carrusel banner
+  hero_images: ['', '', ''],
+  // Paso 2: Hook (según hook_style)
+  editorial_image: '',
+  lookbook_images: ['', '', ''],
+  bento_main: '',
+  bento_detail: '',
+  bento_secondary: '',
+  // Paso 3: Historia visual
+  story_image: ''
+})
+const isOnboardingImagesSaving = ref(false)
+const onboardingPreviewKey = ref(0)
+const isOnboardingPreviewLoading = ref(true)
+const onboardingPreviewEl = ref(null)
+// file input refs para onboarding
+const ob_editorial = ref(null)
+const ob_lookbook = ref([])
+const ob_bento_main = ref(null)
+const ob_bento_detail = ref(null)
+const ob_bento_secondary = ref(null)
+const ob_hero = ref([])
+const ob_story = ref(null)
+
+// Hook del diseño elegido (leído de aiBrandData)
+const onboardingHookStyle = computed(() => {
+  return aiBrandData.value?.layout_config?.hook_style || 'editorial-story'
+})
+
+// Construye el payload de preview incluyendo las imágenes del onboarding
+const buildOnboardingPreviewPayload = () => {
+  if (!aiBrandData.value) return null
+  return JSON.parse(JSON.stringify({
+    ...buildPreviewPayload(aiBrandData.value),
+    _catalog_media: {
+      hero_images: onboardingImages.value.hero_images.filter(Boolean),
+      editorial_image: onboardingImages.value.editorial_image || '',
+      lookbook_images: onboardingImages.value.lookbook_images.filter(Boolean),
+      bento_main: onboardingImages.value.bento_main || '',
+      bento_detail: onboardingImages.value.bento_detail || '',
+      bento_secondary: onboardingImages.value.bento_secondary || '',
+      story_image: onboardingImages.value.story_image || '',
+    }
+  }))
+}
+
+// Escribe al localStorage y recarga el iframe de onboarding
+const updateOnboardingPreview = () => {
+  const payload = buildOnboardingPreviewPayload()
+  if (!payload) return
+  try { localStorage.setItem('ai_design_preview', JSON.stringify(payload)) } catch (e) {}
+  isOnboardingPreviewLoading.value = true
+  onboardingPreviewKey.value++
+}
+
+// Trigger de file input
+const triggerOnboardingFile = (type, idx = null) => {
+  if (type === 'editorial_image') ob_editorial.value?.click()
+  else if (type === 'bento_main') ob_bento_main.value?.click()
+  else if (type === 'bento_detail') ob_bento_detail.value?.click()
+  else if (type === 'bento_secondary') ob_bento_secondary.value?.click()
+  else if (type === 'lookbook_images' && idx !== null) ob_lookbook.value[idx]?.click()
+  else if (type === 'hero_images' && idx !== null) ob_hero.value[idx]?.click()
+  else if (type === 'story_image') ob_story.value?.click()
+}
+
+// Manejo de archivo seleccionado
+const handleOnboardingFile = (event, type, idx = null) => {
+  const file = event.target.files[0]
+  if (!file) return
+  if (file.size > 2 * 1024 * 1024) { showWarning('El archivo es muy grande. Máximo 2MB.'); return }
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    const b64 = e.target.result
+    if (type === 'editorial_image') onboardingImages.value.editorial_image = b64
+    else if (type === 'bento_main') onboardingImages.value.bento_main = b64
+    else if (type === 'bento_detail') onboardingImages.value.bento_detail = b64
+    else if (type === 'bento_secondary') onboardingImages.value.bento_secondary = b64
+    else if (type === 'lookbook_images' && idx !== null) onboardingImages.value.lookbook_images[idx] = b64
+    else if (type === 'hero_images' && idx !== null) onboardingImages.value.hero_images[idx] = b64
+    else if (type === 'story_image') onboardingImages.value.story_image = b64
+    updateOnboardingPreview()
+    // Auto-save draft
+    saveOnboardingDraft()
+  }
+  reader.readAsDataURL(file)
+  // reset input so same file can be re-selected
+  event.target.value = ''
+}
+
+// Guardar borrador en localStorage
+const saveOnboardingDraft = () => {
+  try {
+    localStorage.setItem(ONBOARDING_DRAFT_KEY, JSON.stringify({
+      pending: true,
+      hook: onboardingHookStyle.value,
+      uploadSubStep: uploadSubStep.value,
+      ...onboardingImages.value,
+      saved_at: Date.now()
+    }))
+  } catch (e) {}
+}
+
+// Restaurar borrador (si existe) al entrar al modo upload-images
+const restoreOnboardingDraft = () => {
+  try {
+    const raw = localStorage.getItem(ONBOARDING_DRAFT_KEY)
+    if (!raw) return
+    const draft = JSON.parse(raw)
+    if (!draft.pending) return
+    uploadSubStep.value = draft.uploadSubStep || 1
+    onboardingImages.value = {
+      hero_images: draft.hero_images || ['', '', ''],
+      editorial_image: draft.editorial_image || '',
+      lookbook_images: draft.lookbook_images || ['', '', ''],
+      bento_main: draft.bento_main || '',
+      bento_detail: draft.bento_detail || '',
+      bento_secondary: draft.bento_secondary || '',
+      story_image: draft.story_image || '',
+    }
+  } catch (e) {}
+}
+
+// Guardar borrador y QUEDARSE en upload-images (no navegar al panel)
+const saveAndExitOnboarding = () => {
+  saveOnboardingDraft()
+  showSuccess('Borrador guardado. Puedes retomarlo cuando quieras.')
+}
+
+// Omitir completamente el paso de fotos (sí navega al panel, sin guardar borrador)
+const skipOnboarding = async () => {
+  try { localStorage.removeItem(ONBOARDING_DRAFT_KEY) } catch (e) {}
+  catalogUiMode.value = 'configured'
+  await loadConfiguration()
+  await nextTick()
+  setTimeout(() => { showConfigPanel.value = true }, 80)
+  setTimeout(() => { showPreviewPanel.value = true; refreshPreview() }, 600)
+}
+
+// Finalizar onboarding: guardar imágenes + ir al panel
+const finishOnboarding = async () => {
+  isOnboardingImagesSaving.value = true
+  try {
+    // Copiar imágenes al config.catalogMedia para que saveConfiguration las incluya
+    const heroFiltered = onboardingImages.value.hero_images.filter(Boolean)
+    if (heroFiltered.length > 0) config.catalogMedia.hero_images = heroFiltered
+    if (onboardingImages.value.editorial_image)
+      config.catalogMedia.editorial_image = onboardingImages.value.editorial_image
+    if (onboardingImages.value.bento_main)
+      config.catalogMedia.bento_main = onboardingImages.value.bento_main
+    if (onboardingImages.value.bento_detail)
+      config.catalogMedia.bento_detail = onboardingImages.value.bento_detail
+    if (onboardingImages.value.bento_secondary)
+      config.catalogMedia.bento_secondary = onboardingImages.value.bento_secondary
+    if (onboardingImages.value.story_image)
+      config.catalogMedia.story_image = onboardingImages.value.story_image
+    const cleanLookbook = onboardingImages.value.lookbook_images.filter(Boolean)
+    if (cleanLookbook.length > 0)
+      config.catalogMedia.lookbook_images = [...cleanLookbook, ...config.catalogMedia.lookbook_images].slice(0, 4)
+
+    await saveConfiguration()
+    // Eliminar borrador
+    try { localStorage.removeItem(ONBOARDING_DRAFT_KEY) } catch (e) {}
+
+    catalogUiMode.value = 'configured'
+    await loadConfiguration()
+    await nextTick()
+    setTimeout(() => { showConfigPanel.value = true }, 80)
+    setTimeout(() => { showPreviewPanel.value = true; refreshPreview() }, 600)
+  } catch (err) {
+    showWarning('No se pudieron guardar las imágenes. Intenta de nuevo.')
+  } finally {
+    isOnboardingImagesSaving.value = false
+  }
+}
+
+// Construye el objeto de preview con datos de la tienda incluidos
+const buildPreviewPayload = (design) => {
+  // JSON round-trip ensures plain object (no Vue Proxy) — required for postMessage structured clone
+  return JSON.parse(JSON.stringify({
+    ...design,
+    _store_name: storeName.value,
+    _logo_url: config.brandIdentity?.logo || '',
+    _whatsapp: config.ordersConfig?.whatsappNumber || '',
+  }))
+}
+
+// Escribe el diseño actual al localStorage para que el iframe lo lea
+const writeDesignPreview = (design) => {
+  if (!design) return
+  try { localStorage.setItem('ai_design_preview', JSON.stringify(buildPreviewPayload(design))) } catch (e) {}
+}
+
+// Cuando cambia el índice: escribir en localStorage y recargar el iframe
+// (el iframe carga instantáneo en ai_preview mode porque no hace llamadas API)
+watch(currentDesignIdx, (idx) => {
+  const design = generatedDesigns.value[idx]
+  if (!design) return
+  writeDesignPreview(design)
+  isChoosingIframeLoading.value = true
+  choosingIframeKey.value++
+})
+
+// Cuando llega el primer diseño, inicializar el iframe (una sola vez)
+watch(generatedDesigns, (designs) => {
+  if (designs.length > 0 && catalogUiMode.value === 'choosing') {
+    const current = designs[currentDesignIdx.value] ?? designs[0]
+    writeDesignPreview(current)
+    if (choosingIframeKey.value === 0) {
+      isChoosingIframeLoading.value = true
+      choosingIframeKey.value = 1
+    }
+  }
+}, { deep: false })
+
 // Color Refinement State
 const showColorRefinement = ref(false)
 const colorRefinementPrompt = ref('')
 const isRegeneratingColors = ref(false)
+
+// Reset Modal State
+const showResetModal = ref(false)
+const resetStep = ref(1)
+const isResetting = ref(false)
+const isDownloadingBackup = ref(false)
+
+// Restore Modal State
+const showRestoreModal = ref(false)
+const backupFileInput = ref(null)
+const restoreData = ref(null)
+const restoreFileName = ref('')
+const isRestoring = ref(false)
 
 // Font Modal State
 const showFontModal = ref(false)
@@ -2046,7 +3293,9 @@ const config = reactive({
     lookbook_video: '',                // Urban Lookbook: video opcional
     bento_main: '',                    // Dynamic Bento: imagen principal
     bento_detail: '',                  // Dynamic Bento: imagen detalle
-    editorial_image: ''                // Editorial Story: imagen inspiracional
+    bento_secondary: '',               // Dynamic Bento: imagen secundaria
+    editorial_image: '',               // Editorial Story: imagen inspiracional
+    story_image: ''                    // Historia visual
   },
   inventoryVisibility: {
     visibleCategories: [], 
@@ -2069,38 +3318,25 @@ const availableCategories = ref([])
 // Load categories from store
 onMounted(async () => {
   isLoading.value = true
-  
-  // Cargar categorías desde la API con autenticación
-  try {
-    const response = await apiClient.get('/categories-pos')
-    
-    // La API devuelve {success: true, data: Array, message: '...'}
-    const categoriesData = response.data?.data || response.data
-    
-    if (categoriesData && Array.isArray(categoriesData)) {
-      availableCategories.value = categoriesData.map(cat => ({
-        id: cat.id,
-        name: cat.name
-      }))
-    } else {
-      console.warn('No se encontraron categorías en la respuesta')
-      availableCategories.value = []
-    }
-  } catch (error) {
-    console.error('Error cargando categorías:', error)
-    // Fallback: usar categorías del appStore si falló la API
-    if (appStore.categories && appStore.categories.length > 0) {
-      availableCategories.value = appStore.categories
-    } else {
-      availableCategories.value = []
-    }
-  }
 
-  // Load existing configuration from backend
-  await loadConfiguration()
-  
-  // Load AI brand data
-  await loadAiBrandData()
+  // ⚡ Las 3 llamadas en paralelo — reduce el tiempo de carga ~60-70%
+  const [categoriesRes] = await Promise.allSettled([
+    apiClient.get('/categories-pos'),
+    loadConfiguration(),
+    loadAiBrandData()
+  ])
+
+  // Procesar categorías
+  if (categoriesRes.status === 'fulfilled') {
+    const categoriesData = categoriesRes.value?.data?.data || categoriesRes.value?.data
+    if (categoriesData && Array.isArray(categoriesData)) {
+      availableCategories.value = categoriesData.map(cat => ({ id: cat.id, name: cat.name }))
+    } else {
+      availableCategories.value = appStore.categories?.length ? appStore.categories : []
+    }
+  } else {
+    availableCategories.value = appStore.categories?.length ? appStore.categories : []
+  }
   
   // Validación final: Asegurar que la plantilla sea válida
   config.brandIdentity.template = getValidTemplate(config.brandIdentity.template)
@@ -2135,6 +3371,38 @@ onMounted(async () => {
   // ya no tengan efecto secundario aunque algo cambie en el siguiente tick
   isInitializing.value = false
   isLoading.value = false
+
+  // Determinar modo de UI: si no hay identidad de marca, mostrar onboarding
+  // Solo cambiar el modo si NO estamos ya en 'configured' o 'upload-images'
+  if (catalogUiMode.value !== 'configured' && catalogUiMode.value !== 'upload-images') {
+    if (aiBrandData.value && aiBrandData.value.color_palette) {
+      // Ya tiene identidad creada — verificar si hay borrador de imágenes pendiente
+      let hasDraft = false
+      try {
+        const raw = localStorage.getItem(ONBOARDING_DRAFT_KEY)
+        if (raw) {
+          const draft = JSON.parse(raw)
+          hasDraft = draft.pending === true
+        }
+      } catch (e) {}
+
+      if (hasDraft) {
+        // Retomar el paso de subida de imágenes
+        catalogUiMode.value = 'upload-images'
+        restoreOnboardingDraft()
+        await nextTick()
+        updateOnboardingPreview()
+      } else {
+        // Ya tiene identidad y no hay borrador → ir directo al panel completo
+        catalogUiMode.value = 'configured'
+        showConfigPanel.value = true
+        showPreviewPanel.value = true
+      }
+    } else {
+      // Primera vez → mostrar pantalla de bienvenida
+      catalogUiMode.value = 'welcome'
+    }
+  }
 })
 
 // Validación: Desactivar catálogo automáticamente si no hay categorías O número WhatsApp
@@ -2399,15 +3667,17 @@ const loadConfiguration = async () => {
       config.businessRules.syncWithCashRegister = data.sync_with_cash_register ?? false
 
       // Cargar medios del catálogo (catalog_media puede venir como string o como objeto)
-      const rawMedia = typeof data.catalog_media === 'string'
+      const rawMedia = (typeof data.catalog_media === 'string'
         ? JSON.parse(data.catalog_media)
-        : (data.catalog_media || {})
+        : data.catalog_media) || {}
       config.catalogMedia.hero_images       = rawMedia.hero_images       || ['', '', '']
       config.catalogMedia.lookbook_images   = rawMedia.lookbook_images   || ['', '', '', '']
       config.catalogMedia.lookbook_video    = rawMedia.lookbook_video    || ''
       config.catalogMedia.bento_main        = rawMedia.bento_main        || ''
       config.catalogMedia.bento_detail      = rawMedia.bento_detail      || ''
+      config.catalogMedia.bento_secondary   = rawMedia.bento_secondary   || ''
       config.catalogMedia.editorial_image   = rawMedia.editorial_image   || ''
+      config.catalogMedia.story_image       = rawMedia.story_image       || ''
     }
   } catch (error) {
     console.error('Error loading configuration:', error)
@@ -2453,12 +3723,14 @@ const saveConfiguration = async () => {
       },
       // Medios contextuales por diseño activo
       catalog_media: {
-        hero_images: config.catalogMedia.hero_images.filter(Boolean),
-        lookbook_images: config.catalogMedia.lookbook_images.filter(Boolean),
+        hero_images: config.catalogMedia.hero_images?.filter(Boolean) ?? [],
+        lookbook_images: config.catalogMedia.lookbook_images?.filter(Boolean) ?? [],
         lookbook_video: config.catalogMedia.lookbook_video || null,
         bento_main: config.catalogMedia.bento_main || null,
         bento_detail: config.catalogMedia.bento_detail || null,
-        editorial_image: config.catalogMedia.editorial_image || null
+        bento_secondary: config.catalogMedia.bento_secondary || null,
+        editorial_image: config.catalogMedia.editorial_image || null,
+        story_image: config.catalogMedia.story_image || null
       }
     }
     
@@ -2495,12 +3767,14 @@ const saveConfiguration = async () => {
           ai_cross_sell_messages: aiBrandData.value?.cross_sell_messages || null,
           ai_layout_config: aiBrandData.value?.layout_config || null,
           catalog_media: {
-            hero_images: config.catalogMedia.hero_images.filter(Boolean),
-            lookbook_images: config.catalogMedia.lookbook_images.filter(Boolean),
+            hero_images: config.catalogMedia.hero_images?.filter(Boolean) ?? [],
+            lookbook_images: config.catalogMedia.lookbook_images?.filter(Boolean) ?? [],
             lookbook_video: config.catalogMedia.lookbook_video || null,
             bento_main: config.catalogMedia.bento_main || null,
             bento_detail: config.catalogMedia.bento_detail || null,
-            editorial_image: config.catalogMedia.editorial_image || null
+            bento_secondary: config.catalogMedia.bento_secondary || null,
+            editorial_image: config.catalogMedia.editorial_image || null,
+            story_image: config.catalogMedia.story_image || null
           }
         }
         localStorage.setItem('pos_catalog_config_cache', JSON.stringify(cacheData))
@@ -2519,6 +3793,195 @@ const saveConfiguration = async () => {
 
 // ==================== AI BRAND METHODS ====================
 
+// Open reset modal (replaces confirm())
+const resetAiBrand = () => {
+  resetStep.value = 1
+  showResetModal.value = true
+}
+
+// Download current brand identity as JSON backup and advance to step 2
+const downloadBackupAndContinue = () => {
+  isDownloadingBackup.value = true
+  try {
+    const storeName = (appStore.systemSettings?.store_name || 'mi-tienda')
+      .toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+    const timestamp = new Date().toISOString().slice(0, 10)
+
+    const backup = {
+      version: '1.0',
+      exported_at: new Date().toISOString(),
+      store_name: appStore.systemSettings?.store_name || '',
+      business_description: aiBrandDescription.value || '',
+      color_palette: aiBrandData.value?.color_palette || null,
+      fonts: aiBrandData.value?.fonts || null,
+      recommended_template: aiBrandData.value?.recommended_template || null,
+      banner_texts: aiBrandData.value?.banner_texts || null,
+      about_us: aiBrandData.value?.about_us || null,
+      value_messages: aiBrandData.value?.value_messages || null,
+      announcements: aiBrandData.value?.announcements || null,
+      cross_sell_messages: aiBrandData.value?.cross_sell_messages || null,
+      layout_config: aiBrandData.value?.layout_config || null,
+    }
+
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `identidad-${storeName}-${timestamp}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+
+    // Advance to confirmation step
+    resetStep.value = 2
+  } finally {
+    isDownloadingBackup.value = false
+  }
+}
+
+// Execute the actual reset
+const executeReset = async () => {
+  isResetting.value = true
+  try {
+    await apiClient.post('/web-catalog/ai-brand/reset')
+  } catch (error) {
+    // Silent: reset local state regardless
+  }
+
+  aiBrandData.value = null
+  aiBrandDescription.value = ''
+  showColorRefinement.value = false
+  colorRefinementPrompt.value = ''
+  selectedFontPairId.value = null
+  showResetModal.value = false
+
+  // Limpiar draft e imágenes de onboarding
+  try { localStorage.removeItem(ONBOARDING_DRAFT_KEY) } catch (e) {}
+  try { localStorage.removeItem('ai_design_preview') } catch (e) {}
+  try { localStorage.removeItem('pos_catalog_config_cache') } catch (e) {}
+  uploadSubStep.value = 1
+  onboardingImages.value = {
+    hero_images: ['', '', ''],
+    editorial_image: '',
+    lookbook_images: ['', '', ''],
+    bento_main: '',
+    bento_detail: '',
+    bento_secondary: '',
+    story_image: ''
+  }
+
+  // Limpiar imágenes también en la base de datos
+  config.catalogMedia.hero_images     = ['', '', '']
+  config.catalogMedia.lookbook_images = ['', '', '', '']
+  config.catalogMedia.lookbook_video  = ''
+  config.catalogMedia.bento_main      = ''
+  config.catalogMedia.bento_detail    = ''
+  config.catalogMedia.bento_secondary = ''
+  config.catalogMedia.editorial_image = ''
+  config.catalogMedia.story_image     = ''
+  try {
+    await apiClient.post('/web-catalog/config', {
+      storeActive: false,
+      brandIdentity: { logo: config.brandIdentity.logo, banner: '', primaryColor: config.brandIdentity.primaryColor, template: config.brandIdentity.template },
+      products: { visibleCategories: config.inventoryVisibility.visibleCategories, showPrices: true, hideOutOfStock: false },
+      orders: { allowOrders: true, whatsappNumber: config.ordersConfig.whatsappNumber, customMessage: config.ordersConfig.customMessage },
+      businessRules: { deliveryCost: 0, minimumOrder: 0, syncWithCashRegister: false },
+      catalog_media: null
+    })
+  } catch (e) { /* silent */ }
+
+  // Volver a la pantalla de bienvenida del onboarding
+  showConfigPanel.value = false
+  showPreviewPanel.value = false
+  setTimeout(() => { catalogUiMode.value = 'welcome' }, 200)
+
+  toastIsError.value = false
+  toastMessage.title = 'Identidad restablecida'
+  toastMessage.description = 'Puedes empezar de cero describiendo tu negocio.'
+  showSuccessToast.value = true
+  setTimeout(() => showSuccessToast.value = false, 4000)
+  isResetting.value = false
+}
+
+// Handle file drop on restore zone
+const handleBackupDrop = (event) => {
+  const file = event.dataTransfer?.files?.[0]
+  if (file) parseBackupFile(file)
+}
+
+// Handle file input change
+const handleBackupFileSelect = (event) => {
+  const file = event.target.files?.[0]
+  if (file) parseBackupFile(file)
+  // Reset input so same file can be selected again
+  if (backupFileInput.value) backupFileInput.value.value = ''
+}
+
+// Parse and validate backup JSON
+const parseBackupFile = (file) => {
+  if (!file.name.endsWith('.json')) {
+    toastMessage.title = 'Archivo no válido'
+    toastMessage.description = 'Por favor selecciona un archivo .json de copia de seguridad.'
+    showSuccessToast.value = true
+    setTimeout(() => showSuccessToast.value = false, 4000)
+    return
+  }
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result)
+      if (!data.version || !data.exported_at) {
+        throw new Error('Formato no reconocido')
+      }
+      restoreData.value = data
+      restoreFileName.value = file.name
+    } catch {
+      toastMessage.title = 'Archivo inválido'
+      toastMessage.description = 'El archivo no es una copia de seguridad válida del sistema.'
+      showSuccessToast.value = true
+      setTimeout(() => showSuccessToast.value = false, 4000)
+    }
+  }
+  reader.readAsText(file)
+}
+
+// Send backup data to backend and restore
+const executeRestore = async () => {
+  if (!restoreData.value) return
+  isRestoring.value = true
+  try {
+    const response = await apiClient.post('/web-catalog/ai-brand/restore', restoreData.value)
+    if (response.data.success) {
+      // Reload ALL config so colors, template and AI data update without page refresh
+      await loadConfiguration()
+      await loadAiBrandData()
+      refreshPreview()
+      showRestoreModal.value = false
+      restoreData.value = null
+      restoreFileName.value = ''
+
+      toastIsError.value = false
+      toastMessage.title = 'Plantilla restaurada'
+      toastMessage.description = 'Tu identidad visual ha sido recuperada exitosamente.'
+      showSuccessToast.value = true
+      setTimeout(() => showSuccessToast.value = false, 4000)
+    } else {
+      throw new Error(response.data.message || 'Error al restaurar')
+    }
+  } catch (error) {
+    const msg = error.response?.data?.message
+      || error.response?.data?.errors && Object.values(error.response.data.errors).flat().join(' ')
+      || error.message
+      || 'No se pudo restaurar la plantilla. Intenta de nuevo.'
+    toastIsError.value = true
+    toastMessage.title = 'Error al restaurar'
+    toastMessage.description = msg
+    showSuccessToast.value = true
+    setTimeout(() => { showSuccessToast.value = false; toastIsError.value = false }, 6000)
+  } finally {
+    isRestoring.value = false
+  }
+}
+
 // Load existing AI brand data
 const loadAiBrandData = async () => {
   try {
@@ -2534,7 +3997,7 @@ const loadAiBrandData = async () => {
   }
 }
 
-// Generate brand identity with Groq AI
+// Generate 5 brand identities with Groq AI and open the choosing carousel
 const generateAiBrand = async () => {
   if (!aiBrandDescription.value || aiBrandDescription.value.trim().length < 10) {
     toastMessage.title = 'Descripción muy corta'
@@ -2545,64 +4008,107 @@ const generateAiBrand = async () => {
   }
 
   isGeneratingBrand.value = true
-  aiGenerationProgress.value = 'Analizando tu negocio...'
+  aiGenerationProgress.value = 'Generando 5 diseños únicos para tu marca...'
+  generatedDesigns.value = []
+  designsReady.value = 0
+  currentDesignIdx.value = 0
+
+  // Transition to choosing state immediately so the user sees the progress
+  catalogUiMode.value = 'choosing'
 
   try {
-    // Progress updates
-    setTimeout(() => { if (isGeneratingBrand.value) aiGenerationProgress.value = 'Generando paleta de colores...' }, 2000)
-    setTimeout(() => { if (isGeneratingBrand.value) aiGenerationProgress.value = 'Seleccionando tipografías...' }, 4000)
-    setTimeout(() => { if (isGeneratingBrand.value) aiGenerationProgress.value = 'Redactando textos persuasivos...' }, 6000)
-    setTimeout(() => { if (isGeneratingBrand.value) aiGenerationProgress.value = 'Creando identidad de marca...' }, 8000)
+    // Generate 5 designs in parallel — each slot gets a DISTINCT mood direction
+    const requests = Array.from({ length: 5 }, (_, i) =>
+      apiClient.post('/web-catalog/ai-brand/generate', {
+        business_description: aiBrandDescription.value.trim(),
+        slot: i
+      }).then(res => {
+        if (res.data?.success && res.data?.data) {
+          const design = {
+            ...res.data.data,
+            business_description: aiBrandDescription.value,
+            generated_at: new Date().toISOString()
+          }
+          // Push as they arrive so the phone preview updates progressively
+          generatedDesigns.value = [...generatedDesigns.value, design]
+          designsReady.value++
+        }
+        return null
+      }).catch(() => null)
+    )
 
-    const response = await apiClient.post('/web-catalog/ai-brand/generate', {
-      business_description: aiBrandDescription.value.trim()
-    })
+    await Promise.allSettled(requests)
 
-    if (response.data.success) {
-      aiBrandData.value = {
-        ...response.data.data,
-        business_description: aiBrandDescription.value,
-        generated_at: new Date().toISOString()
-      }
-
-      // Aplicar automáticamente color + plantilla recomendada en backend
-      await apiClient.post('/web-catalog/ai-brand/apply', {
-        apply_colors: true,
-        apply_template: true
-      })
-
-      // Reflejar en estado local para vista previa inmediata
-      if (response.data.data?.color_palette?.primary) {
-        config.brandIdentity.primaryColor = response.data.data.color_palette.primary
-      }
-      if (response.data.data?.recommended_template) {
-        config.brandIdentity.template = getValidTemplate(response.data.data.recommended_template)
-      }
-
-      // Recargar configuración y preview para ver cambios de IA en tiempo real
-      await loadConfiguration()
-      refreshPreview()
-
-      toastMessage.title = 'Identidad generada'
-      toastMessage.description = 'IA aplicada: plantilla, color, fuentes y textos actualizados.'
-      showSuccessToast.value = true
-      setTimeout(() => showSuccessToast.value = false, 4000)
-
-      aiGenerationProgress.value = ''
-    } else {
+    if (generatedDesigns.value.length === 0) {
       toastMessage.title = 'Error'
-      toastMessage.description = response.data.message || 'No se pudo generar la identidad.'
+      toastMessage.description = 'No se pudo generar ningún diseño. Intenta de nuevo.'
+      toastIsError.value = true
       showSuccessToast.value = true
       setTimeout(() => showSuccessToast.value = false, 5000)
+      catalogUiMode.value = 'brief-only'
     }
   } catch (error) {
     toastMessage.title = 'Error de conexión'
     toastMessage.description = 'No se pudo conectar con el servicio de IA.'
+    toastIsError.value = true
     showSuccessToast.value = true
     setTimeout(() => showSuccessToast.value = false, 5000)
+    catalogUiMode.value = 'brief-only'
   } finally {
     isGeneratingBrand.value = false
     aiGenerationProgress.value = ''
+  }
+}
+
+// Apply the chosen design and transition to the full configured view
+const chooseDesign = async (idx) => {
+  const design = generatedDesigns.value[idx]
+  if (!design) return
+
+  isChoosingApplying.value = true
+  // Limpiar preview temporal
+  try { localStorage.removeItem('ai_design_preview') } catch (e) {}
+
+  try {
+    // Save the chosen design via the apply endpoint
+    await apiClient.post('/web-catalog/ai-brand/apply', {
+      brand_data: design,
+      apply_colors: true,
+      apply_template: true
+    })
+
+    // Reflect locally for instant preview
+    aiBrandData.value = design
+    if (design.color_palette?.primary) {
+      config.brandIdentity.primaryColor = design.color_palette.primary
+    }
+    if (design.recommended_template) {
+      config.brandIdentity.template = getValidTemplate(design.recommended_template)
+    }
+
+    // Cambiar a 'upload-images' para el paso de fotos del hook
+    uploadSubStep.value = 1
+    catalogUiMode.value = 'upload-images'
+
+    // Restaurar borrador si hay uno guardado
+    restoreOnboardingDraft()
+    // Inicializar preview del onboarding con el diseño elegido
+    await nextTick()
+    updateOnboardingPreview()
+
+    toastMessage.title = 'Diseño aplicado'
+    toastMessage.description = 'Ahora personaliza tu tienda con tus propias fotos.'
+    toastIsError.value = false
+    showSuccessToast.value = true
+    setTimeout(() => showSuccessToast.value = false, 4000)
+  } catch (error) {
+    toastMessage.title = 'Error al aplicar'
+    toastMessage.description = 'No se pudo guardar el diseño. Intenta de nuevo.'
+    toastIsError.value = true
+    showSuccessToast.value = true
+    setTimeout(() => showSuccessToast.value = false, 5000)
+  } finally {
+    isChoosingApplying.value = false
   }
 }
 
@@ -2744,6 +4250,12 @@ const stopVoiceRecording = () => {
 @keyframes modalSlideIn {
   from { opacity: 0; transform: translateY(12px) scale(0.97); }
   to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes loading {
+  0%   { transform: translateX(-100%); }
+  50%  { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
 }
 
 /* Simular viewport móvil real */
