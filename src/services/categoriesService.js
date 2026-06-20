@@ -37,9 +37,10 @@ export const categoriesService = {
   async create(categoryData) {
     try {
   // console.log('categoriesService.create - Datos enviados:', categoryData)
+      const isFormData = categoryData instanceof FormData;
       const response = await apiCall('/categories', {
         method: 'POST',
-        body: JSON.stringify(categoryData)
+        body: isFormData ? categoryData : JSON.stringify(categoryData)
       })
   // console.log('categoriesService.create - Respuesta recibida:', response)
       return response // Devolver la respuesta completa que ya tiene { success, data, message }
@@ -51,9 +52,13 @@ export const categoriesService = {
 
   async update(id, categoryData) {
     try {
+      const isFormData = categoryData instanceof FormData;
+      if (isFormData && !categoryData.has('_method')) {
+        categoryData.append('_method', 'PUT');
+      }
       const response = await apiCall(`/categories/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(categoryData)
+        method: isFormData ? 'POST' : 'PUT', // Send as POST for FormData with _method=PUT inside
+        body: isFormData ? categoryData : JSON.stringify(categoryData)
       })
       return response // Devolver la respuesta completa que ya tiene { success, data, message }
     } catch (error) {

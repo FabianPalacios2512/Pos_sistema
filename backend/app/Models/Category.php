@@ -14,6 +14,7 @@ class Category extends Model
         'description',
         'icon',
         'color',
+        'image_url',
         'active',
         'products_count'
     ];

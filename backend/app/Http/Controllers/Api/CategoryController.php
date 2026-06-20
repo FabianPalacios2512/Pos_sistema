@@ -89,6 +89,7 @@ class CategoryController extends Controller
                 'description' => 'nullable|string|max:500',
                 'icon' => 'nullable|string|max:50',
                 'color' => 'nullable|string|max:7',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
                 'active' => 'boolean'
             ]);
 
@@ -100,7 +101,20 @@ class CategoryController extends Controller
                 ], 422);
             }
 
-            $category = Category::create($request->all());
+            $data = $request->except('image');
+
+            if ($request->hasFile('image')) {
+                $tenantId = tenant('id');
+                $path = $request->file('image')->store('categories', 'public');
+                
+                if ($tenantId) {
+                    $data['image_url'] = "/storage/tenants/{$tenantId}/{$path}";
+                } else {
+                    $data['image_url'] = \Storage::url($path);
+                }
+            }
+
+            $category = Category::create($data);
 
             return response()->json([
                 'success' => true,
@@ -159,6 +173,7 @@ class CategoryController extends Controller
                 'description' => 'nullable|string|max:500',
                 'icon' => 'nullable|string|max:50',
                 'color' => 'nullable|string|max:7',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
                 'active' => 'boolean'
             ]);
 
@@ -188,7 +203,28 @@ class CategoryController extends Controller
                 ]);
             }
 
-            $category->update($request->all());
+            $data = $request->except('image');
+
+            if ($request->hasFile('image')) {
+                // Eliminar imagen anterior si existe
+                if ($category->image_url) {
+                    $oldPath = str_replace("/storage/tenants/" . tenant('id') . "/", "", $category->image_url);
+                    if (\Storage::disk('public')->exists($oldPath)) {
+                        \Storage::disk('public')->delete($oldPath);
+                    }
+                }
+
+                $tenantId = tenant('id');
+                $path = $request->file('image')->store('categories', 'public');
+                
+                if ($tenantId) {
+                    $data['image_url'] = "/storage/tenants/{$tenantId}/{$path}";
+                } else {
+                    $data['image_url'] = \Storage::url($path);
+                }
+            }
+
+            $category->update($data);
 
             return response()->json([
                 'success' => true,

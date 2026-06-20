@@ -2204,7 +2204,7 @@
          @click.self="showNoCategoriesModal = false">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-zinc-800 max-w-md w-full p-6 animate-fade-in">
         <div class="text-center">
-          <div class="w-16 h-16 bg-amber-100 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg class="w-8 h-8 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
             </svg>
@@ -2240,8 +2240,8 @@
         <!-- Header Simple -->
         <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-zinc-800">
           <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 bg-gray-100 dark:bg-zinc-800 rounded-lg flex items-center justify-center">
-              <svg class="w-5 h-5 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex items-center justify-center">
+              <svg class="w-6 h-6 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
               </svg>
             </div>
@@ -2274,20 +2274,38 @@
             </textarea>
           </div>
 
-          <!-- Selector de Color -->
+          <!-- Imagen de Categoría -->
           <div>
-            <label class="block text-[15px] font-bold text-gray-700 dark:text-zinc-300 mb-2">Color de la Categoría</label>
+            <div class="flex items-center gap-2 mb-2">
+              <label class="block text-[15px] font-bold text-gray-700 dark:text-zinc-300">Foto de la Categoría</label>
+              
+              <!-- Tooltip informativo -->
+              <div class="relative group">
+                <button type="button" class="text-gray-400 hover:text-blue-500 transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </button>
+                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-gray-900 dark:bg-black text-white text-xs rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 shadow-xl">
+                  Es importante agregar una foto porque será la que se mostrará en tu página web. (Para tiendas con catálogo activado).
+                  <!-- Flecha del tooltip -->
+                  <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-black"></div>
+                </div>
+              </div>
+            </div>
+            
             <div class="flex items-center gap-3">
               <input 
-                v-model="categoryForm.color" 
-                type="color"
-                class="w-16 h-10 rounded-xl border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 cursor-pointer"
-              />
-              <input 
-                v-model="categoryForm.color" 
-                type="text"
-                class="flex-1 px-4 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="#3b82f6"
+                type="file"
+                accept="image/*"
+                @change="e => categoryForm.image = e.target.files[0]"
+                class="w-full text-sm text-gray-500 dark:text-zinc-400
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-full file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-blue-50 file:text-blue-700
+                  dark:file:bg-blue-900/30 dark:file:text-blue-400
+                  hover:file:bg-blue-100 dark:hover:file:bg-blue-900/50"
               />
             </div>
           </div>
@@ -2613,7 +2631,8 @@ const categoryForm = ref({
   name: '',
   description: '',
   icon: 'shopping-bag',
-  color: '#3b82f6'
+  color: '#3b82f6',
+  image: null
 })
 
 // Form de proveedor
@@ -5119,7 +5138,17 @@ const saveCategory = async () => {
   try {
     loading.value = true
     
-    const response = await categoriesService.create(categoryForm.value)
+    let submitData = categoryForm.value;
+    if (categoryForm.value.image) {
+      submitData = new FormData();
+      submitData.append('name', categoryForm.value.name);
+      submitData.append('description', categoryForm.value.description);
+      submitData.append('icon', categoryForm.value.icon);
+      submitData.append('color', categoryForm.value.color);
+      submitData.append('image', categoryForm.value.image);
+    }
+    
+    const response = await categoriesService.create(submitData)
     
     if (response.success) {
       showNotification(
