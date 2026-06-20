@@ -1,31 +1,61 @@
 <template>
   <!-- HEADER RETAIL OVERLAY — Urbano / Streetwear / Premium E-commerce -->
-  <!-- Transparente sobre el hero. Sólido al scroll. Full-width sin bordes redondeados. -->
+  <!-- DESKTOP: Logo izq, nav center, search+icons derecha. E-commerce profesional. -->
   <header
     class="fixed top-8 left-0 right-0 z-50 bg-white shadow-[0_1px_0_0_rgba(0,0,0,0.07)]"
     :style="{ fontFamily: fonts.body + ', sans-serif', backgroundColor: palette.background || '#ffffff' }"
   >
-    <div class="flex items-center justify-between h-[60px] px-6 lg:px-8">
+    <div class="flex items-center justify-between h-[60px] lg:h-[76px] px-6 lg:px-10 max-w-[1440px] mx-auto">
 
-      <!-- Izquierda: Logo o nombre de tienda -->
+      <!-- Izquierda: Logo -->
       <div class="flex items-center">
         <img
           v-if="logoUrl"
           :src="logoUrl"
           :alt="storeName"
-          class="h-8 max-w-[140px] object-contain brightness-0"
+          class="h-8 lg:h-10 max-w-[140px] lg:max-w-[180px] object-contain brightness-0"
         />
         <span
           v-else
-          class="font-bold text-base tracking-[0.12em] uppercase leading-none"
+          class="font-bold text-base lg:text-xl tracking-[0.12em] uppercase leading-none"
           :style="{ fontFamily: fonts.heading + ', sans-serif', color: palette.text_dark || '#111111' }"
         >{{ storeName }}</span>
       </div>
 
-      <!-- Derecha: Lupa + Bolsa + Hamburguesa -->
-      <div class="flex items-center gap-5">
+      <!-- Centro: Nav links (solo desktop) -->
+      <nav class="hidden lg:flex items-center gap-8">
+        <span
+          v-for="link in navLinks"
+          :key="link"
+          class="text-[11px] lg:text-[13px] uppercase tracking-[0.14em] lg:tracking-[0.12em] font-semibold cursor-pointer transition-all duration-200 relative overlay-nav"
+          :style="{ color: (palette.text_dark || '#111') + '60' }"
+          @mouseenter="e => e.target.style.color = palette.text_dark || '#111'"
+          @mouseleave="e => e.target.style.color = (palette.text_dark || '#111') + '60'"
+        >{{ link }}</span>
+      </nav>
 
-        <!-- Búsqueda -->
+      <!-- Derecha: Búsqueda + Cuenta + Bolsa + Hamburguesa -->
+      <div class="flex items-center gap-2 lg:gap-3">
+
+        <!-- Desktop: inline search -->
+        <div class="hidden lg:flex items-center">
+          <div v-if="showSearch" class="relative mr-2">
+            <input
+              :value="modelValue"
+              @input="$emit('update:modelValue', $event.target.value)"
+              placeholder="Buscar..."
+              autofocus
+              class="w-[220px] pl-3 pr-8 py-2 text-sm border-b-2 bg-transparent outline-none transition-all focus:w-[280px]"
+              :style="{ borderColor: palette.text_dark + '30', color: palette.text_dark, fontFamily: fonts.body }"
+              @blur="showSearch = false"
+            />
+            <button @click="showSearch = false" class="absolute right-0 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-700">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Búsqueda icon -->
         <button
           @click="showSearch = !showSearch"
           class="flex items-center justify-center w-9 h-9 transition-opacity hover:opacity-60"
@@ -34,6 +64,17 @@
         >
           <svg class="w-[20px] h-[20px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.25">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+          </svg>
+        </button>
+
+        <!-- Cuenta (solo desktop) -->
+        <button
+          class="hidden lg:flex items-center justify-center w-9 h-9 transition-opacity hover:opacity-60"
+          :style="{ color: palette.text_dark || '#111111' }"
+          aria-label="Mi cuenta"
+        >
+          <svg class="w-[20px] h-[20px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.25">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
           </svg>
         </button>
 
@@ -54,10 +95,10 @@
           >{{ cartCount > 9 ? '9+' : cartCount }}</span>
         </button>
 
-        <!-- Hamburguesa -->
+        <!-- Hamburguesa (solo móvil) -->
         <button
           @click="$emit('menu')"
-          class="flex items-center justify-center w-9 h-9 transition-opacity hover:opacity-60"
+          class="lg:hidden flex items-center justify-center w-9 h-9 transition-opacity hover:opacity-60"
           :style="{ color: palette.text_dark || '#111111' }"
           aria-label="Abrir menú"
         >
@@ -69,11 +110,11 @@
       </div>
     </div>
 
-    <!-- Barra de búsqueda desplegable — underline limpio, sin caja -->
+    <!-- Mobile: Barra de búsqueda desplegable -->
     <Transition name="overlay-search">
       <div
         v-if="showSearch"
-        class="px-6 lg:px-8 pb-4 border-t border-gray-100"
+        class="lg:hidden px-6 pb-4 border-t border-gray-100"
         :style="{ backgroundColor: palette.background || '#ffffff' }"
       >
         <div class="relative flex items-center max-w-lg mt-3">
@@ -118,6 +159,8 @@ defineProps({
 defineEmits(['menu', 'cart', 'update:modelValue'])
 
 const showSearch = ref(false)
+
+const navLinks = ['Catálogo', 'Novedades', 'Colecciones', 'Contacto']
 </script>
 
 <style scoped>
@@ -127,5 +170,18 @@ const showSearch = ref(false)
 .overlay-search-enter-from, .overlay-search-leave-to {
   opacity: 0;
   transform: translateY(-6px);
+}
+.overlay-nav::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 1.5px;
+  background: currentColor;
+  transition: width 0.3s ease;
+}
+.overlay-nav:hover::after {
+  width: 100%;
 }
 </style>

@@ -346,18 +346,10 @@ const processImageUrl = (url) => {
   // Usar el mismo origen del frontend (funciona en dev y producción)
   const baseUrl = window.location.origin
   
-  // Si es ruta de storage, construir URL completa
-  if (trimmedUrl.startsWith('/storage')) {
-    return `${baseUrl}${trimmedUrl}`
-  }
+  // Limpiar cualquier prefijo de storage duplicado o mal formado
+  const cleanUrl = trimmedUrl.replace(/^(?:\/?storage\/?)+/, '')
   
-  // Si no empieza con /, agregar /storage/ y construir URL
-  if (!trimmedUrl.startsWith('/')) {
-    return `${baseUrl}/storage/${trimmedUrl}`
-  }
-  
-  // Ruta relativa genérica
-  return `${baseUrl}${trimmedUrl}`
+  return `${baseUrl}/storage/${cleanUrl}`
 }
 
 const handleImageError = (e) => {

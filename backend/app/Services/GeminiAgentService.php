@@ -18,7 +18,7 @@ use Carbon\Carbon;
 class GeminiAgentService
 {
     protected $apiKey;
-    protected $baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+    protected $baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent';
     protected $sessionId;
     protected $maxHistoryMessages = 30; // 30 mensajes para mantener buen contexto de conversación
 
@@ -701,7 +701,7 @@ EOT;
                 'status' => $result['status'],
                 'error_message' => $result['status'] === 'error' ? substr($result['reply'], 0, 255) : null,
                 'response_time_ms' => $responseTime,
-                'model' => 'gemini-2.0-flash',
+                'model' => 'gemini-flash-latest',
                 'provider' => 'gemini',
                 'endpoint' => 'generateContent',
                 'request_type' => 'chat',

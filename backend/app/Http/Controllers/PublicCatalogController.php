@@ -100,7 +100,12 @@ class PublicCatalogController extends Controller
                 break;
         }
 
-        $products = $query->get()->map(function($product) {
+        // Get ecommerce features for discount simulation
+        $ecommerceFeatures = json_decode($config->ai_ecommerce_features ?? 'null', true);
+        $simulateDiscount = $ecommerceFeatures['show_discount_badge'] ?? false;
+        $discountPct = (int) ($ecommerceFeatures['discount_percentage'] ?? 7);
+
+        $products = $query->get()->map(function($product) use ($simulateDiscount, $discountPct) {
             $mainImage = $product->public_image ?? $product->image_url;
 
             // Solo agregar URL base si NO es base64 ni URL absoluta
@@ -117,11 +122,21 @@ class PublicCatalogController extends Controller
                 return $url;
             })->values()->toArray();
 
+            // Simulate compare_at_price for psychological pricing
+            // Only add if the product doesn't already have a real compare_at_price
+            $salePrice = (float) $product->sale_price;
+            $compareAtPrice = null;
+            if ($simulateDiscount && $discountPct > 0 && $salePrice > 0) {
+                // Calculate a fake "original" price by marking up the real price
+                $compareAtPrice = round($salePrice * (1 + $discountPct / 100));
+            }
+
             return [
                 'id' => $product->id,
                 'name' => $product->name,
                 'description' => $product->public_description ?? $product->description,
-                'price' => (float) $product->sale_price,
+                'price' => $salePrice,
+                'compare_at_price' => $compareAtPrice,
                 'image' => $mainImage,
                 'images' => $images,
                 'stock' => $product->current_stock,
@@ -248,6 +263,8 @@ class PublicCatalogController extends Controller
                         'ai_announcements' => null,
                         'ai_cross_sell_messages' => null,
                         'ai_layout_config' => null,
+                        'ai_ecommerce_features' => null,
+                        'ai_fake_reviews' => null,
                         'catalog_media' => null,
                         'store_name' => DB::table('system_settings')->value('company_name')
                             ?? \Stancl\Tenancy\Facades\Tenancy::tenant()?->business_name
@@ -281,6 +298,8 @@ class PublicCatalogController extends Controller
                     'ai_announcements' => json_decode($config->ai_announcements ?? 'null', true),
                     'ai_cross_sell_messages' => json_decode($config->ai_cross_sell_messages ?? 'null', true),
                     'ai_layout_config' => json_decode($config->ai_layout_config ?? 'null', true),
+                    'ai_ecommerce_features' => json_decode($config->ai_ecommerce_features ?? 'null', true),
+                    'ai_fake_reviews' => json_decode($config->ai_fake_reviews ?? 'null', true),
                     'catalog_media' => json_decode($config->catalog_media ?? 'null', true),
                     'store_name' => DB::table('system_settings')->value('company_name')
                         ?? \Stancl\Tenancy\Facades\Tenancy::tenant()?->business_name

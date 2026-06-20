@@ -22,6 +22,14 @@ export { default as HeaderCenteredSerif }   from './HeaderCenteredSerif.vue'
 export { default as HeaderDarkPremium }     from './HeaderDarkPremium.vue'
 // Alta Costura / Tecnología Premium — bg-black sólido + glass al scroll, íconos blancos
 
+export { default as HeaderSplitAction }    from './HeaderSplitAction.vue'
+// E-commerce / Catálogo grande — logo izq, barra búsqueda centrada, iconos der
+// → Estilo Amazon/MercadoLibre, botón de búsqueda con color primario
+
+export { default as HeaderMinimalFloat }   from './HeaderMinimalFloat.vue'
+// Premium / Minimal — header flotante pill que solo aparece al scroll-up
+// → Apple-style, expandable search, glassmorphism pill
+
 // ─── Mapeo para selección por IA ─────────────────────────────────────────────
 // 'editorial-center'   → HeaderEditorialCenter  (moda premium, boutique)
 // 'retail-left'        → HeaderRetailLeft        (masivo, funcional, minimarket)
@@ -29,3 +37,6 @@ export { default as HeaderDarkPremium }     from './HeaderDarkPremium.vue'
 // 'floating-pill'      → HeaderRetailOverlay      (streetwear, urbano, premium overlay)
 // 'utility-search'     → HeaderUtilitySearch      (ferretería, electrónica, catálogo)
 // 'centered-serif'     → HeaderCenteredSerif      (distribuidora, boutique, Kharis-style)
+// 'dark-premium'       → HeaderDarkPremium        (alta costura noir, tech premium)
+// 'split-action'       → HeaderSplitAction        (e-commerce grande, marketplace)
+// 'minimal-float'      → HeaderMinimalFloat       (premium minimal, aparece solo al scroll-up)

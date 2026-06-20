@@ -10,4 +10,7 @@ export { default as HeroMinimal }    from './HeroMinimal.vue'
 export { default as HeroImageGrid }  from './HeroImageGrid.vue'
 export { default as HeroOverlay }        from './HeroOverlay.vue'
 export { default as HeroDarkCinematic }  from './HeroDarkCinematic.vue'
-// Alta Costura / Luxury Black — h-screen, overlay dramático, CTA blanco sólido sobre negro
+export { default as HeroVideoLoop }      from './HeroVideoLoop.vue'
+export { default as HeroParallax }       from './HeroParallax.vue'
+export { default as HeroGradientWave }   from './HeroGradientWave.vue'
+

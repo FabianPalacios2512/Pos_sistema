@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <!-- PLANTILLA A: "MODA PREMIUM" - Estilo Vélez/Zara -->
   <div class="catalog-visual-story relative overflow-x-hidden min-h-screen" :style="themeVars">
     
@@ -117,6 +117,33 @@
       :palette="aiPalette"
       :fonts="aiFonts"
       class="fixed top-8 left-0 right-0 z-50"
+      @menu="showMobileMenu = true"
+      @cart="router.push('/catalog/bolsa')"
+    />
+
+    <!-- ★ NUEVO: Split Action — logo izq + búsqueda centro + iconos der (Amazon style) -->
+    <HeaderSplitAction
+      v-else-if="headerConfig.style === 'split-action'"
+      :storeName="storeName"
+      :logoUrl="storeConfig.logo_url"
+      :cartCount="cartCount"
+      v-model="searchQuery"
+      :palette="aiPalette"
+      :fonts="aiFonts"
+      class="fixed top-8 left-0 right-0 z-50"
+      @menu="showMobileMenu = true"
+      @cart="router.push('/catalog/bolsa')"
+    />
+
+    <!-- ★ NUEVO: Minimal Float — pill flotante que aparece solo al scroll-up -->
+    <HeaderMinimalFloat
+      v-else-if="headerConfig.style === 'minimal-float'"
+      :storeName="storeName"
+      :logoUrl="storeConfig.logo_url"
+      :cartCount="cartCount"
+      v-model="searchQuery"
+      :palette="aiPalette"
+      :fonts="aiFonts"
       @menu="showMobileMenu = true"
       @cart="router.push('/catalog/bolsa')"
     />
@@ -319,6 +346,114 @@
         @ctaSecondary="scrollToProducts"
       />
 
+      <!-- ★ NUEVO: Carousel — auto-rotating slides con progress bars -->
+      <HeroCarousel
+        v-else-if="layoutConfig.hero_style === 'carousel'"
+        :headline="heroHeadlineDisplay"
+        :subheadline="heroSubheadlineDisplay"
+        :backgroundImage="currentHeroImage"
+        :images="carouselImages"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        :ctaText="bannerCtaText"
+        :isMobilePreview="isMobilePreview"
+        @cta="scrollToProducts"
+      />
+
+      <!-- ★ NUEVO: Centered — tipografía pura sin imagen -->
+      <HeroCentered
+        v-else-if="layoutConfig.hero_style === 'centered'"
+        :headline="heroHeadlineDisplay"
+        :subheadline="heroSubheadlineDisplay"
+        :backgroundImage="currentHeroImage"
+        :badge="bannerCtaText ? 'Disponible' : ''"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        :ctaText="bannerCtaText"
+        :isMobilePreview="isMobilePreview"
+        @cta="scrollToProducts"
+      />
+
+      <!-- ★ NUEVO: Image Grid — bento 1 grande + 2 chicos -->
+      <HeroImageGrid
+        v-else-if="layoutConfig.hero_style === 'image-grid'"
+        :headline="heroHeadlineDisplay"
+        :subheadline="heroSubheadlineDisplay"
+        :backgroundImage="currentHeroImage"
+        :images="carouselImages"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        :ctaText="bannerCtaText"
+        :isMobilePreview="isMobilePreview"
+        @cta="scrollToProducts"
+      />
+
+      <!-- ★ NUEVO: Minimal — ultra-clean Apple-style -->
+      <HeroMinimal
+        v-else-if="layoutConfig.hero_style === 'minimal'"
+        :headline="heroHeadlineDisplay"
+        :subheadline="heroSubheadlineDisplay"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        :ctaText="bannerCtaText"
+        :isMobilePreview="isMobilePreview"
+        @cta="scrollToProducts"
+      />
+
+      <!-- ★ NUEVO: Overlay — imagen + gradient denso centrado -->
+      <HeroOverlay
+        v-else-if="layoutConfig.hero_style === 'overlay'"
+        :headline="heroHeadlineDisplay"
+        :subheadline="heroSubheadlineDisplay"
+        :backgroundImage="currentHeroImage"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        :ctaText="bannerCtaText"
+        :ctaSecondary="bannerCtaSecondary"
+        :isMobilePreview="isMobilePreview"
+        @cta="scrollToProducts"
+        @ctaSecondary="scrollToProducts"
+      />
+
+      <!-- ★ NUEVO: Video Loop -->
+      <HeroVideoLoop
+        v-else-if="layoutConfig.hero_style === 'video-loop'"
+        :headline="heroHeadlineDisplay"
+        :subheadline="heroSubheadlineDisplay"
+        :backgroundImage="currentHeroImage"
+        :video="storeConfig.catalog_media?.lookbook_video || ''"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        :ctaText="bannerCtaText"
+        :isMobilePreview="isMobilePreview"
+        @cta="scrollToProducts"
+      />
+
+      <!-- ★ NUEVO: Parallax -->
+      <HeroParallax
+        v-else-if="layoutConfig.hero_style === 'parallax'"
+        :headline="heroHeadlineDisplay"
+        :subheadline="heroSubheadlineDisplay"
+        :backgroundImage="currentHeroImage"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        :ctaText="bannerCtaText"
+        :isMobilePreview="isMobilePreview"
+        @cta="scrollToProducts"
+      />
+
+      <!-- ★ NUEVO: Gradient Wave -->
+      <HeroGradientWave
+        v-else-if="layoutConfig.hero_style === 'gradient-wave'"
+        :headline="heroHeadlineDisplay"
+        :subheadline="heroSubheadlineDisplay"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        :ctaText="bannerCtaText"
+        :isMobilePreview="isMobilePreview"
+        @cta="scrollToProducts"
+      />
+
       <!-- FALLBACK: Editorial por defecto si hero_style no reconocido -->
       <HeroEditorial
         v-else
@@ -336,7 +471,7 @@
     </div>
 
     <!-- TRUST STRIP: Sistema modular — aplica a todos los estilos de hero -->
-    <div class="lg:ml-64">
+    <div>
       <TrustStripMarquee
         v-if="trustStripStyle === 'marquee'"
         :items="trustStripItems"
@@ -369,6 +504,29 @@
         :textColor="aiPalette.text_dark"
         :iconColor="aiPalette.primary"
       />
+      <!-- ★ NUEVO: Icon Grid — íconos circulares grandes + descripción -->
+      <TrustStripIconGrid
+        v-else-if="trustStripStyle === 'icon-grid'"
+        :items="trustStripItems"
+        :bgColor="aiPalette.background"
+        :textColor="isBackgroundDark ? '#ffffff' : aiPalette.text_dark"
+        :iconColor="aiPalette.primary"
+        :iconBgColor="aiPalette.primary + '12'"
+        :iconBorderColor="aiPalette.primary + '20'"
+      />
+      <!-- ★ NUEVO: Countdown — timer de urgencia + promo -->
+      <TrustStripCountdown
+        v-else-if="trustStripStyle === 'countdown'"
+        :promoText="trustStripItems[0]?.label || 'Oferta Especial'"
+        :bgColor="aiPalette.background"
+        :textColor="isBackgroundDark ? '#ffffff' : aiPalette.text_dark"
+        :accentColor="aiPalette.primary"
+        :timerBg="isBackgroundDark ? 'rgba(255,255,255,0.08)' : '#f5f5f5'"
+        :timerBorder="isBackgroundDark ? 'rgba(255,255,255,0.12)' : '#e5e5e5'"
+        :timerTextColor="isBackgroundDark ? '#ffffff' : aiPalette.text_dark"
+        :borderColor="isBackgroundDark ? 'rgba(255,255,255,0.08)' : '#f0f0f0'"
+        @cta="scrollToProducts"
+      />
       <!-- Default / minimal-border -->
       <TrustStripMinimalBorder
         v-else
@@ -380,8 +538,8 @@
       />
     </div>
 
-    <!-- HOOK / SPOTLIGHT: Bloque pre-catálogo modular (reemplaza Brand Story gen?rico) -->
-    <div class="lg:ml-64">
+    <!-- HOOK / SPOTLIGHT: Bloque pre-catálogo modular (reemplaza Brand Story genérico) -->
+    <div>
       <!-- editorial-story: Boutique / Lencería / Alta Costura -->
       <HookEditorialStory
         v-if="hookStyle === 'editorial-story'"
@@ -435,6 +593,39 @@
         :isMobilePreview="isMobilePreview"
         @cta="scrollToProducts"
       />
+      <!-- ★ NUEVO: Testimonials — carrusel de reseñas clientes -->
+      <HookTestimonials
+        v-else-if="hookStyle === 'testimonials' && fakeReviews && fakeReviews.length > 0"
+        :headline="'Lo que dicen nuestros clientes'"
+        :label="'Testimonios'"
+        :testimonials="fakeReviews"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        ctaText="Ver Colección"
+        @cta="scrollToProducts"
+      />
+      <!-- ★ NUEVO: Collection Grid — grid visual de colecciones -->
+      <HookCollectionGrid
+        v-else-if="hookStyle === 'collection-grid'"
+        :headline="bannerHeadline || 'Nuestras Colecciones'"
+        :label="storeConfig.category || 'Explora'"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        ctaText="Ver todo"
+        @cta="scrollToProducts"
+      />
+      <!-- ★ NUEVO: Brand Manifesto — statement tipográfico editorial -->
+      <HookBrandManifesto
+        v-else-if="hookStyle === 'brand-manifesto'"
+        :headline="bannerHeadline || 'Creemos en la belleza de lo auténtico'"
+        :body="hookBodyText"
+        :label="storeConfig.category || 'Nuestro Manifiesto'"
+        :signature="storeName"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        ctaText="Descubre Más"
+        @cta="scrollToProducts"
+      />
     </div>
 
     <!-- BARRA STICKY: Filtrar + Ordenar (Móvil) - Sólida -->
@@ -468,302 +659,177 @@
       </div>
     </div>
 
-    <!-- SIDEBAR LATERAL (Desktop) - Premium Minimalista -->
-    <aside v-if="!isMobilePreview" class="hidden lg:block fixed left-0 top-[154px] bottom-0 w-64 overflow-y-auto z-30 px-6 py-8"
-      :style="{ backgroundColor: aiPalette.background || '#ffffff', borderRight: '1px solid var(--ai-border-subtle)' }">
-      <!-- Filtro por Categoría - Minimalista con línea vertical -->
-      <div class="mb-8">
-        <h3 class="text-xs font-bold mb-5 uppercase tracking-widest" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.4 }">Categorías</h3>
-        <div class="space-y-0.5">
-          <button
-            @click="selectedCategory = null"
-            class="w-full text-left py-2.5 text-sm transition-all duration-200 flex items-center gap-3 relative"
-            :style="{ color: selectedCategory === null ? 'var(--ai-on-bg-text)' : 'color-mix(in srgb, var(--ai-on-bg-text) 45%, transparent)' }"
-          >
-            <span 
-              class="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 transition-opacity duration-200"
-              :style="{ backgroundColor: aiPalette.primary }"
-              :class="selectedCategory === null ? 'opacity-100' : 'opacity-0'"
-            ></span>
-            <span class="pl-4">Todas</span>
-          </button>
-          <button
-            v-for="cat in categories"
-            :key="cat.id"
-            @click="selectedCategory = cat.id"
-            class="w-full text-left py-2.5 text-sm transition-all duration-200 flex items-center gap-3 relative"
-            :style="{ color: selectedCategory === cat.id ? 'var(--ai-on-bg-text)' : 'color-mix(in srgb, var(--ai-on-bg-text) 45%, transparent)' }"
-          >
-            <span 
-              class="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 transition-opacity duration-200"
-              :style="{ backgroundColor: aiPalette.primary }"
-              :class="selectedCategory === cat.id ? 'opacity-100' : 'opacity-0'"
-            ></span>
-            <span class="pl-4">{{ cat.name }}</span>
-          </button>
-        </div>
-      </div>
+    <!-- ═══════════════════════════════════════════════════════════════════
+         LAYOUT DESKTOP: Sidebar sticky + Grid de productos
+         Mobile: bloque normal sin sidebar
+         ═══════════════════════════════════════════════════════════════════ -->
+    <div class="flex items-start">
 
-      <!-- Filtro por Rango de Precio - Slider Simple (Solo Máximo) -->
-      <div class="mb-8">
-        <h3 class="text-xs font-bold mb-5 uppercase tracking-widest" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.4 }">Precio</h3>
-        <div class="space-y-4">
-          <!-- Single Range Slider -->
-          <div class="relative h-1.5 rounded-full" :style="{ backgroundColor: 'var(--ai-border-subtle)' }">
-            <div 
-              class="absolute left-0 h-full rounded-full transition-all"
-              :style="{ backgroundColor: aiPalette.primary, width: ((priceRange.max - minProductPrice) / (maxProductPrice - minProductPrice)) * 100 + '%' }"
-            ></div>
-            <input 
-              type="range" 
-              :min="minProductPrice" 
-              :max="maxProductPrice" 
-              v-model.number="priceRange.max"
-              class="absolute w-full h-1.5 appearance-none bg-transparent cursor-pointer"
-              style="appearance: none; -webkit-appearance: none;"
-            />
-          </div>
-          <!-- Valor del rango -->
-          <div class="flex items-center justify-between text-sm">
-            <span :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.4 }">{{ storeConfig.currency_symbol }}0</span>
-            <span class="font-semibold" :style="{ color: 'var(--ai-on-bg-text)' }">Hasta {{ storeConfig.currency_symbol }}{{ formatPrice(priceRange.max) }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Ordenar por -->
-      <div class="mb-8">
-        <h3 class="text-xs font-bold mb-5 uppercase tracking-widest" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.4 }">Ordenar por</h3>
-        <div class="space-y-3">
-          <label class="flex items-center gap-3 cursor-pointer group">
-            <div class="relative flex items-center">
-              <input 
-                type="radio" 
-                name="sort" 
-                value="" 
-                v-model="sortOrder"
-                class="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-300 transition-all"
-                :style="{ '--primary-color': primaryColor }"
-                style="accent-color: var(--primary-color);"
-              />
-              <span class="absolute w-2 h-2 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" :style="{ backgroundColor: primaryColor }"></span>
-            </div>
-            <span class="text-sm transition-colors" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.6 }">Relevancia</span>
-          </label>
-          
-          <label class="flex items-center gap-3 cursor-pointer group">
-            <div class="relative flex items-center">
-              <input 
-                type="radio" 
-                name="sort" 
-                value="price-asc" 
-                v-model="sortOrder"
-                class="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-300 transition-all"
-              />
-              <span class="absolute w-2 h-2 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" :style="{ backgroundColor: primaryColor }"></span>
-            </div>
-            <span class="text-sm transition-colors" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.6 }">Menor precio</span>
-          </label>
-
-          <label class="flex items-center gap-3 cursor-pointer group">
-            <div class="relative flex items-center">
-              <input 
-                type="radio" 
-                name="sort" 
-                value="price-desc" 
-                v-model="sortOrder"
-                class="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-300 transition-all"
-              />
-              <span class="absolute w-2 h-2 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" :style="{ backgroundColor: primaryColor }"></span>
-            </div>
-            <span class="text-sm transition-colors" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.6 }">Mayor precio</span>
-          </label>
-
-          <label class="flex items-center gap-3 cursor-pointer group">
-            <div class="relative flex items-center">
-              <input 
-                type="radio" 
-                name="sort" 
-                value="name-asc" 
-                v-model="sortOrder"
-                class="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-300 transition-all"
-              />
-              <span class="absolute w-2 h-2 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" :style="{ backgroundColor: primaryColor }"></span>
-            </div>
-            <span class="text-sm transition-colors" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.6 }">Nombre (A-Z)</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Filtro de Disponibilidad -->
-      <div>
-        <h3 class="text-xs font-bold mb-4 uppercase tracking-widest" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.4 }">Filtros</h3>
-        <label class="flex items-center gap-3 cursor-pointer group">
-          <div class="relative flex items-center">
-            <input 
-              type="checkbox" 
-              v-model="showOnlyAvailable"
-              class="peer h-5 w-5 cursor-pointer appearance-none rounded border border-gray-300 transition-all"
-              :style="{ backgroundColor: showOnlyAvailable ? primaryColor : 'transparent', borderColor: showOnlyAvailable ? primaryColor : undefined }"
-            />
-            <svg class="absolute w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <span class="text-sm transition-colors" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.6 }">Solo con stock</span>
-        </label>
-      </div>
-
-      <!-- Botón Limpiar Filtros -->
-      <button
-        v-if="selectedCategory || showOnlyAvailable || sortOrder"
-        @click="clearFilters"
-        class="w-full px-4 py-2.5 text-xs font-bold uppercase tracking-wide text-red-500 hover:text-white hover:bg-red-500 rounded-lg transition-all border border-red-200 hover:border-red-500"
+      <!-- SIDEBAR (Desktop only — sticky dentro del flex) -->
+      <aside
+        v-if="!isMobilePreview"
+        class="hidden lg:block w-64 shrink-0 sticky top-[154px] self-start max-h-[calc(100vh-154px)] overflow-y-auto px-6 py-8 z-20"
+        :style="{ borderRight: '1px solid var(--ai-border-subtle)' }"
       >
-        Limpiar filtros
-      </button>
-    </aside>
-
-    <!-- ÁREA PRINCIPAL: Productos -->
-    <section ref="productsSection" class="lg:ml-64 pt-3 px-4 lg:px-8 pb-8">
-      
-      <!-- Header de Catálogo -->
-      <div class="mb-5 pb-4 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between"
-        :style="{ borderBottom: '1px solid var(--ai-border-subtle)' }">
-        <div>
-          <p class="text-[10px] uppercase tracking-[0.22em] font-semibold" :style="{ color: aiPalette.primary }">Catálogo Curado</p>
-          <h3 class="mt-1 text-2xl md:text-3xl" :style="{ fontFamily: aiFonts.heading + ', serif', fontWeight: 500, color: 'var(--ai-on-bg-text)' }">
-            {{ selectedCategory !== null ? activeCategoryName : (bannerCtaText || 'Compra por estilo') }}
-          </h3>
-          <p class="mt-1 text-sm" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.5 }">
-            {{ filteredProducts.length }} productos
-            <span v-if="selectedCategory !== null || showOnlyAvailable || sortOrder" class="font-semibold" :style="{ color: aiPalette.primary }">
-              — filtrados
-            </span>
-          </p>
+        <!-- Filtro por Categoría -->
+        <div class="mb-8">
+          <h3 class="text-[10px] font-bold mb-5 uppercase tracking-widest" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.4 }">Categorías</h3>
+          <div class="space-y-0.5">
+            <button
+              @click="selectedCategory = null"
+              class="w-full text-left py-2.5 text-sm transition-all duration-200 flex items-center gap-3 relative"
+              :style="{ color: selectedCategory === null ? 'var(--ai-on-bg-text)' : 'color-mix(in srgb, var(--ai-on-bg-text) 45%, transparent)', fontWeight: selectedCategory === null ? 600 : 400 }"
+            >
+              <span class="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full transition-opacity duration-200"
+                :style="{ backgroundColor: aiPalette.primary, opacity: selectedCategory === null ? 1 : 0 }"></span>
+              <span class="pl-4">Todas</span>
+            </button>
+            <button
+              v-for="cat in categories"
+              :key="cat.id"
+              @click="selectedCategory = cat.id"
+              class="w-full text-left py-2.5 text-sm transition-all duration-200 flex items-center gap-3 relative"
+              :style="{ color: selectedCategory === cat.id ? 'var(--ai-on-bg-text)' : 'color-mix(in srgb, var(--ai-on-bg-text) 45%, transparent)', fontWeight: selectedCategory === cat.id ? 600 : 400 }"
+            >
+              <span class="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full transition-opacity duration-200"
+                :style="{ backgroundColor: aiPalette.primary, opacity: selectedCategory === cat.id ? 1 : 0 }"></span>
+              <span class="pl-4">{{ cat.name }}</span>
+            </button>
+          </div>
         </div>
 
-        <button
-          v-if="selectedCategory !== null || showOnlyAvailable || sortOrder || searchQuery"
-          @click="clearFilters"
-          class="px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-[0.14em] border transition-colors"
-          :style="{ borderColor: 'var(--ai-border-subtle)', color: 'var(--ai-on-bg-text)' }"
-        >
-          Reiniciar vista
-        </button>
-      </div>
-
-      <!-- GRID DE PRODUCTOS: E-commerce Premium con Hover Effects -->
-      <div :class="gridClassesPremium">
-        <TransitionGroup name="list">
-          <div 
-            v-for="product in filteredProducts" 
-            :key="product.id"
-            class="group"
-          >
-            <div 
-              class="bg-white rounded-2xl border border-gray-100 overflow-hidden h-full flex flex-col cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/10" 
-              @click="openProductDetails(product)"
-            >
-              
-              <!-- Product Image - Aspect 3:4 Uniforme -->
-              <div class="relative aspect-[3/4] overflow-hidden bg-gray-50">
-                
-                <!-- Imagen del Producto -->
-                <img 
-                  v-if="(product.images && product.images.length > 0) || (product.image_url && product.image_url !== 'https://via.placeholder.com/400' && !imageErrors[product.id])"
-                  :src="product.images && product.images.length > 0 ? product.images[0] : product.image_url"
-                  :alt="product.name"
-                  @error="handleImageError(product.id)"
-                  class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
-                />
-                
-                <!-- Placeholder Elegante -->
-                <div v-else class="w-full h-full flex items-center justify-center bg-gray-100">
-                  <svg class="w-10 h-10 text-gray-300" viewBox="0 0 24 24" fill="none">
-                    <path d="M5 9h14l1 12H4L5 9z" fill="currentColor" opacity="0.3"/>
-                    <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                  </svg>
-                </div>
-                
-                <!-- Botón Agregar - Minimal -->
-                <button
-                  @click.stop="addToCart(product)"
-                  :disabled="product.stock === 0"
-                  class="absolute bottom-2.5 right-2.5 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 z-10"
-                  :class="product.stock > 0 
-                    ? 'bg-white text-gray-600 hover:text-white shadow-sm hover:shadow-md hover:scale-110' 
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'"
-                  :style="product.stock > 0 ? { '--tw-bg-opacity': '1', backgroundColor: 'white' } : {}"
-                  @mouseenter="product.stock > 0 ? $event.currentTarget.style.backgroundColor = aiPalette.primary : null"
-                  @mouseleave="product.stock > 0 ? $event.currentTarget.style.backgroundColor = 'white' : null"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                  </svg>
-                </button>
-
-                <span class="absolute top-2.5 right-2.5 text-[9px] uppercase tracking-[0.12em] bg-white/90 text-gray-800 px-2 py-1 rounded-full font-semibold">
-                  Ver
-                </span>
-
-                <!-- Badges (Esquina Superior Izquierda) - Discretos -->
-                <div class="absolute top-0 left-0 flex flex-col">
-                  <span v-if="product.stock <= 5 && product.stock > 0" class="px-2 py-1 bg-gray-900/85 text-white text-[8px] font-semibold uppercase tracking-wider">
-                    Solo {{ product.stock }}
-                  </span>
-                  <span v-else-if="product.stock === 0" class="px-2 py-1 bg-gray-900/85 text-white text-[8px] font-semibold uppercase tracking-wider">
-                    Agotado
-                  </span>
-                  <span v-if="product.is_new" class="px-2 py-1 bg-gray-900/85 text-white text-[8px] font-semibold uppercase tracking-wider">
-                    Nuevo
-                  </span>
-                </div>
-              </div>
-
-              <!-- Product Info - Compacto y Alineado -->
-              <div class="pt-3 pb-4 px-3">
-                <p class="text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-1 truncate">{{ product.category || 'Colección' }}</p>
-                <h3 class="text-[13px] font-normal text-gray-700 truncate leading-snug mb-1" :style="{ fontFamily: aiFonts.heading + ', serif' }">
-                  {{ product.name }}
-                </h3>
-                <div class="flex items-center justify-between gap-2">
-                  <p class="text-sm font-bold text-gray-900">
-                  {{ storeConfig.currency_symbol }}{{ formatPrice(product.price) }}
-                  </p>
-                  <span class="text-[11px] font-medium" :style="{ color: aiPalette.primary }">Comprar</span>
-                </div>
-              </div>
+        <!-- Precio -->
+        <div class="mb-8">
+          <h3 class="text-[10px] font-bold mb-5 uppercase tracking-widest" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.4 }">Precio máximo</h3>
+          <div class="space-y-3">
+            <div class="relative h-1.5 rounded-full" :style="{ backgroundColor: 'var(--ai-border-subtle)' }">
+              <div class="absolute left-0 h-full rounded-full transition-all"
+                :style="{ backgroundColor: aiPalette.primary, width: ((priceRange.max - minProductPrice) / (maxProductPrice - minProductPrice)) * 100 + '%' }"></div>
+              <input type="range" :min="minProductPrice" :max="maxProductPrice" v-model.number="priceRange.max"
+                class="absolute w-full h-1.5 appearance-none bg-transparent cursor-pointer"
+                style="appearance: none; -webkit-appearance: none;" />
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.35 }">{{ storeConfig.currency_symbol }}0</span>
+              <span class="font-semibold" :style="{ color: 'var(--ai-on-bg-text)' }">{{ storeConfig.currency_symbol }}{{ formatPrice(priceRange.max) }}</span>
             </div>
           </div>
-        </TransitionGroup>
-      </div>
+        </div>
 
-      <!-- Empty State Elegante -->
-      <div v-if="filteredProducts.length === 0" class="text-center py-20">
-        <svg class="w-16 h-16 mx-auto mb-4" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.15 }" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
-        </svg>
-        <p class="text-sm font-light tracking-wide" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.4 }">No hay productos disponibles</p>
-      </div>
-    </section>
+        <!-- Ordenar -->
+        <div class="mb-8">
+          <h3 class="text-[10px] font-bold mb-4 uppercase tracking-widest" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.4 }">Ordenar por</h3>
+          <div class="space-y-2.5">
+            <label v-for="opt in [['', 'Relevancia'], ['price-asc', 'Menor precio'], ['price-desc', 'Mayor precio'], ['name-asc', 'Nombre A-Z']]"
+              :key="opt[0]" class="flex items-center gap-3 cursor-pointer">
+              <div class="relative flex items-center shrink-0">
+                <input type="radio" name="sort-desktop" :value="opt[0]" v-model="sortOrder"
+                  class="peer h-4 w-4 cursor-pointer appearance-none rounded-full border transition-all"
+                  :style="{ borderColor: 'var(--ai-border-subtle)' }" />
+                <span class="absolute w-2 h-2 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                  :style="{ backgroundColor: aiPalette.primary }"></span>
+              </div>
+              <span class="text-sm" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.65 }">{{ opt[1] }}</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Disponibilidad -->
+        <div class="mb-8">
+          <label class="flex items-center gap-3 cursor-pointer">
+            <div class="relative flex items-center shrink-0">
+              <input type="checkbox" v-model="showOnlyAvailable"
+                class="peer h-5 w-5 cursor-pointer appearance-none rounded border transition-all"
+                :style="{ backgroundColor: showOnlyAvailable ? aiPalette.primary : 'transparent', borderColor: showOnlyAvailable ? aiPalette.primary : 'var(--ai-border-subtle)' }" />
+              <svg class="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <span class="text-sm" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.65 }">Solo con stock</span>
+          </label>
+        </div>
+
+        <!-- Limpiar -->
+        <button
+          v-if="selectedCategory || showOnlyAvailable || sortOrder"
+          @click="clearFilters"
+          class="w-full py-2 text-xs font-bold uppercase tracking-wide rounded-lg transition-all border"
+          style="color: #ef4444; border-color: #fecaca;"
+          @mouseenter="e => { e.currentTarget.style.backgroundColor='#ef4444'; e.currentTarget.style.color='white'; e.currentTarget.style.borderColor='#ef4444' }"
+          @mouseleave="e => { e.currentTarget.style.backgroundColor='transparent'; e.currentTarget.style.color='#ef4444'; e.currentTarget.style.borderColor='#fecaca' }"
+        >Limpiar filtros</button>
+      </aside>
+
+      <!-- ÁREA PRINCIPAL: Productos -->
+      <section ref="productsSection" class="flex-1 min-w-0 pt-6 px-4 lg:px-8 pb-16">
+        
+        <!-- Header de Catálogo -->
+        <div class="mb-6 pb-4 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between"
+          :style="{ borderBottom: '1px solid var(--ai-border-subtle)' }">
+          <div>
+            <p class="text-[10px] uppercase tracking-[0.22em] font-semibold" :style="{ color: aiPalette.primary }">Catálogo Curado</p>
+            <h3 class="mt-1 text-2xl lg:text-3xl" :style="{ fontFamily: aiFonts.heading + ', serif', fontWeight: 500, color: 'var(--ai-on-bg-text)' }">
+              {{ selectedCategory !== null ? activeCategoryName : (bannerCtaText || 'Compra por estilo') }}
+            </h3>
+            <p class="mt-1 text-sm" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.5 }">
+              {{ filteredProducts.length }} productos
+              <span v-if="selectedCategory !== null || showOnlyAvailable || sortOrder" class="font-semibold" :style="{ color: aiPalette.primary }">
+                — filtrados
+              </span>
+            </p>
+          </div>
+          <button
+            v-if="selectedCategory !== null || showOnlyAvailable || sortOrder || searchQuery"
+            @click="clearFilters"
+            class="px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-[0.14em] border transition-colors"
+            :style="{ borderColor: 'var(--ai-border-subtle)', color: 'var(--ai-on-bg-text)' }"
+          >Reiniciar vista</button>
+        </div>
+
+        <!-- GRID DE PRODUCTOS -->
+        <div :class="gridClassesPremium">
+          <TransitionGroup name="list">
+            <ProductCard
+              v-for="product in filteredProducts"
+              :key="product.id"
+              :product="product"
+              :palette="aiPalette"
+              :fonts="aiFonts"
+              :currencySymbol="storeConfig.currency_symbol"
+              :aspectRatio="layoutConfig.product_card_aspect || '3/4'"
+              @click="openProductDetails(product)"
+              @add-to-cart="addToCart(product)"
+            />
+          </TransitionGroup>
+        </div>
+
+        <!-- Empty State -->
+        <div v-if="filteredProducts.length === 0" class="text-center py-20">
+          <svg class="w-16 h-16 mx-auto mb-4" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.15 }" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
+          </svg>
+          <p class="text-sm font-light tracking-wide" :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.4 }">No hay productos disponibles</p>
+        </div>
+      </section>
+
+    </div><!-- fin flex desktop layout -->
 
     <!-- ABOUT US SECTION (AI Generated) -->
-    <section v-if="storeConfig.ai_about_us" class="border-t py-12" :style="{ backgroundColor: aiPalette.background, borderColor: aiPalette.secondary }">
-      <div class="lg:ml-64 px-4 lg:px-8">
-        <div class="rounded-3xl border border-gray-200 overflow-hidden" :style="{ backgroundColor: '#ffffff' }">
+    <section v-if="storeConfig.ai_about_us" class="border-t py-12" :style="{ borderColor: 'var(--ai-border-subtle)' }">
+      <div class="px-4 lg:px-12 max-w-5xl mx-auto">
+        <div class="rounded-3xl overflow-hidden" :style="{ border: '1px solid var(--ai-border-subtle)' }">
           <div class="grid md:grid-cols-[1.2fr,1fr] gap-0">
             <div class="p-6 md:p-8">
               <p class="text-[10px] uppercase tracking-[0.24em] font-semibold" :style="{ color: aiPalette.primary }">Nuestra esencia</p>
               <h3 
-                class="text-2xl md:text-3xl text-gray-900 mt-2 mb-4"
-                :style="{ fontFamily: aiFonts.heading + ', serif', fontWeight: 500 }"
+                class="text-2xl md:text-3xl mt-2 mb-4"
+                :style="{ fontFamily: aiFonts.heading + ', serif', fontWeight: 500, color: 'var(--ai-on-bg-text)' }"
               >
                 Nuestra Historia
               </h3>
               <p 
-                class="text-sm md:text-base text-gray-600 leading-relaxed whitespace-pre-line"
-                :style="{ fontFamily: aiFonts.body + ', sans-serif' }"
+                class="text-sm md:text-base leading-relaxed whitespace-pre-line"
+                :style="{ fontFamily: aiFonts.body + ', sans-serif', color: 'var(--ai-on-bg-text)', opacity: 0.7 }"
               >
                 {{ storeConfig.ai_about_us }}
               </p>
@@ -772,9 +838,10 @@
                 <div
                   v-for="(msg, i) in storeConfig.ai_value_messages"
                   :key="'history-value-' + i"
-                  class="flex items-start gap-2.5 text-sm text-gray-700"
+                  class="flex items-start gap-2.5 text-sm"
+                  :style="{ color: 'var(--ai-on-bg-text)', opacity: 0.75 }"
                 >
-                  <span class="mt-1 w-1.5 h-1.5 rounded-full" :style="{ backgroundColor: aiPalette.primary }"></span>
+                  <span class="mt-1 w-1.5 h-1.5 shrink-0 rounded-full" :style="{ backgroundColor: aiPalette.primary }"></span>
                   <span :style="{ fontFamily: aiFonts.body + ', sans-serif' }">{{ msg }}</span>
                 </div>
               </div>
@@ -782,7 +849,7 @@
 
             <div class="relative min-h-[260px] md:min-h-full">
               <img v-if="storyImageSlots[0]" :src="storyImageSlots[0]" alt="Colección principal" class="w-full h-full object-cover" />
-              <div v-else class="w-full h-full bg-gray-100"></div>
+              <div v-else class="w-full h-full" :style="{ backgroundColor: isBackgroundDark ? 'rgba(255,255,255,0.04)' : '#f3f4f6' }"></div>
               <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent"></div>
             </div>
           </div>
@@ -790,17 +857,90 @@
       </div>
     </section>
 
-    <!-- FOOTER: Powered by 105 POS -->
-    <footer class="border-t py-8 text-center" :class="{ 'mb-16': cartCount > 0 }" :style="{ backgroundColor: aiPalette.background, borderColor: aiPalette.secondary }">
-      <p class="text-xs text-gray-400 tracking-wide">
-        Tecnología por
-        <a 
-          href="https://105pos.pro/register" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          class="font-semibold text-gray-600 hover:text-gray-900 transition-colors"
-        >105 POS</a>
-      </p>
+    <!-- FLOATING PROMO BANNER — Lateral "X% OFF" badge -->
+    <Transition name="slide-left">
+      <div
+        v-if="ecommerceFeatures.show_promo_banner && ecommerceFeatures.promo_banner_text && !isPreviewMode"
+        class="fixed left-0 top-1/2 -translate-y-1/2 z-[55] hidden lg:block"
+      >
+        <div
+          class="flex items-center gap-2 px-3 py-4 rounded-r-xl shadow-lg cursor-pointer hover:translate-x-0.5 transition-transform duration-300"
+          :style="{
+            backgroundColor: aiPalette.primary,
+            color: '#ffffff',
+            writingMode: 'vertical-rl',
+            textOrientation: 'mixed',
+            boxShadow: '4px 0 20px rgba(0,0,0,0.15)'
+          }"
+          @click="scrollToProducts"
+        >
+          <span class="text-[11px] font-bold tracking-wider uppercase">{{ ecommerceFeatures.promo_banner_text }}</span>
+        </div>
+      </div>
+    </Transition>
+
+    <!-- MOBILE PROMO BANNER — Floating bottom pill (only when no cart) -->
+    <Transition name="slide-up">
+      <div
+        v-if="ecommerceFeatures.show_promo_banner && ecommerceFeatures.promo_banner_text && cartCount === 0 && !ecommerceFeatures.show_bottom_nav && !isPreviewMode"
+        class="fixed bottom-4 left-4 right-4 z-[50] lg:hidden"
+      >
+        <div
+          class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-full shadow-xl"
+          :style="{
+            backgroundColor: aiPalette.primary,
+            color: '#ffffff',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
+          }"
+          @click="scrollToProducts"
+        >
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" />
+          </svg>
+          <span class="text-[12px] font-bold tracking-wide">{{ ecommerceFeatures.promo_banner_text }}</span>
+        </div>
+      </div>
+    </Transition>
+
+    <!-- FOOTER: Profesional y Elegante -->
+    <footer 
+      class="border-t pt-16 pb-8 px-6 lg:px-12 flex flex-col items-center" 
+      :class="{ 'mb-16': cartCount > 0 || ecommerceFeatures.show_bottom_nav }" 
+      :style="{ backgroundColor: aiPalette.background, borderColor: aiPalette.secondary }"
+    >
+      <div class="w-full max-w-[1280px] mx-auto flex flex-col items-center gap-8">
+        <!-- Logo / Nombre de Tienda -->
+        <h2 
+          class="text-xl lg:text-2xl tracking-[0.15em] uppercase font-bold text-center"
+          :style="{ color: aiPalette.text_dark, fontFamily: aiFonts.heading + ', serif' }"
+        >
+          {{ storeConfig.store_name }}
+        </h2>
+        
+        <!-- Enlaces legales elegantes -->
+        <div class="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-[10px] uppercase tracking-[0.2em] font-semibold"
+          :style="{ color: aiPalette.text_dark, opacity: 0.6 }"
+        >
+          <span class="cursor-pointer hover:opacity-100 transition-opacity">Políticas</span>
+          <span class="cursor-pointer hover:opacity-100 transition-opacity">Términos</span>
+          <span class="cursor-pointer hover:opacity-100 transition-opacity">Contacto</span>
+        </div>
+
+        <!-- Separador sutil -->
+        <div class="w-8 h-px mt-2 mb-2" :style="{ backgroundColor: aiPalette.text_dark, opacity: 0.15 }"></div>
+
+        <!-- Créditos 105 POS -->
+        <p class="text-[9px] uppercase tracking-widest" :style="{ color: aiPalette.text_dark, opacity: 0.4 }">
+          Tecnología por
+          <a 
+            href="https://105pos.pro/register" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="font-bold hover:opacity-100 transition-opacity ml-1"
+          >105 POS</a>
+        </p>
+      </div>
     </footer>
 
     <!-- WHATSAPP BUTTON - En móvil sube con carrito, en PC fijo -->
@@ -809,7 +949,7 @@
       :href="`https://wa.me/${storeConfig.whatsapp_number.replace(/[^0-9]/g, '')}?text=Hola, me interesa hacer un pedido`"
       target="_blank"
       class="fixed right-4 lg:right-[30px] z-[60] w-12 h-12 bg-[#25D366] hover:bg-[#1ebe57] text-white rounded-full flex items-center justify-center transform hover:scale-105 transition-all duration-300 bottom-6 lg:bottom-[30px]"
-      :class="{ 'bottom-[76px]': cartCount > 0, 'lg:bottom-[30px]': true }"
+      :class="{ 'bottom-[76px]': cartCount > 0 || ecommerceFeatures.show_bottom_nav, 'lg:bottom-[30px]': true }"
       style="box-shadow: 0 4px 16px rgba(37, 211, 102, 0.25), 0 8px 32px rgba(37, 211, 102, 0.12);"
       title="Contactar por WhatsApp"
     >
@@ -821,7 +961,7 @@
     <!-- STICKY BOTTOM ACTION BAR - Solo Móvil (Desktop usa Mini-Cart en Header) -->
     <Transition name="slide-up">
       <div 
-        v-if="cartCount > 0"
+        v-if="cartCount > 0 && !ecommerceFeatures.show_bottom_nav"
         class="fixed bottom-0 left-0 right-0 z-[55] px-4 py-3 flex items-center justify-between lg:hidden"
         :style="{ backgroundColor: aiPalette.background }"
         style="box-shadow: 0 -4px 16px rgba(0,0,0,0.08);"
@@ -1113,6 +1253,18 @@
       </div>
     </Transition>
 
+    <!-- APP-LIKE BOTTOM NAVIGATION BAR -->
+    <BottomNavBar
+      v-if="ecommerceFeatures.show_bottom_nav"
+      :active="'home'"
+      :cart-count="cartCount"
+      :accent-color="aiPalette.primary"
+      :text-color="'var(--ai-on-bg-text)'"
+      :bg-color="aiPalette.background"
+      :border-color="aiPalette.secondary"
+      @navigate="(to) => { if (to === 'cart') { toggleCart() } else if (to === 'home') { window.scrollTo({ top: 0, behavior: 'smooth' }) } }"
+    />
+
   </div>
 </template>
 
@@ -1121,12 +1273,14 @@ import { ref, computed, onMounted, onUnmounted, watch, nextTick, inject } from '
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import QuantityModal from './QuantityModal.vue'
+import ProductCard from './ProductCard.vue'
 import POSVariantSelector from '../POSVariantSelector.vue'
 import { useCatalogCart } from '../../stores/catalogCart.js'
-import { HeroEditorial, HeroSplit, HeroStreetwear, HeroFocus, HeroPortrait, HeroDarkCinematic } from './blocks/heroes/index.js'
-import { HeaderEditorialCenter, HeaderRetailLeft, HeaderTransparentGlass, HeaderRetailOverlay, HeaderUtilitySearch, HeaderCenteredSerif, HeaderDarkPremium } from './blocks/headers/index.js'
-import { TrustStripDarkContrast, TrustStripMinimalBorder, TrustStripDivided, TrustStripMarquee, TrustStripSoftPills } from './blocks/trust-strips/index.js'
-import { HookEditorialStory, HookUrbanLookbook, HookDynamicBento, HookDarkNoir } from './blocks/hooks/index.js'
+import { HeroEditorial, HeroSplit, HeroStreetwear, HeroFocus, HeroPortrait, HeroDarkCinematic, HeroCarousel, HeroCentered, HeroImageGrid, HeroMinimal, HeroOverlay, HeroVideoLoop, HeroParallax, HeroGradientWave } from './blocks/heroes/index.js'
+import { HeaderEditorialCenter, HeaderRetailLeft, HeaderTransparentGlass, HeaderRetailOverlay, HeaderUtilitySearch, HeaderCenteredSerif, HeaderDarkPremium, HeaderSplitAction, HeaderMinimalFloat } from './blocks/headers/index.js'
+import { TrustStripDarkContrast, TrustStripMinimalBorder, TrustStripDivided, TrustStripMarquee, TrustStripSoftPills, TrustStripIconGrid, TrustStripCountdown } from './blocks/trust-strips/index.js'
+import { HookEditorialStory, HookUrbanLookbook, HookDynamicBento, HookDarkNoir, HookTestimonials, HookCollectionGrid, HookBrandManifesto } from './blocks/hooks/index.js'
+import BottomNavBar from './blocks/BottomNavBar.vue'
 import { productUrl } from '../../utils/slugify.js'
 
 const router = useRouter()
@@ -1271,6 +1425,25 @@ const layoutConfig = computed(() => {
     ticker_style: cfg.ticker_style || 'muted-light',
     hero_content_density: cfg.hero_content_density || 'balanced'
   }
+})
+
+// AI ecommerce features — controls retail elements (badges, promos, bottom nav, reviews)
+const ecommerceFeatures = computed(() => {
+  const ecf = props.storeConfig.ai_ecommerce_features || {}
+  return {
+    show_discount_badge: ecf.show_discount_badge ?? false,
+    discount_percentage: ecf.discount_percentage ?? 7,
+    show_promo_banner: ecf.show_promo_banner ?? false,
+    promo_banner_text: ecf.promo_banner_text || '',
+    show_reviews: ecf.show_reviews ?? false,
+    show_bottom_nav: ecf.show_bottom_nav ?? false,
+    retail_intensity: ecf.retail_intensity || 'minimal'
+  }
+})
+
+// Fake reviews from AI
+const fakeReviews = computed(() => {
+  return props.storeConfig.ai_fake_reviews || []
 })
 
 // AI header config — controla qué navbar se renderiza + su ticker y animación
@@ -1654,12 +1827,12 @@ const gridClasses = computed(() => {
   return 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 lg:gap-5'
 })
 
-// Grid Premium para Moda (2 columnas en móvil, máximo 4 en desktop)
+// Grid Premium para Moda (2 columnas en móvil, 3 en desktop con sidebar, 4 en pantallas XL)
 const gridClassesPremium = computed(() => {
   if (props.isMobilePreview) {
     return 'grid grid-cols-2 gap-3 px-0'
   }
-  return 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5'
+  return 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-5'
 })
 
 

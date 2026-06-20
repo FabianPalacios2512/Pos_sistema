@@ -292,15 +292,18 @@
                 <!-- Barra flotante de controles -->
                 <div class="flex items-center justify-center gap-4 p-3 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl rounded-3xl border border-gray-200/80 dark:border-zinc-700/80 shadow-xl shadow-gray-300/30 dark:shadow-black/40 max-w-[280px] mx-auto">
                   
-                  <!-- Botón de micrófono - Glassmorphism con brillo activo -->
+                  <!-- Botón de micrófono - Live Call Premium -->
                   <button
-                    class="w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300"
+                    class="relative w-16 h-16 rounded-full flex items-center justify-center transition-all duration-500 group"
                     :class="liveCall.isListening.value 
-                      ? 'bg-gradient-to-br from-blue-400 to-violet-500 text-white shadow-lg shadow-blue-400/40' 
-                      : 'bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-600 dark:text-gray-300'"
-                    :style="liveCall.isListening.value ? { boxShadow: '0 0 25px rgba(96,165,250,0.5), 0 0 50px rgba(167,139,250,0.3)' } : {}"
+                      ? 'bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white shadow-[0_0_30px_rgba(168,85,247,0.5)] scale-105' 
+                      : 'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 text-gray-700 dark:text-gray-200 shadow-xl shadow-gray-200/50 dark:shadow-black/20'"
                   >
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <!-- Ondas animadas cuando escucha -->
+                    <div v-if="liveCall.isListening.value" class="absolute inset-0 rounded-full border border-white/50 animate-ping" style="animation-duration: 1.5s;"></div>
+                    <div v-if="liveCall.isListening.value" class="absolute -inset-2 rounded-full border border-purple-400/30 animate-ping" style="animation-duration: 2s; animation-delay: 200ms;"></div>
+                    
+                    <svg class="w-7 h-7 relative z-10 transition-transform duration-300" :class="{'scale-110': liveCall.isListening.value}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/>
                     </svg>
                   </button>
@@ -481,17 +484,16 @@
                 <!-- Mensaje del usuario -->
                 <div v-if="message.type === 'user'" class="flex justify-end">
                   <div class="max-w-[85%] bg-[#e3f2fd] dark:bg-blue-900/40 text-gray-900 dark:text-blue-100 px-4 py-3 rounded-[20px] rounded-br-md">
-                    <p class="text-[15px] whitespace-pre-line leading-relaxed">{{ message.text }}</p>
+                    <p class="text-[15px] whitespace-pre-line leading-relaxed" v-html="formatMessage(message.text)"></p>
                   </div>
                 </div>
 
                 <!-- Mensaje de la IA -->
                 <div v-else class="flex gap-3">
-                  <!-- Avatar Gemini -->
-                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 via-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-                    <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 0L14.59 8.41L23 11L14.59 13.59L12 22L9.41 13.59L1 11L9.41 8.41L12 0Z"/>
-                    </svg>
+                  <!-- Avatar IA Premium -->
+                  <div class="relative w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-[0_0_12px_rgba(99,102,241,0.3)]">
+                    <div class="absolute inset-[1.5px] bg-white dark:bg-[#131314] rounded-full"></div>
+                    <div class="w-2.5 h-2.5 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full shadow-[0_0_8px_rgba(139,92,246,0.6)] animate-pulse z-10"></div>
                   </div>
 
                   <div class="flex-1 max-w-[88%]">
@@ -529,7 +531,7 @@
                         </svg>
                         <p class="text-amber-700 dark:text-amber-400 text-sm">{{ message.text }}</p>
                       </div>
-                      <p v-else class="whitespace-pre-line">{{ message.text }}</p>
+                      <p v-else class="whitespace-pre-line" v-html="formatMessage(message.text)"></p>
                       
                       <button 
                         v-if="message.suggested_action"
@@ -546,10 +548,9 @@
 
               <!-- Typing indicator - Estilo Gemini -->
               <div v-if="isTyping" class="flex gap-3 animate-fade-in">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 via-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-                  <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 0L14.59 8.41L23 11L14.59 13.59L12 22L9.41 13.59L1 11L9.41 8.41L12 0Z"/>
-                  </svg>
+                <div class="relative w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-[0_0_12px_rgba(99,102,241,0.3)]">
+                  <div class="absolute inset-[1.5px] bg-white dark:bg-[#131314] rounded-full"></div>
+                  <div class="w-2.5 h-2.5 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full shadow-[0_0_8px_rgba(139,92,246,0.6)] animate-pulse z-10"></div>
                 </div>
                 <div class="flex items-center gap-1 py-3">
                   <div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
@@ -639,53 +640,49 @@
                   </div>
                   
                   <!-- Derecha: Mic + Enviar -->
-                  <div class="flex items-center gap-1">
+                  <div class="flex items-center gap-2">
                     <!-- Botón Live Call (solo para Premium y Enterprise) -->
                     <button
                       v-if="hasVoiceAccess"
                       type="button"
                       @click="startLiveCall"
                       :disabled="isTyping || !canUseVoice"
-                      class="relative w-10 h-10 flex items-center justify-center rounded-full transition-all"
+                      class="relative w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 group"
                       :class="[
                         canUseVoice 
-                          ? 'text-gray-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
-                          : 'text-gray-300 dark:text-zinc-600 cursor-not-allowed'
+                          ? 'bg-blue-50/80 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 hover:scale-105 border border-blue-100 dark:border-blue-800/50'
+                          : 'bg-gray-50 dark:bg-zinc-800 text-gray-300 dark:text-zinc-600 cursor-not-allowed'
                       ]"
                       :title="canUseVoice ? (voiceLimitSeconds === 0 ? 'Llamada en vivo (ilimitado)' : `Llamada en vivo (${Math.floor(voiceSecondsRemaining / 60)}:${String(voiceSecondsRemaining % 60).padStart(2, '0')} restantes)`) : 'Sin minutos de voz disponibles'"
                     >
                       <!-- Indicador de tiempo restante (muestra si hay límite y ha usado algo) -->
                       <span 
                         v-if="voiceLimitSeconds > 0 && voiceSecondsRemaining < voiceLimitSeconds"
-                        class="absolute -top-1 -right-1 px-1 py-0.5 bg-blue-500 text-white text-[8px] font-bold rounded-full"
+                        class="absolute -top-1 -right-1 px-1.5 py-0.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-[9px] font-bold rounded-full shadow-sm"
                       >
                         {{ Math.floor(voiceSecondsRemaining / 60) }}m
                       </span>
-                      <!-- Icono de onda de audio / Live -->
-                      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                      <!-- Icono de onda de audio / Live (Rallitas preferidas por el usuario) -->
+                      <svg class="w-5 h-5 transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 3v18M8 7v10M4 10v4M16 7v10M20 10v4"/>
                         <path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 3v18M8 7v10M4 10v4M16 7v10M20 10v4"/>
                       </svg>
                     </button>
 
-                    <!-- Enviar / Ecualizer -->
+                    <!-- Enviar -->
                     <button
                       type="submit"
                       :disabled="!inputMessage.trim() || isTyping"
                       :class="[
-                        'w-10 h-10 flex items-center justify-center rounded-full transition-all',
+                        'w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300',
                         inputMessage.trim() && !isTyping
-                          ? 'bg-gray-800 dark:bg-zinc-700 text-white hover:bg-gray-900 dark:hover:bg-zinc-600'
-                          : 'text-gray-500 dark:text-zinc-500 hover:bg-white/60 dark:hover:bg-zinc-700/50'
+                          ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/30 hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-0.5'
+                          : 'bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500 cursor-not-allowed opacity-70'
                       ]"
                     >
-                      <!-- Icono de ecualizer cuando no hay texto -->
-                      <svg v-if="!inputMessage.trim()" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M7 18h2V6H7v12zm4 4h2V2h-2v20zm4-8h2v-4h-2v4z"/>
-                      </svg>
-                      <!-- Flecha de enviar cuando hay texto -->
-                      <svg v-else class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                      <!-- Flecha de enviar estilizada (se muestra siempre para evitar confusiones) -->
+                      <svg class="w-5 h-5 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.125A59.769 59.769 0 0121.485 12 59.768 59.768 0 013.27 20.875L5.999 12zm0 0h7.5"/>
                       </svg>
                     </button>
                   </div>
@@ -1605,6 +1602,20 @@ export default {
       liveCall.endCall()
     }
 
+    // Formatear mensaje para renderizar Markdown básico (negritas e itálicas)
+    const formatMessage = (text) => {
+      if (!text) return ''
+      // Prevenir XSS básico
+      let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      
+      // Parsear **negrita**
+      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      // Parsear *itálica*
+      html = html.replace(/\*(.*?)\*/g, '<em>$1</em>')
+      
+      return html
+    }
+
     return {
       localChatOpen,
       isControlledExternally,
@@ -1662,7 +1673,8 @@ export default {
       chatMessageLimit,
       chatMessagesUsedToday,
       chatMessagesRemaining,
-      canSendChat
+      canSendChat,
+      formatMessage
     }
   }
 }

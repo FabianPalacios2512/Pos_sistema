@@ -23,7 +23,23 @@ export { default as HookDarkNoir }       from './HookDarkNoir.vue'
 // → Fondo negro puro, imagen asimétrica 60/40, texto blanco + gray-400
 // → CTA outline sutil (border-white/20), sin tarjetas ni fondos visibles
 
+export { default as HookTestimonials }   from './HookTestimonials.vue'
+// Social Proof / Cualquier vertical — carrusel de reseñas con avatares
+// → Tarjetas horizontales scroll, stars + quote + autor, build confianza
+
+export { default as HookCollectionGrid } from './HookCollectionGrid.vue'
+// Multi-categoría / Moda / Retail — grid visual de colecciones
+// → 2 tall + 2 short asymétrico, hover arrows, collection labels
+
+export { default as HookBrandManifesto } from './HookBrandManifesto.vue'
+// Editorial / Premium / Marcas con filosofía — statement tipográfico full-width
+// → Headline serif grande, texto manifiesto, firma de marca
+
 // ─── Mapeo para selección por IA ──────────────────────────────────────────────
-// 'editorial-story' → HookEditorialStory  (boutique, costura, belleza premium)
-// 'urban-lookbook'  → HookUrbanLookbook   (streetwear, sneakers, moda juvenil)
-// 'dynamic-bento'   → HookDynamicBento    (deportivo, tech, consumo masivo)
+// 'editorial-story'   → HookEditorialStory   (boutique, costura, belleza premium)
+// 'urban-lookbook'    → HookUrbanLookbook    (streetwear, sneakers, moda juvenil)
+// 'dynamic-bento'     → HookDynamicBento     (deportivo, tech, consumo masivo)
+// 'dark-noir'         → HookDarkNoir         (alta costura noir, lujo oscuro)
+// 'testimonials'      → HookTestimonials     (cualquier vertical, social proof)
+// 'collection-grid'   → HookCollectionGrid   (multi-categoría, moda, retail)
+// 'brand-manifesto'   → HookBrandManifesto   (editorial, premium, marcas con historia)

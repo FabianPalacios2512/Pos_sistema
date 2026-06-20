@@ -26,56 +26,133 @@
     leave-from-class="opacity-100"
     leave-to-class="opacity-0"
   >
-  <div v-if="catalogUiMode === 'welcome'" class="h-full flex items-center justify-center bg-white dark:bg-[#0a0a0c] relative overflow-hidden">
-    <!-- Fondo: gradiente muy suave, casi imperceptible -->
+  <div v-if="catalogUiMode === 'welcome'" class="h-full grid grid-cols-1 lg:grid-cols-12 bg-white dark:bg-[#09090b] relative overflow-hidden">
+    <!-- Background: Mesh gradient premium -->
     <div class="absolute inset-0 pointer-events-none">
-      <div class="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-indigo-50/40 dark:from-[#0a0a0c] dark:via-[#0f0f12] dark:to-[#0a0a0c]"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(120,119,198,0.06),transparent)] dark:bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(120,119,198,0.10),transparent)]"></div>
+      <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-zinc-800 to-transparent"></div>
     </div>
 
-    <div class="relative z-10 max-w-3xl mx-auto px-8 text-center">
+    <!-- ═══ COLUMNA IZQUIERDA: Contenido ═══ -->
+    <div class="lg:col-span-5 relative z-10 flex flex-col justify-center px-12 lg:px-16 xl:px-20 py-12">
 
-      <!-- Icono desnudo — sin fondo, sin sombra de color -->
-      <div class="inline-flex items-center justify-center mb-10">
-        <svg class="w-20 h-20 text-gray-800 dark:text-zinc-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.0">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.375.375 0 00.375-.375v-1.5a.375.375 0 00-.375-.375h-3.75a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375z" />
-        </svg>
+      <!-- Pill badge superior -->
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-full mb-8 w-fit">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-[10px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-[0.15em]">✦ Impulsado por IA generativa</span>
       </div>
 
-      <!-- Título: sólido, tracking apretado, sin gradiente -->
-      <h1 class="text-[3.8rem] font-bold tracking-tight text-gray-900 dark:text-white leading-[1.05] mb-6">
-        Tu tienda online,<br>
-        <span class="text-[#1a73e8]">lista en minutos</span>
+      <!-- Hero Text -->
+      <h1 class="text-5xl md:text-[3.5rem] lg:text-6xl font-black text-gray-900 dark:text-white tracking-tight mb-6 leading-[1.1]">
+        La IA crea tu<br class="hidden md:block"/>
+        tienda 
+        <span class="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 pb-2">
+          perfecta
+          <!-- Curva decorativa (underline) -->
+          <svg class="absolute -bottom-1 left-0 w-full h-3 text-emerald-400" viewBox="0 0 100 20" preserveAspectRatio="none">
+            <path d="M0,15 Q50,0 100,10" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/>
+          </svg>
+        </span>
       </h1>
-      <p class="text-[1.15rem] text-gray-500 dark:text-zinc-400 mb-14 leading-relaxed max-w-xl mx-auto">
-        Describe tu negocio con tus propias palabras y nuestra IA construirá una identidad visual completa para tu catálogo web — colores, tipografías, textos y más.
+      <p class="text-[1.1rem] text-gray-600 dark:text-zinc-400 mb-10 max-w-lg leading-relaxed font-medium">
+        Describe tu negocio y en 30 segundos tendrás un diseño profesional, con tu identidad, colores y textos listos para vender.
       </p>
 
-      <!-- Feature icons: desnudos, sin contenedor -->
-      <div class="flex items-start justify-center gap-16 mb-14">
-        <div v-for="feat in [
-          { icon: 'M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z', label: 'IA Generativa' },
-          { icon: 'M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z', label: 'Menos de 30 seg' },
-          { icon: 'M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z M15 12a3 3 0 11-6 0 3 3 0 016 0z', label: 'Vista previa en vivo' }
-        ]" :key="feat.label" class="flex flex-col items-center gap-3">
-          <svg class="w-7 h-7 text-gray-700 dark:text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2">
-            <path stroke-linecap="round" stroke-linejoin="round" :d="feat.icon" />
-          </svg>
-          <span class="text-[13px] font-medium text-gray-500 dark:text-zinc-400 tracking-wide">{{ feat.label }}</span>
+      <!-- CTA: Negro sólido, más grande, con intención -->
+      <button
+        @click="catalogUiMode = 'brief-only'"
+        class="welcome-cta-btn group inline-flex items-center gap-3 px-10 py-5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 text-[16px] font-semibold rounded-xl shadow-lg shadow-gray-900/15 dark:shadow-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-gray-900/20 active:translate-y-0 active:scale-[0.98] w-fit"
+      >
+        <svg class="w-5 h-5 transition-transform duration-300 group-hover:rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+        </svg>
+        Crear mi tienda ahora
+        <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+        </svg>
+      </button>
+
+      <!-- Micro-beneficios como checklist vertical -->
+      <div class="flex flex-col gap-3 mt-10">
+        <div v-for="benefit in [
+          { icon: 'M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z', text: 'Listo en 30 segundos' },
+          { icon: 'M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42', text: 'Sin conocimientos de diseño' },
+          { icon: 'M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z', text: '5 opciones únicas para elegir' }
+        ]" :key="benefit.text" class="flex items-center gap-3">
+          <div class="w-5 h-5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center flex-shrink-0">
+            <svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+          </div>
+          <span class="text-[14px] text-gray-600 dark:text-zinc-400 font-medium">{{ benefit.text }}</span>
         </div>
       </div>
 
-      <!-- CTA: sólido, sin gradiente, con sombra limpia -->
-      <button
-        @click="catalogUiMode = 'brief-only'"
-        class="inline-flex items-center gap-3 px-10 py-[18px] bg-[#1a73e8] hover:bg-[#1557b0] text-white text-[17px] font-semibold rounded-2xl shadow-xl shadow-blue-500/25 transition-all duration-200 hover:shadow-blue-500/35 hover:-translate-y-px"
-      >
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
-        </svg>
-        Crear mi tienda web ahora
-      </button>
+      <!-- Social Proof / Avatares -->
+      <div class="mt-12 flex items-center gap-4">
+        <div class="flex -space-x-3">
+          <img class="w-10 h-10 rounded-full border-2 border-white dark:border-zinc-900 object-cover shadow-sm" src="https://randomuser.me/api/portraits/women/12.jpg" alt="User 1" loading="lazy" />
+          <img class="w-10 h-10 rounded-full border-2 border-white dark:border-zinc-900 object-cover shadow-sm" src="https://randomuser.me/api/portraits/men/32.jpg" alt="User 2" loading="lazy" />
+          <img class="w-10 h-10 rounded-full border-2 border-white dark:border-zinc-900 object-cover shadow-sm" src="https://randomuser.me/api/portraits/women/44.jpg" alt="User 3" loading="lazy" />
+          <img class="w-10 h-10 rounded-full border-2 border-white dark:border-zinc-900 object-cover shadow-sm" src="https://randomuser.me/api/portraits/men/46.jpg" alt="User 4" loading="lazy" />
+        </div>
+        <div class="flex flex-col">
+          <span class="text-[13px] font-bold text-gray-700 dark:text-zinc-300 leading-tight">+2,500 negocios</span>
+          <span class="text-[12px] text-gray-500 dark:text-zinc-500 leading-tight">ya crearon su tienda</span>
+        </div>
+      </div>
+    </div>
 
-      <p class="mt-5 text-[13px] text-gray-400 dark:text-zinc-600 tracking-wide">Gratis · Sin necesidad de diseñador · Todo con IA</p>
+    <!-- ═══ COLUMNA DERECHA: Carrusel dinámico de imágenes reales ═══ -->
+    <div class="lg:col-span-7 relative z-10 flex items-center justify-center bg-gray-50/50 dark:bg-zinc-900/30 border-t lg:border-t-0 lg:border-l border-gray-100 dark:border-zinc-800/50 p-6 md:p-8 lg:p-8 xl:p-10 min-h-[400px] lg:min-h-0 overflow-hidden">
+      <!-- Decoración de fondo sutil -->
+      <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.04),transparent)] dark:bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.06),transparent)]"></div>
+
+      <!-- Contenedor del Carrusel (Sin restricciones pesadas para que sea gigante) -->
+      <div 
+        class="relative w-full max-w-[95%] md:max-w-4xl lg:max-w-5xl xl:max-w-7xl transform hover:scale-[1.02] transition-transform duration-700 ease-out"
+        @mouseenter="isCarouselHovered = true"
+        @mouseleave="isCarouselHovered = false"
+      >
+        <div class="relative w-full aspect-[4/3] md:aspect-[16/10] lg:aspect-[16/10] xl:aspect-[16/9]">
+          <TransitionGroup
+            enter-active-class="transition-all duration-700 ease-out"
+            enter-from-class="opacity-0 translate-x-12"
+            enter-to-class="opacity-100 translate-x-0"
+            leave-active-class="transition-all duration-700 ease-in absolute inset-0"
+            leave-from-class="opacity-100 translate-x-0"
+            leave-to-class="opacity-0 -translate-x-12"
+          >
+            <div
+              v-for="(imgSrc, idx) in carouselImages"
+              v-show="idx === activeCarouselIdx"
+              :key="imgSrc"
+              class="absolute inset-0 w-full h-full flex items-center justify-center"
+            >
+              <!-- Se usa object-contain y tamaño full para que abarque lo máximo posible del aspecto asignado -->
+              <img :src="imgSrc" alt="Preview Tienda" class="w-full h-full object-contain filter drop-shadow-[0_20px_40px_rgba(0,0,0,0.12)] dark:drop-shadow-[0_20px_40px_rgba(0,0,0,0.4)]" loading="lazy" />
+            </div>
+          </TransitionGroup>
+        </div>
+
+        <!-- Indicadores (dots) mucho más limpios -->
+        <div class="absolute -bottom-8 md:-bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-2.5 md:gap-3 bg-gray-900/5 dark:bg-white/10 backdrop-blur-sm px-4 md:px-5 py-2 md:py-2.5 rounded-full border border-gray-200/50 dark:border-white/10">
+          <button 
+            v-for="(_, idx) in carouselImages" 
+            :key="idx"
+            class="transition-all duration-300 rounded-full"
+            :class="idx === activeCarouselIdx ? 'w-6 h-2 md:w-8 md:h-2 bg-gray-900 dark:bg-white' : 'w-2 h-2 bg-gray-400/60 hover:bg-gray-600 dark:bg-white/40 dark:hover:bg-white/80'"
+            @click="activeCarouselIdx = idx"
+            aria-label="Ir a la imagen"
+          ></button>
+        </div>
+      </div>
+
+      <!-- Label flotante de preview en vivo -->
+      <div class="absolute top-6 md:top-10 right-6 md:right-10 inline-flex items-center gap-2.5 px-4 py-2 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-gray-200 dark:border-zinc-700 rounded-full shadow-lg transition-all duration-300 z-20" :class="isCarouselHovered ? 'opacity-30' : 'opacity-100'">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-[10px] font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Resultados Reales</span>
+      </div>
     </div>
   </div>
   </Transition>
@@ -91,79 +168,177 @@
     leave-from-class="opacity-100 translate-y-0"
     leave-to-class="opacity-0 translate-y-4"
   >
-  <div v-if="catalogUiMode === 'brief-only'" class="h-full flex flex-col items-center justify-center bg-white dark:bg-[#0a0a0c] px-6 relative overflow-hidden">
-    <!-- Fondo mínimo -->
-    <div class="absolute inset-0 pointer-events-none bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-[#0a0a0c] dark:to-[#0f0f12]"></div>
+  <div v-if="catalogUiMode === 'brief-only'" class="h-full flex flex-col items-center justify-center bg-white dark:bg-[#09090b] px-6 relative overflow-hidden">
+    <!-- Background: clean subtle gradient -->
+    <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(120,119,198,0.05),transparent)] dark:bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(120,119,198,0.08),transparent)]"></div>
 
     <div class="relative z-10 w-full max-w-3xl">
-      <!-- Header -->
-      <div class="text-center mb-10">
-        <!-- Badge discreta -->
-        <div class="inline-flex items-center gap-1.5 px-4 py-1.5 bg-gray-100 dark:bg-zinc-800 rounded-full mb-6">
-          <span class="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-zinc-500"></span>
-          <span class="text-[11px] text-gray-600 dark:text-zinc-400 uppercase tracking-widest font-semibold">IA lista para empezar</span>
+      <!-- ═══ STEPPER REDISEÑADO ═══ -->
+      <div class="flex items-start justify-center gap-0 mb-10">
+        <!-- Paso 1: Activo -->
+        <div class="flex flex-col items-center gap-1.5">
+          <div class="w-8 h-8 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 flex items-center justify-center font-bold text-xs shadow-sm">1</div>
+          <span class="text-[12px] font-semibold text-gray-900 dark:text-white">Inspiración</span>
+          <span class="text-[10px] text-gray-400 dark:text-zinc-500 font-medium">Describe tu negocio</span>
         </div>
-        <h2 class="text-[2.8rem] font-bold tracking-tight text-gray-900 dark:text-white mb-3">Cuéntame sobre tu negocio</h2>
-        <p class="text-[16px] text-gray-500 dark:text-zinc-400 leading-relaxed">Describe tu marca: estilo, público objetivo, colores que te gustan, qué vendes...</p>
+        <!-- Barra conectora 1→2 -->
+        <div class="flex-1 max-w-[80px] mt-4 mx-3">
+          <div class="h-[2px] w-full bg-gray-200 dark:bg-zinc-800 rounded-full"></div>
+        </div>
+        <!-- Paso 2: Pendiente -->
+        <div class="flex flex-col items-center gap-1.5 opacity-40">
+          <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500 flex items-center justify-center font-bold text-xs border border-gray-200 dark:border-zinc-700">2</div>
+          <span class="text-[12px] font-medium text-gray-400 dark:text-zinc-500">Elección</span>
+          <span class="text-[10px] text-gray-300 dark:text-zinc-600 font-medium">Elige tu favorito</span>
+        </div>
+        <!-- Barra conectora 2→3 -->
+        <div class="flex-1 max-w-[80px] mt-4 mx-3">
+          <div class="h-[2px] w-full bg-gray-200 dark:bg-zinc-800 rounded-full"></div>
+        </div>
+        <!-- Paso 3: Pendiente -->
+        <div class="flex flex-col items-center gap-1.5 opacity-40">
+          <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500 flex items-center justify-center font-bold text-xs border border-gray-200 dark:border-zinc-700">3</div>
+          <span class="text-[12px] font-medium text-gray-400 dark:text-zinc-500">Fotos</span>
+          <span class="text-[10px] text-gray-300 dark:text-zinc-600 font-medium">Sube tus imágenes</span>
+        </div>
       </div>
 
-      <!-- Tarjeta del textarea: blanco puro, sombra editorial -->
-      <div class="bg-white dark:bg-[#111113] rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-[0_12px_40px_rgb(0,0,0,0.06)] dark:shadow-[0_12px_40px_rgb(0,0,0,0.4)] overflow-hidden">
-        <textarea
-          v-model="aiBrandDescription"
-          rows="10"
-          placeholder="Ejemplo: Tengo una tienda de ropa femenina, estilo romántico y boho. Mi clienta tiene entre 25 y 40 años. Me gustan los colores tierra, beige y rosado polvoso. Quiero que mi tienda se vea elegante pero accesible..."
-          class="w-full px-8 pt-8 pb-4 bg-transparent text-[16px] text-gray-900 dark:text-zinc-100 placeholder-gray-300 dark:placeholder-zinc-600 resize-none leading-relaxed focus:outline-none focus:ring-0"
-          @keydown.ctrl.enter="generateAiBrand"
-        ></textarea>
+      <!-- ═══ HEADER CONVERSACIONAL ═══ -->
+      <div class="text-center mb-6">
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-gray-900 dark:text-white mb-3">Cuéntame sobre tu negocio</h2>
+        <p class="text-base text-gray-500 dark:text-zinc-400 leading-relaxed max-w-xl mx-auto">
+          ¿Qué vendes? ¿Cuál es tu estilo? ¿Qué colores te representan? Escríbelo como si hablaras con un diseñador.
+        </p>
+      </div>
+
+      <!-- ═══ TEXTAREA CARD: más amplio, con placeholder animado ═══ -->
+      <div class="bg-white dark:bg-[#111113] rounded-xl border transition-colors duration-200 shadow-sm overflow-hidden relative"
+        :class="aiBrandDescription.length > 0 ? 'border-gray-300 dark:border-zinc-700 shadow-md' : 'border-gray-200 dark:border-zinc-800'">
+        <!-- Floating Voice indicator -->
+        <div v-if="isRecordingVoice" class="absolute top-4 right-4 flex items-center gap-1.5 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/40 text-red-600 dark:text-red-400 px-3 py-1.5 rounded-full text-[11px] font-semibold animate-pulse z-10">
+          <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
+          <span>Escuchando...</span>
+        </div>
+
+        <div class="relative">
+          <textarea
+            ref="briefTextarea"
+            v-model="aiBrandDescription"
+            rows="5"
+            class="w-full px-7 pt-7 pb-3 bg-transparent text-base text-gray-900 dark:text-zinc-100 resize-none leading-relaxed focus:outline-none focus:ring-0 placeholder-transparent"
+            @keydown.ctrl.enter="generateAiBrand"
+          ></textarea>
+          <!-- Placeholder animado con fade -->
+          <div v-if="!aiBrandDescription" class="absolute top-7 left-7 right-7 pointer-events-none">
+            <TransitionGroup
+              enter-active-class="transition-opacity duration-500 ease-out"
+              enter-from-class="opacity-0"
+              enter-to-class="opacity-100"
+              leave-active-class="transition-opacity duration-300 ease-in absolute inset-0"
+              leave-from-class="opacity-100"
+              leave-to-class="opacity-0"
+            >
+              <p v-for="(ph, idx) in animatedPlaceholders" v-show="idx === activePlaceholderIdx" :key="ph" class="text-base text-gray-300 dark:text-zinc-600 leading-relaxed">
+                {{ ph }}
+              </p>
+            </TransitionGroup>
+          </div>
+        </div>
+        
         <!-- Footer del card -->
-        <div class="px-8 pb-6 flex items-center justify-between border-t border-gray-100 dark:border-zinc-800 pt-5">
-          <span class="text-[13px] text-gray-400 dark:text-zinc-600">{{ aiBrandDescription.length }} caracteres · Ctrl+Enter para generar</span>
-          <div class="flex items-center gap-2">
-            <!-- Voz -->
+        <div class="px-7 py-3.5 flex items-center justify-between border-t border-gray-100 dark:border-zinc-800/80 bg-gray-50/60 dark:bg-zinc-900/40">
+          <div class="flex items-center gap-3">
+            <span class="text-[11px] font-medium transition-colors duration-200"
+              :class="aiBrandDescription.length >= 30 ? 'text-emerald-500 dark:text-emerald-400' : 'text-gray-400 dark:text-zinc-500'">
+              {{ aiBrandDescription.length }} caracteres
+            </span>
+            <!-- Indicador de buena descripción -->
+            <Transition enter-active-class="transition-all duration-300 ease-out" enter-from-class="opacity-0 scale-90" enter-to-class="opacity-100 scale-100" leave-active-class="transition-all duration-200 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
+              <span v-if="aiBrandDescription.length >= 50" class="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-500 dark:text-emerald-400">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" /></svg>
+                Buena descripción
+              </span>
+            </Transition>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <!-- Botón de voz -->
             <button
               @click="toggleVoiceRecording"
               :title="isRecordingVoice ? 'Detener grabación' : 'Dictar con voz'"
-              class="w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-150"
+              class="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-150 relative"
               :class="isRecordingVoice
-                ? 'bg-red-500 text-white'
-                : 'bg-gray-50 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300 border border-gray-200 dark:border-zinc-700'"
+                ? 'bg-red-500 text-white shadow-sm'
+                : 'bg-white dark:bg-zinc-800 text-gray-400 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 border border-gray-200 dark:border-zinc-700 hover:border-gray-300'"
             >
-              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <span v-if="isRecordingVoice" class="absolute inset-0 rounded-lg bg-red-500 animate-ping opacity-50"></span>
+              <svg class="w-4 h-4 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
               </svg>
             </button>
-            <!-- Generar -->
+            
+            <!-- Botón generar: negro sólido, más grande -->
             <button
               @click="generateAiBrand"
               :disabled="!aiBrandDescription || aiBrandDescription.trim().length < 10 || isGeneratingBrand"
-              class="inline-flex items-center gap-2.5 px-7 py-3 bg-[#1a73e8] hover:bg-[#1557b0] text-white text-[15px] font-semibold rounded-xl shadow-md shadow-blue-500/20 transition-all duration-150 disabled:opacity-35 disabled:cursor-not-allowed disabled:shadow-none"
+              class="group inline-flex items-center gap-2.5 px-7 py-3 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 text-[14px] font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
             >
-              <svg v-if="!isGeneratingBrand" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+              <svg v-if="!isGeneratingBrand" class="w-4 h-4 transition-transform duration-300 group-hover:rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
               </svg>
-              <svg v-else class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+              <svg v-else class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
               </svg>
-              {{ isGeneratingBrand ? aiGenerationProgress || 'Generando...' : 'Generar identidad' }}
+              <span>{{ isGeneratingBrand ? aiGenerationProgress || 'Creando...' : 'Generar 5 diseños ✦' }}</span>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Progress bar mientras genera -->
-      <div v-if="isGeneratingBrand" class="mt-5">
-        <div class="w-full bg-gray-100 dark:bg-zinc-800 rounded-full h-px overflow-hidden mb-2">
-          <div class="h-full bg-gray-800 dark:bg-zinc-300 rounded-full animate-[loading_2.5s_ease-in-out_infinite]" style="width: 70%"></div>
+      <!-- ═══ SUGERENCIAS RÁPIDAS (debajo del textarea) ═══ -->
+      <div class="mt-4 mb-2">
+        <p class="text-[10px] font-bold text-gray-400 dark:text-zinc-600 uppercase tracking-[0.12em] mb-3 text-center">¿No sabes qué escribir? Prueba un ejemplo:</p>
+        <div class="flex flex-wrap items-center justify-center gap-2.5">
+          <button
+            v-for="sugg in promptSuggestions"
+            :key="sugg.label"
+            @click="selectPromptSuggestion(sugg.desc)"
+            class="inline-flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-lg text-[13px] font-medium text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-200 active:scale-95 transition-all duration-150 shadow-sm hover:shadow"
+          >
+            <span class="text-[16px]">{{ sugg.icon }}</span>
+            <span>{{ sugg.label }}</span>
+          </button>
         </div>
-        <p class="text-center text-[11px] text-gray-400 dark:text-zinc-600">{{ aiGenerationProgress }}</p>
       </div>
 
-      <!-- Volver -->
-      <div class="text-center mt-7">
-        <button @click="catalogUiMode = 'welcome'" class="text-[11px] text-gray-400 dark:text-zinc-600 hover:text-gray-700 dark:hover:text-zinc-300 transition-colors tracking-wide">
-          ← Volver al inicio
+      <!-- ═══ BARRA DE CARGA CON MENSAJES ROTATIVOS ═══ -->
+      <Transition
+        enter-active-class="transition-all duration-300 ease-out"
+        enter-from-class="opacity-0 -translate-y-2"
+        enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition-all duration-200 ease-in"
+        leave-from-class="opacity-100 translate-y-0"
+        leave-to-class="opacity-0 -translate-y-2"
+      >
+        <div v-if="isGeneratingBrand" class="mt-5 bg-gray-50 dark:bg-zinc-900/50 rounded-xl border border-gray-100 dark:border-zinc-800 px-6 py-4">
+          <div class="w-full bg-gray-200 dark:bg-zinc-800 rounded-full h-1.5 overflow-hidden mb-3">
+            <div class="h-full bg-gray-900 dark:bg-white rounded-full transition-all duration-700 ease-out" :style="{ width: designsReady ? (designsReady / 5 * 100) + '%' : '15%', animation: designsReady ? 'none' : 'loading 2.5s ease-in-out infinite' }"></div>
+          </div>
+          <p class="text-center text-[12px] font-medium text-gray-500 dark:text-zinc-400 flex items-center justify-center gap-2">
+            <svg class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+            <span>{{ aiGenerationProgress || 'Preparando tu diseño...' }}</span>
+          </p>
+        </div>
+      </Transition>
+
+      <!-- Volver: más visible -->
+      <div class="text-center mt-8">
+        <button @click="catalogUiMode = 'welcome'" class="inline-flex items-center gap-1.5 text-[12px] font-medium text-gray-400 dark:text-zinc-600 hover:text-gray-700 dark:hover:text-zinc-300 transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
+          Volver al inicio
         </button>
       </div>
     </div>
@@ -173,57 +348,107 @@
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <!-- CHOOSING: Carrusel de 5 diseños generados por IA                 -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <div v-if="catalogUiMode === 'choosing'" class="h-full flex flex-col items-center justify-center bg-white dark:bg-[#0a0a0c] px-4 relative overflow-hidden">
-    <!-- Fondo mínimo -->
-    <div class="absolute inset-0 pointer-events-none bg-gradient-to-br from-slate-50 via-white to-indigo-50/20 dark:from-[#0a0a0c] dark:to-[#0f0f12]"></div>
+  <div v-if="catalogUiMode === 'choosing'" class="h-full flex flex-col items-center bg-white dark:bg-[#09090b] px-4 relative overflow-y-auto overflow-x-hidden py-4">
+    <!-- Background: clean -->
+    <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(120,119,198,0.04),transparent)] dark:bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(120,119,198,0.06),transparent)]"></div>
+
+    <!-- Contenedor interno para centrar contenido en pantallas grandes si cabe -->
+    <div class="w-full max-w-6xl mx-auto flex flex-col items-center flex-shrink-0">
+      <!-- Stepper: consistent with redesigned Brief -->
+    <div class="relative z-10 flex items-start justify-center gap-0 mb-5 flex-shrink-0">
+      <!-- Paso 1: Completado -->
+      <div class="flex flex-col items-center gap-1">
+        <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <span class="text-[11px] font-medium text-gray-400 dark:text-zinc-500">Inspiración</span>
+      </div>
+      <!-- Barra conectora 1→2 (completada) -->
+      <div class="flex-1 max-w-[60px] mt-4 mx-2.5">
+        <div class="h-[2px] w-full bg-emerald-500 rounded-full"></div>
+      </div>
+      <!-- Paso 2: Activo -->
+      <div class="flex flex-col items-center gap-1">
+        <div class="w-8 h-8 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 flex items-center justify-center font-bold text-xs shadow-sm">2</div>
+        <span class="text-[11px] font-semibold text-gray-900 dark:text-white">Elección</span>
+      </div>
+      <!-- Barra conectora 2→3 -->
+      <div class="flex-1 max-w-[60px] mt-4 mx-2.5">
+        <div class="h-[2px] w-full bg-gray-200 dark:bg-zinc-800 rounded-full"></div>
+      </div>
+      <!-- Paso 3: Pendiente -->
+      <div class="flex flex-col items-center gap-1 opacity-40">
+        <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500 flex items-center justify-center font-bold text-xs border border-gray-200 dark:border-zinc-700">3</div>
+        <span class="text-[11px] font-medium text-gray-400 dark:text-zinc-500">Fotos</span>
+      </div>
+    </div>
 
     <!-- Header -->
-    <div class="relative z-10 text-center mb-8 flex-shrink-0">
-      <div v-if="designsReady < 5" class="inline-flex items-center gap-2 px-4 py-1.5 bg-gray-100 dark:bg-zinc-800 rounded-full mb-5">
+    <div class="relative z-10 text-center mb-5 flex-shrink-0">
+      <div v-if="designsReady < 5" class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md mb-3 animate-pulse">
         <svg class="animate-spin w-3 h-3 text-gray-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
         </svg>
-        <span class="text-[11px] text-gray-600 dark:text-zinc-400 uppercase tracking-widest font-semibold">Generando · {{ designsReady }}/5 listos</span>
+        <span class="text-[10px] text-gray-600 dark:text-zinc-400 uppercase tracking-[0.12em] font-bold">Generando diseños · {{ designsReady }}/5</span>
       </div>
-      <div v-else class="inline-flex items-center gap-2 px-4 py-1.5 bg-gray-100 dark:bg-zinc-800 rounded-full mb-5">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-        <span class="text-[11px] text-gray-600 dark:text-zinc-400 uppercase tracking-widest font-semibold">5 diseños únicos listos</span>
+      <div v-else class="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 rounded-md mb-3">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-[10px] text-emerald-700 dark:text-emerald-400 uppercase tracking-[0.12em] font-bold">5 diseños listos</span>
       </div>
-      <h2 class="text-[2.4rem] font-bold tracking-tight text-gray-900 dark:text-white mb-2">Elige tu diseño favorito</h2>
-      <p class="text-[15px] text-gray-500 dark:text-zinc-400">La IA creó 5 identidades únicas para tu marca.</p>
+      <h2 class="text-2xl md:text-3xl font-semibold tracking-[-0.02em] text-gray-900 dark:text-white mb-1.5">Elige tu diseño</h2>
+      <p class="text-[13px] text-gray-500 dark:text-zinc-400">5 combinaciones únicas adaptadas al estilo de tu marca.</p>
     </div>
 
     <!-- Área principal: flechas + teléfono + moodboard -->
-    <div class="relative z-10 flex items-center gap-8 flex-shrink-0">
+    <div class="relative z-10 flex items-center justify-center gap-8 flex-shrink-0 w-full max-w-5xl px-4">
 
       <!-- Flecha Anterior -->
       <button
         @click="currentDesignIdx = (currentDesignIdx - 1 + generatedDesigns.length) % generatedDesigns.length"
         :disabled="generatedDesigns.length < 2"
-        class="w-12 h-12 rounded-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 shadow-md flex items-center justify-center text-gray-600 dark:text-zinc-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-600 hover:shadow-lg transition-all disabled:opacity-20 flex-shrink-0"
+        class="w-10 h-10 rounded-lg bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 flex items-center justify-center text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-300 dark:hover:border-zinc-700 active:scale-95 transition-all disabled:opacity-20 flex-shrink-0"
+        :class="{ 'ring-4 ring-blue-500 animate-pulse border-transparent': highlightArrows }"
       >
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
         </svg>
       </button>
 
-      <!-- TELÉFONO hiperrealista (375×740 escalado a 0.95 → 356×703) -->
-      <div style="width: 356px; height: 703px; position: relative; flex-shrink: 0;">
-        <div style="position: absolute; top: 0; left: 0; width: 375px; height: 740px; transform: scale(0.95); transform-origin: top left;">
-          <!-- Marco negro real del teléfono -->
-          <div class="absolute inset-0 rounded-[3rem] border-[12px] border-black shadow-2xl pointer-events-none z-50">
-            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-36 h-6 bg-black rounded-b-2xl -mt-[12px]"></div>
-            <div class="absolute -left-[12px] top-24 w-1 h-10 bg-black rounded-l"></div>
-            <div class="absolute -left-[12px] top-36 w-1 h-14 bg-black rounded-l"></div>
-            <div class="absolute -right-[12px] top-28 w-1 h-16 bg-black rounded-r"></div>
-          </div>
-          <!-- Pantalla -->
-          <div class="w-full h-full overflow-hidden bg-white relative rounded-[2.4rem]" style="isolation: isolate; transform: translateZ(0);">
-            <div v-if="isChoosingIframeLoading" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white z-10">
-              <div class="w-5 h-5 border border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
-              <p class="text-[10px] text-gray-400 tracking-wide">Cargando diseño...</p>
+      <!-- TELÉFONO hiperrealista premium (375×740 escalado a 0.85 → 318×629) -->
+      <div style="width: 318px; height: 629px; position: relative; flex-shrink: 0;" class="hover:scale-[1.01] transition-transform duration-300">
+        <div style="position: absolute; top: 0; left: 0; width: 375px; height: 740px; transform: scale(0.85); transform-origin: top left;">
+          
+          <!-- Marco negro premium del teléfono -->
+          <div class="absolute inset-0 rounded-[3rem] border-[14px] border-slate-900 dark:border-zinc-800 shadow-2xl pointer-events-none z-50">
+            <!-- Dynamic Island -->
+            <div class="absolute top-2.5 left-1/2 -translate-x-1/2 w-28 h-5.5 bg-black rounded-full flex items-center justify-between px-3.5 z-50">
+              <span class="w-1.5 h-1.5 rounded-full bg-blue-500/80"></span>
+              <div class="flex gap-1">
+                <span class="w-1.5 h-1 bg-white/20 rounded-full"></span>
+                <span class="w-1 h-1 bg-white/20 rounded-full"></span>
+              </div>
             </div>
+            <!-- Side Sheen Highlights -->
+            <div class="absolute inset-0 rounded-[2.3rem] border border-white/10 dark:border-white/5 pointer-events-none"></div>
+            <!-- Side Buttons -->
+            <div class="absolute -left-[15px] top-28 w-1 h-12 bg-slate-900 dark:bg-zinc-800 rounded-l-md"></div>
+            <div class="absolute -left-[15px] top-44 w-1 h-16 bg-slate-900 dark:bg-zinc-800 rounded-l-md"></div>
+            <div class="absolute -right-[15px] top-36 w-1 h-20 bg-slate-900 dark:bg-zinc-800 rounded-r-md"></div>
+          </div>
+
+          <!-- Pantalla del celular -->
+          <div class="w-full h-full overflow-hidden bg-white relative rounded-[2.2rem]" style="isolation: isolate; transform: translateZ(0);">
+            <div v-if="isChoosingIframeLoading" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white/95 dark:bg-zinc-955/95 z-10 backdrop-blur-sm">
+              <div class="relative w-10 h-10 flex items-center justify-center">
+                <div class="absolute inset-0 rounded-full border-4 border-slate-100 dark:border-zinc-850"></div>
+                <div class="absolute inset-0 rounded-full border-4 border-t-blue-500 dark:border-t-blue-400 animate-spin"></div>
+              </div>
+              <p class="text-[11px] font-semibold text-gray-400 dark:text-zinc-555 uppercase tracking-widest">Aplicando Estilos...</p>
+            </div>
+            
             <iframe
               v-if="generatedDesigns[currentDesignIdx]"
               ref="choosingIframeEl"
@@ -234,52 +459,105 @@
               title="Vista Previa del Diseño"
               @load="isChoosingIframeLoading = false"
             ></iframe>
+            
             <div v-else class="w-full h-full flex flex-col items-center justify-center gap-3 bg-gray-50 dark:bg-zinc-900">
               <svg class="animate-spin w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
               </svg>
-              <p class="text-[10px] text-gray-400">Diseño {{ currentDesignIdx + 1 }} llegando...</p>
+              <p class="text-xs text-gray-400">Generando variante {{ currentDesignIdx + 1 }}...</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Moodboard / Especificaciones — estilo Manual de Marca -->
-      <div v-if="generatedDesigns[currentDesignIdx]" class="w-56 space-y-3 flex-shrink-0">
-
-        <!-- Tipografías -->
-        <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 p-4">
-          <p class="text-[10px] text-gray-400 dark:text-zinc-500 uppercase tracking-widest font-semibold mb-3">Tipografías</p>
-          <p class="text-[15px] font-semibold text-gray-900 dark:text-white truncate"
-            :style="{ fontFamily: generatedDesigns[currentDesignIdx].fonts?.heading + ', serif' }"
-          >{{ generatedDesigns[currentDesignIdx].fonts?.heading }}</p>
-          <p class="text-[12px] text-gray-400 dark:text-zinc-500 truncate mt-1"
-            :style="{ fontFamily: generatedDesigns[currentDesignIdx].fonts?.body + ', sans-serif' }"
-          >{{ generatedDesigns[currentDesignIdx].fonts?.body }}</p>
-        </div>
-
-        <!-- Composición -->
-        <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 p-4 space-y-2">
-          <p class="text-[10px] text-gray-400 dark:text-zinc-500 uppercase tracking-widest font-semibold mb-3">Composición</p>
-          <div v-for="(val, key) in { Header: generatedDesigns[currentDesignIdx].layout_config?.header_style, Hero: generatedDesigns[currentDesignIdx].layout_config?.hero_style, Hook: generatedDesigns[currentDesignIdx].layout_config?.hook_style, Trust: generatedDesigns[currentDesignIdx].layout_config?.trust_strip_style }" :key="key" class="flex items-center gap-2">
-            <span class="text-[10px] text-gray-400 dark:text-zinc-500 w-10 flex-shrink-0">{{ key }}</span>
-            <span class="text-[10px] bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700 px-2 py-0.5 rounded truncate">{{ val || '—' }}</span>
+      <!-- Moodboard / Brand Card + Actions -->
+      <div v-if="generatedDesigns[currentDesignIdx]" class="w-72 flex flex-col gap-4 flex-shrink-0">
+        
+        <!-- Tarjeta de Identidad -->
+        <div class="space-y-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg p-4">
+          <div class="border-b border-gray-100 dark:border-zinc-855 pb-3">
+          <p class="text-[9px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">Identidad Sugerida</p>
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-md text-gray-600 dark:text-zinc-400 text-[10px] font-semibold uppercase tracking-wider">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122l.188 1.011a1.125 1.125 0 01-1.098 1.328H5.16a1.125 1.125 0 01-1.097-1.328l.187-1.011m10.28-4.5h.008v.008h-.008V11.25zm.008 2.25h.008v.008h-.008V13.5zm-2.25-2.25h.008v.008h-.008V11.25zm0 2.25h.008v.008h-.008V13.5zm2.25-4.5h.008v.008h-.008V9zm0 2.25h.008v.008h-.008V11.25zm-2.25-2.25h.008v.008h-.008V9zm0 2.25h.008v.008h-.008V11.25zm-2.25-2.25h.008v.008h-.008V9zm0 2.25h.008v.008h-.008V11.25zm-2.25-2.25h.008v.008h-.008V9zm0 2.25h.008v.008h-.008V11.25zm-2.25-2.25h.008v.008h-.008V9zm0 2.25h.008v.008h-.008V11.25z" />
+            </svg>
+            {{ getCreativeDirectionName(generatedDesigns[currentDesignIdx]) }}
           </div>
         </div>
 
-        <!-- Paleta -->
-        <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 p-4">
-          <p class="text-[10px] text-gray-400 dark:text-zinc-500 uppercase tracking-widest font-semibold mb-3">Paleta</p>
-          <div class="flex gap-2 flex-wrap">
+        <!-- Muestra Tipográfica Real -->
+        <div class="bg-gray-50 dark:bg-zinc-800/60 border border-gray-100 dark:border-zinc-700/50 rounded-md p-3.5 relative overflow-hidden group">
+          <div class="absolute -right-4 -bottom-6 text-7xl font-black text-gray-200/30 dark:text-zinc-800/10 select-none group-hover:scale-110 transition-transform duration-300" :style="{ fontFamily: generatedDesigns[currentDesignIdx].fonts?.heading + ', serif' }">
+            Aa
+          </div>
+          <p class="text-[9px] text-gray-400 dark:text-zinc-500 uppercase tracking-widest font-bold mb-1">Tipografía Principal</p>
+          <div class="flex items-baseline gap-2.5">
+            <span class="text-4xl font-semibold text-gray-800 dark:text-white" :style="{ fontFamily: generatedDesigns[currentDesignIdx].fonts?.heading + ', serif' }">Aa</span>
+            <span class="text-xs font-semibold text-gray-600 dark:text-zinc-400 truncate max-w-[120px]" :style="{ fontFamily: generatedDesigns[currentDesignIdx].fonts?.heading + ', serif' }">
+              {{ generatedDesigns[currentDesignIdx].fonts?.heading }}
+            </span>
+          </div>
+          <p class="text-[10px] text-gray-400 dark:text-zinc-555 border-t border-gray-250/20 dark:border-zinc-800 pt-2 mt-2 truncate" :style="{ fontFamily: generatedDesigns[currentDesignIdx].fonts?.body + ', sans-serif' }">
+            Lectura: {{ generatedDesigns[currentDesignIdx].fonts?.body }}
+          </p>
+        </div>
+
+        <!-- Paleta Explicada -->
+        <div class="bg-gray-50 dark:bg-zinc-800/60 border border-gray-100 dark:border-zinc-700/50 rounded-md p-3.5">
+          <p class="text-[9px] text-gray-400 dark:text-zinc-500 uppercase tracking-widest font-bold mb-3">Paleta Cromática</p>
+          <div class="grid grid-cols-2 gap-2">
             <div
               v-for="(clr, key) in generatedDesigns[currentDesignIdx].color_palette"
               :key="key"
-              class="w-8 h-8 rounded-lg shadow-sm ring-1 ring-gray-200/60 dark:ring-zinc-700/40"
-              :style="{ backgroundColor: clr }"
-              :title="key + ': ' + clr"
-            ></div>
+              class="flex flex-col gap-1 p-1.5 bg-white dark:bg-zinc-900 rounded-md border border-gray-200/50 dark:border-zinc-700/50 hover:border-gray-300 dark:hover:border-zinc-600 transition-colors cursor-help relative group"
+            >
+              <div class="w-full h-5 rounded" :style="{ backgroundColor: clr }"></div>
+              <div>
+                <p class="text-[8px] text-gray-450 dark:text-zinc-550 uppercase tracking-wider truncate font-bold">
+                  {{ key.replace('color_', '').replace('_', ' ') }}
+                </p>
+                <p class="text-[9px] font-mono font-semibold text-gray-700 dark:text-zinc-350">{{ clr }}</p>
+              </div>
+            </div>
           </div>
+        </div>
+
+        <!-- Estructura Web Bloques -->
+        <div class="bg-gray-50 dark:bg-zinc-800/60 border border-gray-100 dark:border-zinc-700/50 rounded-md p-3.5">
+          <p class="text-[9px] text-gray-400 dark:text-zinc-500 uppercase tracking-widest font-bold mb-2.5">Estructura Web</p>
+          <div class="space-y-1.5">
+            <div v-for="(val, key) in { Header: generatedDesigns[currentDesignIdx].layout_config?.header_style, Hero: generatedDesigns[currentDesignIdx].layout_config?.hero_style, Hook: generatedDesigns[currentDesignIdx].layout_config?.hook_style }" :key="key" class="flex items-center justify-between py-1 border-b border-gray-100 dark:border-zinc-800 last:border-0">
+              <span class="text-[10px] text-gray-400 dark:text-zinc-500 font-semibold uppercase tracking-wider">{{ key }}</span>
+              <span class="text-[10px] font-semibold text-gray-700 dark:text-zinc-300 truncate max-w-[130px]">{{ val || '—' }}</span>
+            </div>
+          </div>
+        </div>
+        </div>
+        
+        <!-- Botones (Movidos aquí para estar junto al diseño y evitar scroll) -->
+        <div class="flex flex-col items-center gap-2.5 w-full mt-2">
+          <button
+            @click="chooseDesign(currentDesignIdx)"
+            :disabled="!generatedDesigns[currentDesignIdx] || isChoosingApplying"
+            class="w-full py-3.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 font-semibold text-[14px] rounded-lg shadow-sm transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            <svg v-if="!isChoosingApplying" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+            </svg>
+            <svg v-else class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+            <span>{{ isChoosingApplying ? 'Guardando...' : 'Elegir este diseño' }}</span>
+          </button>
+          
+          <button
+            @click="() => { try { localStorage.removeItem('ai_design_preview') } catch(e) {}; catalogUiMode = 'brief-only' }"
+            class="text-[11px] font-medium text-gray-400 dark:text-zinc-600 hover:text-gray-700 dark:hover:text-zinc-300 transition-colors"
+          >
+            ← Cambiar descripción y regenerar
+          </button>
         </div>
       </div>
 
@@ -287,63 +565,43 @@
       <button
         @click="currentDesignIdx = (currentDesignIdx + 1) % generatedDesigns.length"
         :disabled="generatedDesigns.length < 2"
-        class="w-12 h-12 rounded-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 shadow-md flex items-center justify-center text-gray-600 dark:text-zinc-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-600 hover:shadow-lg transition-all disabled:opacity-20 flex-shrink-0"
+        class="w-10 h-10 rounded-lg bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 flex items-center justify-center text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-300 dark:hover:border-zinc-700 active:scale-95 transition-all disabled:opacity-20 flex-shrink-0"
+        :class="{ 'ring-4 ring-blue-500 animate-pulse border-transparent': highlightArrows }"
       >
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
         </svg>
       </button>
     </div>
 
-    <!-- Dots + contador -->
-    <div class="relative z-10 flex flex-col items-center gap-2.5 mt-6 flex-shrink-0">
+    <!-- Dots -->
+    <div class="relative z-10 flex flex-col items-center gap-1.5 mt-4 flex-shrink-0">
       <div class="flex items-center gap-1.5">
         <button
           v-for="(design, i) in generatedDesigns"
           :key="i"
           @click="currentDesignIdx = i"
-          class="transition-all duration-200 rounded-full"
-          :class="i === currentDesignIdx ? 'w-5 h-1.5 bg-gray-800 dark:bg-zinc-200' : 'w-1.5 h-1.5 bg-gray-200 dark:bg-zinc-700 hover:bg-gray-400 dark:hover:bg-zinc-500'"
+          class="transition-all duration-300 rounded-sm"
+          :class="i === currentDesignIdx ? 'w-5 h-1.5 bg-gray-900 dark:bg-white' : 'w-1.5 h-1.5 bg-gray-200 dark:bg-zinc-700 hover:bg-gray-400 dark:hover:bg-zinc-500'"
         ></button>
         <button
           v-for="j in (5 - generatedDesigns.length)"
           :key="'ph-' + j"
           disabled
-          class="w-1.5 h-1.5 rounded-full bg-gray-100 dark:bg-zinc-800 cursor-default"
+          class="w-1.5 h-1.5 rounded-sm bg-gray-100 dark:bg-zinc-800 cursor-default opacity-40"
         ></button>
       </div>
-      <p class="text-[10px] text-gray-400 dark:text-zinc-600 tracking-wide">{{ currentDesignIdx + 1 }} / {{ generatedDesigns.length }}</p>
+      <p class="text-[10px] text-gray-400 dark:text-zinc-600 font-medium">{{ currentDesignIdx + 1 }} / {{ generatedDesigns.length || 5 }}</p>
     </div>
 
-    <!-- Botones de acción -->
-    <div class="relative z-10 flex flex-col items-center gap-3 mt-6 mb-8 flex-shrink-0 w-full max-w-sm">
-      <button
-        @click="chooseDesign(currentDesignIdx)"
-        :disabled="!generatedDesigns[currentDesignIdx] || isChoosingApplying"
-        class="w-full py-4 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 font-semibold text-[15px] rounded-xl shadow-md shadow-black/10 transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2.5"
-      >
-        <svg v-if="!isChoosingApplying" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
-        </svg>
-        <svg v-else class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-        </svg>
-        {{ isChoosingApplying ? 'Aplicando...' : 'Elegir este diseño' }}
-      </button>
-      <button
-        @click="() => { try { localStorage.removeItem('ai_design_preview') } catch(e) {}; catalogUiMode = 'brief-only' }"
-        class="text-[13px] text-gray-400 dark:text-zinc-600 hover:text-gray-700 dark:hover:text-zinc-300 transition-colors tracking-wide"
-      >
-        ← Cambiar descripción y regenerar
-      </button>
     </div>
+    <!-- /Contenedor interno -->
   </div>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <!-- UPLOAD IMAGES: Paso de subida de imágenes del hook elegido        -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <div v-if="catalogUiMode === 'upload-images'" class="h-full flex flex-col bg-white dark:bg-[#0a0a0c] overflow-hidden">
+  <div v-if="catalogUiMode === 'upload-images'" class="h-full flex flex-col bg-white dark:bg-[#09090b] overflow-hidden">
 
     <!-- ── HEADER ──────────────────────────────────────────────────────── -->
     <div class="flex-shrink-0 px-8 py-4 flex items-center justify-between border-b border-gray-200 dark:border-zinc-800">
@@ -433,7 +691,7 @@
           </div>
 
           <!-- 3 slots hero en columnas, formato retrato -->
-          <div class="flex gap-2.5 mb-5" style="height: 280px;">
+          <div class="flex gap-2.5 mb-5 rounded-xl transition-all duration-300" :class="{ 'ring-4 ring-blue-500 ring-offset-4 ring-offset-white dark:ring-offset-[#09090b] animate-pulse': highlightPhotos }" style="height: 280px;">
             <div
               v-for="i in 3" :key="'h'+i"
               @click="triggerOnboardingFile('hero_images', i-1)"
@@ -475,11 +733,11 @@
           <!-- CTAs -->
           <div class="mt-auto space-y-2.5">
             <button @click="uploadSubStep = 2; saveOnboardingDraft()"
-              class="w-full py-4 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 font-bold text-base rounded-xl shadow-md shadow-black/10 transition-all flex items-center justify-center gap-2.5">
+              class="w-full py-3.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 font-semibold text-sm rounded-lg shadow-sm transition-all flex items-center justify-center gap-2">
               Siguiente: Bloque especial
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
             </button>
-            <button @click="uploadSubStep = 2" class="w-full py-2 text-sm text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300 hover:underline transition-colors text-center">
+            <button @click="uploadSubStep = 2" class="w-full py-2 text-[11px] text-gray-400 dark:text-zinc-600 hover:text-gray-700 dark:hover:text-zinc-300 transition-colors text-center">
               Omitir esta sección →
             </button>
           </div>
@@ -676,10 +934,49 @@
             </div>
           </template>
 
+          <!-- ── fallback: otros estilos — foto visual de marca ── -->
+          <template v-else>
+            <div class="mb-4">
+              <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed">
+                Tu diseño usa un bloque de texto. Pero puedes subir una foto que represente tu marca — aparecerá en la sección visual de tu tienda.
+              </p>
+            </div>
+            <div
+              @click="triggerOnboardingFile('story_image')"
+              @dragover.prevent
+              @drop.prevent="e => { const f = e.dataTransfer.files[0]; if (f) { const ev = { target: { files: [f], value: '' } }; handleOnboardingFile(ev, 'story_image') } }"
+              class="group relative w-full rounded-lg border-2 border-dashed cursor-pointer transition-all duration-200 overflow-hidden mb-3"
+              :class="onboardingImages.story_image ? 'border-gray-200 dark:border-zinc-700' : 'border-gray-300 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-900/60 hover:bg-gray-100 dark:hover:bg-zinc-800/50 hover:border-gray-400 dark:hover:border-zinc-500'"
+              style="aspect-ratio: 16/9;"
+            >
+              <template v-if="onboardingImages.story_image">
+                <img :src="onboardingImages.story_image" class="w-full h-full object-cover" />
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
+                  <span class="opacity-0 group-hover:opacity-100 text-white text-sm font-medium bg-black/60 px-4 py-2 rounded-full transition-all">Cambiar foto</span>
+                </div>
+                <button @click.stop="onboardingImages.story_image = ''; updateOnboardingPreview()"
+                  class="absolute top-3 right-3 w-8 h-8 bg-black/50 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-all shadow-md">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+              </template>
+              <template v-else>
+                <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 text-center">
+                  <div class="flex flex-col items-center gap-2">
+                    <div class="w-12 h-12 rounded-full border-2 border-dashed border-gray-300 dark:border-zinc-600 group-hover:border-gray-500 flex items-center justify-center transition-colors">
+                      <svg class="w-5 h-5 text-gray-500 dark:text-zinc-400 group-hover:text-gray-700 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-gray-700 dark:text-zinc-300 group-hover:text-gray-900 transition-colors">Foto de tu marca</p>
+                    <p class="text-xs text-gray-400 dark:text-zinc-500">JPG o PNG · arrastra o haz clic · máx. 2MB</p>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </template>
+
           <!-- CTAs paso 2 -->
           <div class="mt-6 space-y-2.5">
             <button @click="uploadSubStep = 3; saveOnboardingDraft()"
-              class="w-full py-4 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 font-bold text-base rounded-xl shadow-md shadow-black/10 transition-all flex items-center justify-center gap-2.5">
+              class="w-full py-3.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 font-semibold text-sm rounded-lg shadow-sm transition-all flex items-center justify-center gap-2">
               Siguiente: Historia visual
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
             </button>
@@ -740,7 +1037,7 @@
             <button
               @click="finishOnboarding"
               :disabled="isOnboardingImagesSaving"
-              class="w-full py-4 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 font-bold text-lg rounded-xl shadow-lg shadow-black/15 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+              class="w-full py-3.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 font-semibold text-base rounded-lg shadow-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2.5"
             >
               <svg v-if="!isOnboardingImagesSaving" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
@@ -830,7 +1127,7 @@
         </div>
         
         <!-- Estado de la Tienda - Gemini -->
-        <div class="flex items-center justify-between p-2 bg-[#f8f9fa] dark:bg-[#282a2c] rounded-full">
+        <div class="flex items-center justify-between p-2 bg-[#f8f9fa] dark:bg-[#282a2c] rounded-lg">
           <span class="text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] ml-1">Estado:</span>
           <div class="flex items-center gap-1.5">
             <button 
@@ -859,7 +1156,7 @@
           v-for="tab in tabs" 
           :key="tab.id"
           @click="activeTab = tab.id"
-          class="w-full text-left px-3 py-2.5 rounded-full transition-all duration-150 flex items-center gap-2.5 group"
+          class="w-full text-left px-3 py-2.5 rounded-lg transition-all duration-150 flex items-center gap-2.5 group"
           :class="activeTab === tab.id 
             ? 'bg-[#e8f0fe] dark:bg-[#1a73e8]/20 text-[#1a73e8] dark:text-[#8ab4f8]' 
             : 'text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c]'"
@@ -901,7 +1198,7 @@
         <button 
           @click="saveConfiguration"
           :disabled="isSaving"
-          class="w-full px-3 py-2.5 bg-[#1e8e3e] hover:bg-[#168936] text-white text-xs font-medium rounded-full transition-all duration-150 flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full px-3 py-2.5 bg-[#1e8e3e] hover:bg-[#168936] text-white text-xs font-medium rounded-lg transition-all duration-150 flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <svg v-if="!isSaving" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -915,7 +1212,7 @@
         
         <button 
           @click="copyStoreLink"
-          class="w-full px-3 py-2 bg-white dark:bg-[#3a3a3f] hover:bg-[#f0f4f9] dark:hover:bg-[#4a4a4f] text-[#1e1f20] dark:text-[#e3e3e3] text-xs font-medium rounded-full transition-all duration-150 flex items-center justify-center gap-1.5">
+          class="w-full px-3 py-2 bg-white dark:bg-[#3a3a3f] hover:bg-[#f0f4f9] dark:hover:bg-[#4a4a4f] text-[#1e1f20] dark:text-[#e3e3e3] text-xs font-medium rounded-lg transition-all duration-150 flex items-center justify-center gap-1.5">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
           </svg>
@@ -924,7 +1221,7 @@
         
         <button 
           @click="openCatalogInNewWindow"
-          class="w-full px-3 py-2 bg-[#1e1f20] dark:bg-[#e3e3e3] hover:bg-black dark:hover:bg-white text-white dark:text-[#1e1f20] text-xs font-medium rounded-full transition-all duration-150 flex items-center justify-center gap-1.5"
+          class="w-full px-3 py-2 bg-[#1e1f20] dark:bg-[#e3e3e3] hover:bg-black dark:hover:bg-white text-white dark:text-[#1e1f20] text-xs font-medium rounded-lg transition-all duration-150 flex items-center justify-center gap-1.5"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -939,7 +1236,7 @@
         <div class="grid grid-cols-2 gap-1.5">
           <button
             @click="showRestoreModal = true; restoreData = null; restoreFileName = ''"
-            class="px-2 py-2 bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 text-[#5f6368] dark:text-[#9aa0a6] hover:text-blue-600 dark:hover:text-blue-400 text-[11px] font-medium rounded-full transition-all duration-150 flex items-center justify-center gap-1 border border-transparent hover:border-blue-100 dark:hover:border-blue-900/30"
+            class="px-2 py-2 bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 text-[#5f6368] dark:text-[#9aa0a6] hover:text-blue-600 dark:hover:text-blue-400 text-[11px] font-medium rounded-lg transition-all duration-150 flex items-center justify-center gap-1 border border-transparent hover:border-blue-100 dark:hover:border-blue-900/30"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
@@ -950,7 +1247,7 @@
           <button
             @click="resetAiBrand"
             :disabled="!aiBrandData && !aiBrandDescription"
-            class="px-2 py-2 bg-transparent hover:bg-red-50 dark:hover:bg-red-900/20 text-[#5f6368] dark:text-[#9aa0a6] hover:text-red-600 dark:hover:text-red-400 text-[11px] font-medium rounded-full transition-all duration-150 flex items-center justify-center gap-1 disabled:opacity-30 disabled:cursor-not-allowed border border-transparent hover:border-red-100 dark:hover:border-red-900/30"
+            class="px-2 py-2 bg-transparent hover:bg-red-50 dark:hover:bg-red-900/20 text-[#5f6368] dark:text-[#9aa0a6] hover:text-red-600 dark:hover:text-red-400 text-[11px] font-medium rounded-lg transition-all duration-150 flex items-center justify-center gap-1 disabled:opacity-30 disabled:cursor-not-allowed border border-transparent hover:border-red-100 dark:hover:border-red-900/30"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
@@ -998,7 +1295,7 @@
         
         <!-- Barra de Advertencia - Configuración Incompleta - Gemini -->
         <div v-if="showWarningMessage" 
-             class="bg-[#fef7e0] dark:bg-[#ea8600]/15 border-l-4 border-[#ea8600] rounded-2xl p-4 flex items-start gap-3 animate-fade-in">
+             class="bg-[#fef7e0] dark:bg-[#ea8600]/15 border-l-4 border-[#ea8600] rounded-lg p-4 flex items-start gap-3 animate-fade-in">
           <svg class="w-5 h-5 text-[#ea8600] dark:text-[#fdd663] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
           </svg>
@@ -1171,7 +1468,7 @@
                     leave-to-class="opacity-0 -translate-y-2"
                   >
                     <div v-if="showColorRefinement" class="mt-5">
-                      <div class="relative rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] bg-[#f8f9fa] dark:bg-[#282a2c] overflow-hidden focus-within:border-[#1a73e8]/50 dark:focus-within:border-[#8ab4f8]/40 focus-within:shadow-[0_0_0_3px_rgba(26,115,232,0.08)] transition-all duration-200">
+                      <div class="relative rounded-lg border border-[#e8eaed] dark:border-[#3a3a3f] bg-[#f8f9fa] dark:bg-[#282a2c] overflow-hidden focus-within:border-[#1a73e8]/50 dark:focus-within:border-[#8ab4f8]/40 focus-within:shadow-[0_0_0_3px_rgba(26,115,232,0.08)] transition-all duration-200">
                         <!-- Label strip -->
                         <div class="px-5 pt-4 pb-0">
                           <p class="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Guía para la IA</p>
@@ -1608,7 +1905,7 @@
           <div v-if="activeTab === 'ai-brand'" class="space-y-6 animate-fade-in">
 
             <!-- TARJETA 1: Describe tu Negocio -->
-            <div class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+            <div class="bg-white dark:bg-[#1e1f20] rounded-lg border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
               <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
                 <div class="flex items-center gap-2">
                   <svg class="w-5 h-5 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1625,7 +1922,7 @@
                     v-model="aiBrandDescription"
                     rows="5"
                     placeholder="Ej: Vendo ropa casual para mujer, mi estilo es boho chic y minimalista. Me enfoco en telas naturales y colores tierra. Mi público son mujeres de 25-40 años que buscan comodidad con estilo..."
-                    class="w-full px-4 py-3 rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] bg-[#f8f9fa] dark:bg-[#282a2c] text-sm text-[#1e1f20] dark:text-[#e3e3e3] placeholder-[#5f6368] dark:placeholder-[#9aa0a6] focus:outline-none focus:ring-2 focus:ring-[#1a73e8] dark:focus:ring-[#8ab4f8] focus:border-transparent resize-none"
+                    class="w-full px-4 py-3 rounded-lg border border-[#e8eaed] dark:border-[#3a3a3f] bg-[#f8f9fa] dark:bg-[#282a2c] text-sm text-[#1e1f20] dark:text-[#e3e3e3] placeholder-[#5f6368] dark:placeholder-[#9aa0a6] focus:outline-none focus:ring-2 focus:ring-[#1a73e8] dark:focus:ring-[#8ab4f8] focus:border-transparent resize-none"
                     :disabled="isGeneratingBrand"
                   ></textarea>
                   <span class="absolute bottom-3 right-3 text-[10px] text-[#9aa0a6]">{{ aiBrandDescription.length }}/2000</span>
@@ -1677,7 +1974,7 @@
             <template v-if="aiBrandData">
               
               <!-- TARJETA 2: Paleta de Colores Generada -->
-              <div v-if="aiBrandData.color_palette" class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+              <div v-if="aiBrandData.color_palette" class="bg-white dark:bg-[#1e1f20] rounded-lg border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
                 <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f] flex items-center justify-between">
                   <div>
                     <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Paleta de Colores</h3>
@@ -1694,7 +1991,7 @@
                   <div class="grid grid-cols-6 gap-3">
                     <div v-for="(color, key) in aiBrandData.color_palette" :key="key" class="text-center">
                       <div 
-                        class="w-full aspect-square rounded-2xl border-2 border-[#e8eaed] dark:border-[#3a3a3f] mb-2 cursor-pointer hover:scale-105 transition-transform"
+                        class="w-full aspect-square rounded-lg border-2 border-[#e8eaed] dark:border-[#3a3a3f] mb-2 cursor-pointer hover:scale-105 transition-transform"
                         :style="{ backgroundColor: color }"
                         :title="color"
                         @click="navigator.clipboard.writeText(color)"
@@ -1707,20 +2004,20 @@
               </div>
 
               <!-- TARJETA 3: Tipografías -->
-              <div v-if="aiBrandData.fonts" class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+              <div v-if="aiBrandData.fonts" class="bg-white dark:bg-[#1e1f20] rounded-lg border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
                 <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
                   <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Tipografías Recomendadas</h3>
                   <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Par de fuentes seleccionado para tu marca</p>
                 </div>
                 <div class="p-6">
                   <div class="grid grid-cols-2 gap-6">
-                    <div class="p-4 rounded-2xl bg-[#f8f9fa] dark:bg-[#282a2c] border border-[#e8eaed] dark:border-[#3a3a3f]">
+                    <div class="p-4 rounded-lg bg-[#f8f9fa] dark:bg-[#282a2c] border border-[#e8eaed] dark:border-[#3a3a3f]">
                       <p class="text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-2">Títulos</p>
                       <p class="text-2xl text-[#1e1f20] dark:text-[#e3e3e3]" :style="{ fontFamily: aiBrandData.fonts.heading + ', serif' }">
                         {{ aiBrandData.fonts.heading }}
                       </p>
                     </div>
-                    <div class="p-4 rounded-2xl bg-[#f8f9fa] dark:bg-[#282a2c] border border-[#e8eaed] dark:border-[#3a3a3f]">
+                    <div class="p-4 rounded-lg bg-[#f8f9fa] dark:bg-[#282a2c] border border-[#e8eaed] dark:border-[#3a3a3f]">
                       <p class="text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-2">Cuerpo de texto</p>
                       <p class="text-base text-[#1e1f20] dark:text-[#e3e3e3]" :style="{ fontFamily: aiBrandData.fonts.body + ', sans-serif' }">
                         {{ aiBrandData.fonts.body }}
@@ -1734,7 +2031,7 @@
               </div>
 
               <!-- TARJETA 4: Plantilla Recomendada -->
-              <div v-if="aiBrandData.recommended_template" class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+              <div v-if="aiBrandData.recommended_template" class="bg-white dark:bg-[#1e1f20] rounded-lg border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
                 <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f] flex items-center justify-between">
                   <div>
                     <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Plantilla Recomendada</h3>
@@ -1754,13 +2051,13 @@
               </div>
 
               <!-- TARJETA 5: Textos del Banner -->
-              <div v-if="aiBrandData.banner_texts" class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+              <div v-if="aiBrandData.banner_texts" class="bg-white dark:bg-[#1e1f20] rounded-lg border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
                 <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
                   <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Textos del Banner</h3>
                   <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Copy profesional generado para tu banner principal</p>
                 </div>
                 <div class="p-6 space-y-4">
-                  <div class="relative rounded-2xl overflow-hidden" :style="{ backgroundColor: aiBrandData.color_palette?.primary || '#1a1a1a' }">
+                  <div class="relative rounded-lg overflow-hidden" :style="{ backgroundColor: aiBrandData.color_palette?.primary || '#1a1a1a' }">
                     <div class="p-8 text-center">
                       <h2 class="text-2xl font-light text-white mb-2" style="text-shadow: 0 2px 12px rgba(0,0,0,0.3);">
                         {{ aiBrandData.banner_texts.headline }}
@@ -1777,7 +2074,7 @@
               </div>
 
               <!-- TARJETA 6: Sobre Nosotros -->
-              <div v-if="aiBrandData.about_us" class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+              <div v-if="aiBrandData.about_us" class="bg-white dark:bg-[#1e1f20] rounded-lg border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
                 <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
                   <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Nuestra Historia</h3>
                   <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Sección "Sobre Nosotros" generada por IA</p>
@@ -1791,7 +2088,7 @@
 
               <!-- TARJETA 7: Mensajes de Valor + Anuncios -->
               <div class="grid grid-cols-2 gap-4">
-                <div v-if="aiBrandData.value_messages" class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+                <div v-if="aiBrandData.value_messages" class="bg-white dark:bg-[#1e1f20] rounded-lg border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
                   <div class="px-5 py-3 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
                     <h4 class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Mensajes de Valor</h4>
                   </div>
@@ -1807,7 +2104,7 @@
                   </div>
                 </div>
 
-                <div v-if="aiBrandData.announcements" class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+                <div v-if="aiBrandData.announcements" class="bg-white dark:bg-[#1e1f20] rounded-lg border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
                   <div class="px-5 py-3 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
                     <h4 class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Barra de Anuncios</h4>
                   </div>
@@ -1821,7 +2118,7 @@
               </div>
 
               <!-- TARJETA 8: Mensajes de Venta Cruzada -->
-              <div v-if="aiBrandData.cross_sell_messages" class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+              <div v-if="aiBrandData.cross_sell_messages" class="bg-white dark:bg-[#1e1f20] rounded-lg border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
                 <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
                   <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Mensajes de Recomendación</h3>
                   <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Venta cruzada profesional para tu catálogo</p>
@@ -1858,7 +2155,7 @@
           <div v-if="activeTab === 'identity'" class="space-y-6 animate-fade-in">
             
             <!-- TARJETA 1: Logo y Color Primario - Gemini -->
-            <div class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+            <div class="bg-white dark:bg-[#1e1f20] rounded-lg border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
               <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
                 <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Identidad Visual</h3>
                 <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Logo y color principal de tu tienda</p>
@@ -1872,11 +2169,11 @@
                     <label class="block text-xs font-medium uppercase tracking-wide text-[#5f6368] dark:text-[#9aa0a6]">Logo de la Tienda</label>
                     <div 
                       @click="triggerFileUpload('logo')"
-                      class="relative w-full h-32 border-2 border-dashed border-[#dadce0] dark:border-[#3a3a3f] rounded-2xl hover:border-[#1a73e8] dark:hover:border-[#8ab4f8] hover:bg-[#e8f0fe] dark:hover:bg-[#1a73e8]/10 transition-all cursor-pointer group bg-[#f8f9fa] dark:bg-[#282a2c] flex items-center justify-center"
+                      class="relative w-full h-32 border-2 border-dashed border-[#dadce0] dark:border-[#3a3a3f] rounded-lg hover:border-[#1a73e8] dark:hover:border-[#8ab4f8] hover:bg-[#e8f0fe] dark:hover:bg-[#1a73e8]/10 transition-all cursor-pointer group bg-[#f8f9fa] dark:bg-[#282a2c] flex items-center justify-center"
                     >
                       <div v-if="config.brandIdentity.logo" class="absolute inset-0 p-3 flex items-center justify-center">
                         <img :src="config.brandIdentity.logo" class="max-w-full max-h-full object-contain" />
-                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 rounded-2xl">
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 rounded-lg">
                           <button 
                             @click.stop="config.brandIdentity.logo = ''"
                             class="text-white text-xs font-medium px-3 py-2 bg-[#ea4335] hover:bg-[#d33426] rounded-full transition-colors flex items-center gap-1.5"
@@ -1905,7 +2202,7 @@
                   <!-- Color Picker - Gemini -->
                   <div class="space-y-3">
                     <label class="block text-xs font-medium uppercase tracking-wide text-[#5f6368] dark:text-[#9aa0a6]">Color Primario</label>
-                    <div class="flex items-center gap-3 p-4 border border-[#e8eaed] dark:border-[#3a3a3f] rounded-2xl bg-white dark:bg-[#282a2c] hover:border-[#1a73e8] dark:hover:border-[#8ab4f8] transition-all">
+                    <div class="flex items-center gap-3 p-4 border border-[#e8eaed] dark:border-[#3a3a3f] rounded-lg bg-white dark:bg-[#282a2c] hover:border-[#1a73e8] dark:hover:border-[#8ab4f8] transition-all">
                       <input 
                         type="color" 
                         v-model="config.brandIdentity.primaryColor"
@@ -1928,7 +2225,7 @@
             </div>
             
             <!-- TARJETA 2: Selección de Plantilla - Gemini -->
-            <div class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+            <div class="bg-white dark:bg-[#1e1f20] rounded-lg border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
               <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
                 <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Plantilla de Diseño</h3>
                 <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Elige el estilo visual de tu catálogo web</p>
@@ -1941,13 +2238,13 @@
                   <button 
                     v-if="isFashionStore"
                     @click="config.brandIdentity.template = 'visual-story'"
-                    class="group relative p-5 rounded-2xl border transition-all text-left"
+                    class="group relative p-5 rounded-lg border transition-all text-left"
                     :class="config.brandIdentity.template === 'visual-story' 
                       ? 'border-[#1a73e8] dark:border-[#8ab4f8] bg-[#e8f0fe] dark:bg-[#1a73e8]/15' 
                       : 'border-[#e8eaed] dark:border-[#3a3a3f] hover:border-[#1a73e8]/50 dark:hover:border-[#8ab4f8]/50 bg-white dark:bg-[#282a2c]'"
                   >
                     <div class="flex flex-col items-center text-center space-y-3">
-                      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#e8eaed] to-[#f0f4f9] dark:from-[#3a3a3f] dark:to-[#282a2c] flex items-center justify-center">
+                      <div class="w-14 h-14 rounded-lg bg-gradient-to-br from-[#e8eaed] to-[#f0f4f9] dark:from-[#3a3a3f] dark:to-[#282a2c] flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
@@ -1969,13 +2266,13 @@
                   <!-- Speed Market - Gemini -->
                   <button 
                     @click="config.brandIdentity.template = 'speed-market'"
-                    class="group relative p-5 rounded-2xl border transition-all text-left"
+                    class="group relative p-5 rounded-lg border transition-all text-left"
                     :class="config.brandIdentity.template === 'speed-market' 
                       ? 'border-[#1a73e8] dark:border-[#8ab4f8] bg-[#e8f0fe] dark:bg-[#1a73e8]/15' 
                       : 'border-[#e8eaed] dark:border-[#3a3a3f] hover:border-[#1a73e8]/50 dark:hover:border-[#8ab4f8]/50 bg-white dark:bg-[#282a2c]'"
                   >
                     <div class="flex flex-col items-center text-center space-y-3">
-                      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#e8eaed] to-[#f0f4f9] dark:from-[#3a3a3f] dark:to-[#282a2c] flex items-center justify-center">
+                      <div class="w-14 h-14 rounded-lg bg-gradient-to-br from-[#e8eaed] to-[#f0f4f9] dark:from-[#3a3a3f] dark:to-[#282a2c] flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
@@ -1997,13 +2294,13 @@
                   <!-- Modern Grid - Gemini -->
                   <button 
                     @click="config.brandIdentity.template = 'modern-grid'"
-                    class="group relative p-5 rounded-2xl border transition-all text-left"
+                    class="group relative p-5 rounded-lg border transition-all text-left"
                     :class="config.brandIdentity.template === 'modern-grid' 
                       ? 'border-[#1a73e8] dark:border-[#8ab4f8] bg-[#e8f0fe] dark:bg-[#1a73e8]/15' 
                       : 'border-[#e8eaed] dark:border-[#3a3a3f] hover:border-[#1a73e8]/50 dark:hover:border-[#8ab4f8]/50 bg-white dark:bg-[#282a2c]'"
                   >
                     <div class="flex flex-col items-center text-center space-y-3">
-                      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#e8eaed] to-[#f0f4f9] dark:from-[#3a3a3f] dark:to-[#282a2c] flex items-center justify-center">
+                      <div class="w-14 h-14 rounded-lg bg-gradient-to-br from-[#e8eaed] to-[#f0f4f9] dark:from-[#3a3a3f] dark:to-[#282a2c] flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z" />
                         </svg>
@@ -2025,13 +2322,13 @@
                   <!-- Urban Street - PlantillaUrbana01 -->
                   <button 
                     @click="config.brandIdentity.template = 'urban-street'"
-                    class="group relative p-5 rounded-2xl border transition-all text-left"
+                    class="group relative p-5 rounded-lg border transition-all text-left"
                     :class="config.brandIdentity.template === 'urban-street' 
                       ? 'border-[#1a73e8] dark:border-[#8ab4f8] bg-[#e8f0fe] dark:bg-[#1a73e8]/15' 
                       : 'border-[#e8eaed] dark:border-[#3a3a3f] hover:border-[#1a73e8]/50 dark:hover:border-[#8ab4f8]/50 bg-white dark:bg-[#282a2c]'"
                   >
                     <div class="flex flex-col items-center text-center space-y-3">
-                      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1e1f20] to-[#3a3a3f] dark:from-[#0a0a0a] dark:to-[#282a2c] flex items-center justify-center">
+                      <div class="w-14 h-14 rounded-lg bg-gradient-to-br from-[#1e1f20] to-[#3a3a3f] dark:from-[#0a0a0a] dark:to-[#282a2c] flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
                         </svg>
@@ -2055,7 +2352,7 @@
             </div>
             
             <!-- TARJETA 3: Banner Promocional (Solo Fashion) - Gemini -->
-            <div v-if="isFashionStore" class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+            <div v-if="isFashionStore" class="bg-white dark:bg-[#1e1f20] rounded-lg border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
               <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
                 <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Banner Promocional</h3>
                 <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Imagen destacada en la parte superior (exclusivo para tiendas de moda)</p>
@@ -2064,7 +2361,7 @@
               <div class="p-6">
                 <div 
                   @click="triggerFileUpload('banner')"
-                  class="relative w-full h-48 border-2 border-dashed border-[#dadce0] dark:border-[#3a3a3f] rounded-2xl hover:border-[#1a73e8] dark:hover:border-[#8ab4f8] hover:bg-[#e8f0fe] dark:hover:bg-[#1a73e8]/10 transition-all cursor-pointer group bg-[#f8f9fa] dark:bg-[#282a2c] flex items-center justify-center overflow-hidden"
+                  class="relative w-full h-48 border-2 border-dashed border-[#dadce0] dark:border-[#3a3a3f] rounded-lg hover:border-[#1a73e8] dark:hover:border-[#8ab4f8] hover:bg-[#e8f0fe] dark:hover:bg-[#1a73e8]/10 transition-all cursor-pointer group bg-[#f8f9fa] dark:bg-[#282a2c] flex items-center justify-center overflow-hidden"
                 >
                   <div v-if="config.brandIdentity.banner" class="absolute inset-0 p-2">
                     <img :src="config.brandIdentity.banner" class="w-full h-full object-cover rounded-xl" />
@@ -2116,7 +2413,7 @@
                 <p class="text-sm text-[#1a73e8] dark:text-[#8ab4f8]">Cargando categorías desde la base de datos...</p>
               </div>
               
-              <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-5 border border-[#e8eaed] dark:border-[#3a3a3f]">
+              <div class="bg-white dark:bg-[#1e1f20] rounded-lg p-5 border border-[#e8eaed] dark:border-[#3a3a3f]">
                 <label class="block text-xs font-medium uppercase tracking-wide text-[#5f6368] dark:text-[#9aa0a6] mb-3">Categorías Visibles</label>
                 <div class="flex flex-wrap gap-2">
                   <button 
@@ -2140,7 +2437,7 @@
             </section>
 
             <section>
-              <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-5 border border-[#e8eaed] dark:border-[#3a3a3f] flex items-center justify-between">
+              <div class="bg-white dark:bg-[#1e1f20] rounded-lg p-5 border border-[#e8eaed] dark:border-[#3a3a3f] flex items-center justify-between">
                 <div>
                   <h3 class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Ocultar productos sin stock</h3>
                   <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">No mostrar productos agotados en el catálogo</p>
@@ -2172,7 +2469,7 @@
               <!-- Grid 2 Columnas: Número + País/Horario - Gemini -->
               <div class="grid grid-cols-2 gap-6">
                 
-                <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-4 border border-[#e8eaed] dark:border-[#3a3a3f]">
+                <div class="bg-white dark:bg-[#1e1f20] rounded-lg p-4 border border-[#e8eaed] dark:border-[#3a3a3f]">
                   <label class="block text-xs font-medium uppercase tracking-wide text-[#5f6368] dark:text-[#9aa0a6] mb-2">Número de WhatsApp</label>
                   <input 
                     type="text" 
@@ -2183,7 +2480,7 @@
                   <p class="text-[10px] text-[#5f6368] dark:text-[#9aa0a6] mt-2">Es el número donde recibirás los pedidos.</p>
                 </div>
 
-                <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-4 border border-[#e8eaed] dark:border-[#3a3a3f] opacity-60">
+                <div class="bg-white dark:bg-[#1e1f20] rounded-lg p-4 border border-[#e8eaed] dark:border-[#3a3a3f] opacity-60">
                   <label class="block text-xs font-medium uppercase tracking-wide text-[#5f6368] dark:text-[#9aa0a6] mb-2">Horario de Atención</label>
                   <input 
                     type="text" 
@@ -2197,7 +2494,7 @@
               </div>
 
               <!-- Mensaje Inicial - Full Width - Gemini -->
-              <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-4 border border-[#e8eaed] dark:border-[#3a3a3f] mt-6">
+              <div class="bg-white dark:bg-[#1e1f20] rounded-lg p-4 border border-[#e8eaed] dark:border-[#3a3a3f] mt-6">
                 <label class="block text-xs font-medium uppercase tracking-wide text-[#5f6368] dark:text-[#9aa0a6] mb-2">Mensaje Inicial Personalizado</label>
                 <textarea 
                   v-model="config.ordersConfig.customMessage"
@@ -2224,7 +2521,7 @@
               <!-- Grid 2 Columnas: Costo + Mínimo - Gemini -->
               <div class="grid grid-cols-2 gap-6">
                 
-                <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-4 border border-[#e8eaed] dark:border-[#3a3a3f]">
+                <div class="bg-white dark:bg-[#1e1f20] rounded-lg p-4 border border-[#e8eaed] dark:border-[#3a3a3f]">
                   <label class="block text-xs font-medium uppercase tracking-wide text-[#5f6368] dark:text-[#9aa0a6] mb-2">Costo de Domicilio</label>
                   <div class="relative">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[#5f6368] dark:text-[#9aa0a6] text-sm font-medium">$</span>
@@ -2238,7 +2535,7 @@
                   <p class="text-[10px] text-[#5f6368] dark:text-[#9aa0a6] mt-2">Precio del envío a domicilio.</p>
                 </div>
 
-                <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-4 border border-[#e8eaed] dark:border-[#3a3a3f]">
+                <div class="bg-white dark:bg-[#1e1f20] rounded-lg p-4 border border-[#e8eaed] dark:border-[#3a3a3f]">
                   <label class="block text-xs font-medium uppercase tracking-wide text-[#5f6368] dark:text-[#9aa0a6] mb-2">Pedido Mínimo</label>
                   <div class="relative">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[#5f6368] dark:text-[#9aa0a6] text-sm font-medium">$</span>
@@ -2261,7 +2558,7 @@
                 <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-1">Conecta tu tienda con otros sistemas.</p>
               </div>
               
-              <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-5 border border-[#e8eaed] dark:border-[#3a3a3f] flex items-center justify-between">
+              <div class="bg-white dark:bg-[#1e1f20] rounded-lg p-5 border border-[#e8eaed] dark:border-[#3a3a3f] flex items-center justify-between">
                 <div>
                   <h3 class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Sincronizar con Caja Registradora</h3>
                   <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Registrar pedidos online automáticamente en el POS</p>
@@ -2381,7 +2678,7 @@
 
         <!-- Modal Panel -->
         <div
-          class="relative bg-white dark:bg-[#1e1f20] rounded-3xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_32px_64px_-12px_rgba(0,0,0,0.7)] border border-[#e8eaed]/60 dark:border-[#3a3a3f] w-full max-w-2xl max-h-[88vh] flex flex-col overflow-hidden"
+          class="relative bg-white dark:bg-[#1e1f20] rounded-xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_32px_64px_-12px_rgba(0,0,0,0.7)] border border-[#e8eaed]/60 dark:border-[#3a3a3f] w-full max-w-2xl max-h-[88vh] flex flex-col overflow-hidden"
           style="animation: modalSlideIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;"
         >
           <!-- Modal Header -->
@@ -2407,7 +2704,7 @@
                 v-for="pair in fontPairs"
                 :key="pair.id"
                 @click="applyFontPair(pair)"
-                class="group relative text-left p-5 rounded-2xl border-2 transition-all duration-150 hover:shadow-[0_4px_16px_0_rgba(0,0,0,0.1)] dark:hover:shadow-[0_4px_16px_0_rgba(0,0,0,0.35)]"
+                class="group relative text-left p-5 rounded-lg border-2 transition-all duration-150 hover:shadow-[0_4px_16px_0_rgba(0,0,0,0.1)] dark:hover:shadow-[0_4px_16px_0_rgba(0,0,0,0.35)]"
                 :class="(selectedFontPairId === pair.id || (aiBrandData?.fonts?.heading === pair.heading && aiBrandData?.fonts?.body === pair.body))
                   ? 'border-[#1e1f20] dark:border-[#e3e3e3] bg-[#f8f9fa] dark:bg-[#282a2c]'
                   : 'border-[#e8eaed] dark:border-[#3a3a3f] bg-white dark:bg-[#1e1f20] hover:border-[#c0c4c8] dark:hover:border-[#5f6368]'"
@@ -2483,7 +2780,7 @@
         <div class="absolute inset-0 bg-black/70 backdrop-blur-md" @click="showResetModal = false"></div>
 
         <!-- Panel -->
-        <div class="relative bg-white dark:bg-[#18181b] rounded-3xl shadow-[0_40px_80px_-12px_rgba(0,0,0,0.5)] dark:shadow-[0_40px_80px_-12px_rgba(0,0,0,0.9)] border border-[#e8eaed] dark:border-[#27272a] w-full max-w-2xl flex flex-col overflow-hidden">
+        <div class="relative bg-white dark:bg-[#18181b] rounded-xl shadow-[0_40px_80px_-12px_rgba(0,0,0,0.5)] dark:shadow-[0_40px_80px_-12px_rgba(0,0,0,0.9)] border border-[#e8eaed] dark:border-[#27272a] w-full max-w-2xl flex flex-col overflow-hidden">
 
           <!-- Paso 1: Copia de seguridad -->
           <template v-if="resetStep === 1">
@@ -2502,7 +2799,7 @@
 
             <!-- Cuerpo: tarjeta visual de lo que se va a perder -->
             <div class="px-10 py-7">
-              <div class="rounded-2xl border border-[#e8eaed] dark:border-[#27272a] overflow-hidden">
+              <div class="rounded-lg border border-[#e8eaed] dark:border-[#27272a] overflow-hidden">
                 <div class="px-5 py-3.5 bg-[#f8f9fa] dark:bg-[#27272a] border-b border-[#e8eaed] dark:border-[#3a3a3f]">
                   <p class="text-xs font-bold text-[#9aa0a6] uppercase tracking-widest">Se restablecerá</p>
                 </div>
@@ -2521,7 +2818,7 @@
               <button
                 @click="downloadBackupAndContinue"
                 :disabled="isDownloadingBackup"
-                class="w-full px-6 py-4 bg-[#1e1f20] dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-[#1e1f20] text-[15px] font-semibold rounded-2xl transition-all duration-200 flex items-center justify-center gap-2.5 disabled:opacity-50 shadow-lg shadow-black/10"
+                class="w-full px-6 py-4 bg-[#1e1f20] dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-[#1e1f20] text-[15px] font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2.5 disabled:opacity-50 shadow-lg shadow-black/10"
               >
                 <svg v-if="!isDownloadingBackup" class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -2535,7 +2832,7 @@
 
               <button
                 @click="resetStep = 2"
-                class="w-full px-6 py-3.5 bg-transparent hover:bg-[#f8f9fa] dark:hover:bg-[#27272a] text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#1e1f20] dark:hover:text-white text-[15px] font-medium rounded-2xl border border-[#e8eaed] dark:border-[#27272a] transition-all duration-200"
+                class="w-full px-6 py-3.5 bg-transparent hover:bg-[#f8f9fa] dark:hover:bg-[#27272a] text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#1e1f20] dark:hover:text-white text-[15px] font-medium rounded-lg border border-[#e8eaed] dark:border-[#27272a] transition-all duration-200"
               >
                 Continuar sin guardar copia
               </button>
@@ -2563,7 +2860,7 @@
             </div>
 
             <div class="px-10 py-7">
-              <div class="rounded-2xl bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/40 px-5 py-4 flex items-start gap-3">
+              <div class="rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/40 px-5 py-4 flex items-start gap-3">
                 <svg class="w-5 h-5 text-red-500 dark:text-red-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
                 </svg>
@@ -2575,7 +2872,7 @@
               <button
                 @click="executeReset"
                 :disabled="isResetting"
-                class="w-full px-6 py-4 bg-red-600 hover:bg-red-700 text-white text-[15px] font-semibold rounded-2xl transition-all duration-200 flex items-center justify-center gap-2.5 disabled:opacity-50 shadow-lg shadow-red-600/20"
+                class="w-full px-6 py-4 bg-red-600 hover:bg-red-700 text-white text-[15px] font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2.5 disabled:opacity-50 shadow-lg shadow-red-600/20"
               >
                 <svg v-if="!isResetting" class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
@@ -2589,7 +2886,7 @@
 
               <button
                 @click="resetStep = 1"
-                class="w-full px-6 py-3.5 bg-transparent hover:bg-[#f8f9fa] dark:hover:bg-[#27272a] text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#1e1f20] dark:hover:text-white text-[15px] font-medium rounded-2xl border border-[#e8eaed] dark:border-[#27272a] transition-all duration-200"
+                class="w-full px-6 py-3.5 bg-transparent hover:bg-[#f8f9fa] dark:hover:bg-[#27272a] text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#1e1f20] dark:hover:text-white text-[15px] font-medium rounded-lg border border-[#e8eaed] dark:border-[#27272a] transition-all duration-200"
               >
                 ← Volver y descargar copia
               </button>
@@ -2618,7 +2915,7 @@
       >
         <div class="absolute inset-0 bg-black/70 backdrop-blur-md" @click="showRestoreModal = false"></div>
         <div
-          class="relative bg-white dark:bg-[#18181b] rounded-3xl shadow-[0_40px_80px_-12px_rgba(0,0,0,0.5)] dark:shadow-[0_40px_80px_-12px_rgba(0,0,0,0.9)] border border-[#e8eaed] dark:border-[#27272a] w-full max-w-2xl overflow-hidden"
+          class="relative bg-white dark:bg-[#18181b] rounded-xl shadow-[0_40px_80px_-12px_rgba(0,0,0,0.5)] dark:shadow-[0_40px_80px_-12px_rgba(0,0,0,0.9)] border border-[#e8eaed] dark:border-[#27272a] w-full max-w-2xl overflow-hidden"
         >
           <!-- Header -->
           <div class="px-10 pt-10 pb-7 border-b border-[#f0f2f5] dark:border-[#27272a]">
@@ -2635,7 +2932,7 @@
           <!-- Drop zone -->
           <div class="px-10 py-7">
             <div
-              class="group border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all duration-200"
+              class="group border-2 border-dashed rounded-lg p-10 text-center cursor-pointer transition-all duration-200"
               :class="restoreData
                 ? 'border-[#1a73e8] dark:border-[#8ab4f8] bg-blue-50/50 dark:bg-blue-950/20'
                 : 'border-[#dadce0] dark:border-[#3a3a3f] hover:border-[#1a73e8] dark:hover:border-[#8ab4f8] hover:bg-[#f8f9fa] dark:hover:bg-[#27272a]/50'"
@@ -2667,7 +2964,7 @@
             <button
               @click="executeRestore"
               :disabled="!restoreData || isRestoring"
-              class="w-full px-6 py-4 bg-[#1a73e8] hover:bg-[#1557b0] text-white text-[15px] font-semibold rounded-2xl transition-all duration-200 flex items-center justify-center gap-2.5 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-blue-600/20"
+              class="w-full px-6 py-4 bg-[#1a73e8] hover:bg-[#1557b0] text-white text-[15px] font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2.5 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-blue-600/20"
             >
               <svg v-if="!isRestoring" class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
@@ -2704,7 +3001,7 @@
       :class="toastIsError
         ? 'bg-red-600 border-red-500/50'
         : 'bg-[#1e8e3e] border-[#1e8e3e]/50'"
-      class="fixed bottom-6 right-6 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 z-[99999] border"
+      class="fixed bottom-6 right-6 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-4 z-[99999] border"
     >
       <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
         <svg v-if="!toastIsError" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -2729,11 +3026,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed, watch, nextTick } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed, watch, nextTick } from 'vue'
 import { appStore } from '../store/appStore.js'
 import apiClient from '../services/apiClient.js'
 import axios from 'axios'
 import { useToast } from '../composables/useToast.js'
+import { useUIContextStore } from '../store/uiContextStore.js'
 
 const { showError, showWarning } = useToast()
 
@@ -2790,6 +3088,57 @@ const aiBrandData = ref(null)
 const isRecordingVoice = ref(false)
 const voiceRecognition = ref(null)
 const aiGenerationProgress = ref('')
+const highlightArrows = ref(false)
+const highlightPhotos = ref(false)
+
+const handleAIAction = async (params) => {
+  const { accion, descripcion } = params
+  switch (accion) {
+    case 'activar_tienda_inicial':
+      if (catalogUiMode.value === 'loading' || catalogUiMode.value === 'welcome') {
+        catalogUiMode.value = 'brief-only'
+      }
+      break
+    case 'describir_negocio':
+      if (descripcion) {
+        aiBrandDescription.value = descripcion
+        await generateAiBrand()
+      }
+      break
+    case 'siguiente_diseno':
+      if (catalogUiMode.value === 'choosing' && generatedDesigns.value.length > 1) {
+        currentDesignIdx.value = (currentDesignIdx.value + 1) % generatedDesigns.value.length
+      }
+      break
+    case 'anterior_diseno':
+      if (catalogUiMode.value === 'choosing' && generatedDesigns.value.length > 1) {
+        currentDesignIdx.value = (currentDesignIdx.value - 1 + generatedDesigns.value.length) % generatedDesigns.value.length
+      }
+      break
+    case 'elegir_diseno':
+      if (catalogUiMode.value === 'choosing') {
+        chooseDesign(currentDesignIdx.value)
+      }
+      break
+    case 'saltar_fotos':
+      if (catalogUiMode.value === 'upload-images') {
+        skipOnboarding()
+      }
+      break
+    case 'resaltar_fotos':
+      if (catalogUiMode.value === 'upload-images') {
+        highlightPhotos.value = true
+        setTimeout(() => highlightPhotos.value = false, 3000)
+      }
+      break
+    case 'resaltar_botones':
+      if (catalogUiMode.value === 'choosing') {
+        highlightArrows.value = true
+        setTimeout(() => highlightArrows.value = false, 3000)
+      }
+      break
+  }
+}
 
 // Store name reactive computed (used in choosing phone preview)
 const storeName = computed(() => appStore.systemSettings?.store_name || 'Mi Tienda')
@@ -2800,6 +3149,135 @@ const storeName = computed(() => appStore.systemSettings?.store_name || 'Mi Tien
 const catalogUiMode = ref('loading')
 const showConfigPanel = ref(false)   // animates in after AI generation
 const showPreviewPanel = ref(false)  // loads last for wow effect
+
+// Imágenes reales para el carrusel de la pantalla de bienvenida
+const carouselImages = [
+  '/img-plantillaia/plan1.png',
+  '/img-plantillaia/plan2.png',
+  '/img-plantillaia/plan3.png',
+  '/img-plantillaia/plan4.png',
+  '/img-plantillaia/plan5.png'
+]
+const activeCarouselIdx = ref(0)
+let carouselInterval = null
+const isCarouselHovered = ref(false)
+
+const startCarousel = () => {
+  if (carouselInterval) clearInterval(carouselInterval)
+  carouselInterval = setInterval(() => {
+    if (!isCarouselHovered.value) {
+      activeCarouselIdx.value = (activeCarouselIdx.value + 1) % carouselImages.length
+    }
+  }, 4000)
+}
+
+// Animated placeholders for the brief textarea
+const animatedPlaceholders = [
+  'Ej: Tengo una tienda de ropa femenina bohemia, colores tierra y beige. Mi clienta tiene entre 25 y 40 años...',
+  'Ej: Cafetería artesanal con estilo industrial, tonos oscuros y madera. Queremos transmitir energía urbana...',
+  'Ej: Marca de skincare natural y vegana. Tonos verde sabio, rosa palo y blanco roto. Enfocada en bienestar...'
+]
+const activePlaceholderIdx = ref(0)
+let placeholderInterval = null
+const briefTextarea = ref(null)
+
+onMounted(() => {
+  const uiContext = useUIContextStore()
+  uiContext.registerAction('catalogWebAction', handleAIAction)
+
+  startCarousel()
+  placeholderInterval = setInterval(() => {
+    activePlaceholderIdx.value = (activePlaceholderIdx.value + 1) % animatedPlaceholders.length
+  }, 4000)
+})
+
+onUnmounted(() => {
+  if (carouselInterval) clearInterval(carouselInterval)
+  if (placeholderInterval) clearInterval(placeholderInterval)
+})
+
+const promptSuggestions = [
+  {
+    icon: '👗',
+    label: 'Moda & Ropa',
+    desc: 'Tengo una boutique de ropa de lino y algodón orgánico. Estilo minimalista, fresco y escandinavo. Paleta en tonos crudos, beige, arena y blanco. Quiero que se sienta muy premium, amplio y limpio.'
+  },
+  {
+    icon: '🍔',
+    label: 'Gourmet / Comida',
+    desc: 'Es una hamburguesería artesanal con estilo industrial. Paleta de colores negro carbón, naranja fuego y madera oscura. Queremos transmitir energía, juventud, sabores intensos y diseño urbano.'
+  },
+  {
+    icon: '✨',
+    label: 'Belleza / Skincare',
+    desc: 'Marca de cosmética vegana y natural. Buscamos un diseño de bienestar botánico, con tipografía elegante serif y paleta en verde sabio, rosa palo y blanco roto. Enfocado en salud y sofisticación.'
+  },
+  {
+    icon: '☕',
+    label: 'Café & Dulces',
+    desc: 'Cafetería de especialidad y pastelería fina. Estilo cálido y artesanal. Colores café tostado, crema y terracota. Buscamos que sea muy acogedor, con fotos de repostería fresca y granos seleccionados.'
+  }
+]
+
+let typewriterTimeout = null
+const selectPromptSuggestion = (desc) => {
+  if (typewriterTimeout) clearTimeout(typewriterTimeout)
+  aiBrandDescription.value = ''
+  let index = 0
+  const speed = 8
+  const typeWriter = () => {
+    if (index < desc.length) {
+      aiBrandDescription.value += desc.charAt(index)
+      index++
+      typewriterTimeout = setTimeout(typeWriter, speed)
+    } else {
+      typewriterTimeout = null
+    }
+  }
+  typeWriter()
+}
+
+const loadFontDynamically = (fontName) => {
+  if (!fontName) return
+  const id = `dynamic-font-${fontName.replace(/\\s+/g, '-').toLowerCase()}`
+  if (document.getElementById(id)) return
+  const link = document.createElement('link')
+  link.id = id
+  link.rel = 'stylesheet'
+  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@400;600;700&display=swap`
+  document.head.appendChild(link)
+}
+
+const toggleVoiceRecording = () => {
+  if (isRecordingVoice.value) {
+    stopVoiceRecording()
+  } else {
+    startVoiceRecording()
+  }
+}
+
+const getCreativeDirectionName = (design) => {
+  const mood = design?.layout_config?.editorial_mood || 'luxury'
+  const presets = {
+    'luxury': 'Lujo Editorial',
+    'luxury-editorial': 'Lujo Editorial',
+    'bold-energetic': 'Negrita & Energético',
+    'fresh-modern': 'Fresco & Moderno',
+    'warm-artisan': 'Cálido & Artesanal',
+    'urban-street': 'Urbano & Street',
+    'clean-minimal': 'Limpio & Minimalista',
+    'vibrant-tropical': 'Vibrante Tropical',
+    'portrait-beauty': 'Retrato Belleza',
+    'glass-premium': 'Premium Glass',
+    'dark-luxury': 'Lujo Nocturno Noir',
+    'industrial-raw': 'Industrial Raw',
+    'botanical-wellness': 'Bienestar Botánico',
+    'candy-pop': 'Candy Pop Pastel',
+    'scandinavian-neutral': 'Nórdico Neutral',
+    'retro-vintage': 'Retro Vintage'
+  }
+  return presets[mood] || 'Estilo de Autor'
+}
 
 // ── Choosing mode: carousel de diseños ──────────────────────────────────
 const generatedDesigns = ref([])    // array de hasta 5 diseños generados
@@ -3013,6 +3491,11 @@ watch(currentDesignIdx, (idx) => {
   const design = generatedDesigns.value[idx]
   if (!design) return
   writeDesignPreview(design)
+  
+  // Cargar fuentes de Google Fonts dinámicamente en el parent
+  if (design.fonts?.heading) loadFontDynamically(design.fonts.heading)
+  if (design.fonts?.body) loadFontDynamically(design.fonts.body)
+
   isChoosingIframeLoading.value = true
   choosingIframeKey.value++
 })
@@ -4275,5 +4758,25 @@ const stopVoiceRecording = () => {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+/* Welcome CTA subtle shimmer */
+.welcome-cta-btn {
+  position: relative;
+  overflow: hidden;
+}
+.welcome-cta-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  animation: ctaShimmer 3s ease-in-out infinite;
+}
+@keyframes ctaShimmer {
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
 }
 </style>

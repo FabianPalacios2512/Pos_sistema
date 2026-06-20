@@ -39,7 +39,7 @@ class AiUsageLog extends Model
      * Gemini Live API: 25 tokens por segundo de audio (entrada/salida)
      */
     const PRICING = [
-        'gemini-2.0-flash' => [
+        'gemini-flash-latest' => [
             'input' => 0.10,   // $0.10 / 1M tokens
             'output' => 0.40, // $0.40 / 1M tokens
         ],
@@ -69,7 +69,7 @@ class AiUsageLog extends Model
      */
     public static function calculateTextCost(int $inputTokens, int $outputTokens, string $provider = 'gemini'): float
     {
-        $pricing = $provider === 'groq' ? self::PRICING['groq-llama'] : self::PRICING['gemini-2.0-flash'];
+        $pricing = $provider === 'groq' ? self::PRICING['groq-llama'] : self::PRICING['gemini-flash-latest'];
         
         $inputCost = ($inputTokens / 1000000) * $pricing['input'];
         $outputCost = ($outputTokens / 1000000) * $pricing['output'];

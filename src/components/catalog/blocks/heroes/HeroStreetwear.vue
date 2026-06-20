@@ -1,6 +1,6 @@
 <template>
-  <!-- HERO STREETWEAR — Urbano / Bold -->
-  <!-- Imagen full con texto superpuesto desde abajo, tipografía de impacto, CTA sólido -->
+  <!-- HERO STREETWEAR — Urbano / BOLD / Agresivo -->
+  <!-- Imagen full con texto BOLD superpuesto, tipografía de máximo impacto, CTA sólido -->
   <section class="relative w-full overflow-hidden" :class="heightClass">
 
     <!-- Imagen de fondo full -->
@@ -15,61 +15,64 @@
       <div v-else class="w-full h-full" :style="{ backgroundColor: palette.text_dark }"></div>
     </div>
 
-    <!-- Overlay: gradiente de abajo hacia arriba, más agresivo en la zona del texto -->
-    <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.1) 75%, transparent 100%)"></div>
+    <!-- Overlay: gradiente agresivo -->
+    <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.60) 45%, rgba(0,0,0,0.12) 75%, transparent 100%)"></div>
 
-    <!-- Badge superior izquierda -->
-    <div class="absolute top-4 left-4 z-10">
+    <!-- Badge superior izquierda — PROMINENTE -->
+    <div class="absolute top-4 left-4 lg:top-8 lg:left-10 z-10">
       <span
-        class="text-[8px] uppercase tracking-[0.28em] font-bold px-3 py-1.5"
+        class="text-[9px] lg:text-[12px] uppercase tracking-[0.25em] font-black px-3.5 lg:px-5 py-2 lg:py-2.5"
         :style="{ backgroundColor: palette.primary, color: '#ffffff', fontFamily: fonts.body + ', sans-serif' }"
       >DROP 01</span>
     </div>
 
     <!-- Contenido inferior: título + subheadline + CTA -->
-    <div class="absolute inset-x-0 bottom-0 z-10 px-5 pb-7 md:px-10 md:pb-10">
+    <div class="absolute inset-x-0 bottom-0 z-10 px-5 pb-7 md:px-10 md:pb-10 lg:px-16 lg:pb-16 xl:px-24 xl:pb-20">
+      <div class="max-w-[1200px]">
 
-      <!-- Eyebrow label -->
-      <p
-        class="text-white/50 text-[9px] uppercase tracking-[0.3em] mb-2 font-light"
-        :style="{ fontFamily: fonts.body + ', sans-serif' }"
-      >Temporada 2026</p>
-
-      <!-- Título de alto impacto -->
-      <h2
-        class="text-white leading-[0.93] uppercase mb-4"
-        :class="isMobilePreview ? 'text-[30px]' : 'text-[34px] md:text-[62px] lg:text-[78px]'"
-        :style="{
-          fontFamily: fonts.heading + ', Arial Black, Impact, sans-serif',
-          fontWeight: 900,
-          letterSpacing: '-0.02em'
-        }"
-      >{{ headline }}</h2>
-
-      <!-- Fila: subtítulo izquierda + CTA derecha -->
-      <div class="flex items-center justify-between gap-4">
+        <!-- Eyebrow label -->
         <p
-          v-if="subheadline"
-          class="text-white/60 text-[10px] uppercase tracking-[0.14em] leading-relaxed max-w-[200px]"
+          class="text-white/55 text-[10px] lg:text-[12px] uppercase tracking-[0.25em] mb-3 lg:mb-5 font-semibold"
           :style="{ fontFamily: fonts.body + ', sans-serif' }"
-        >{{ subheadline }}</p>
-        <div v-else class="flex-1"></div>
+        >Temporada 2026</p>
 
-        <!-- CTA rectangular sólido -->
-        <button
-          @click="$emit('cta')"
-          class="flex-shrink-0 flex items-center gap-2.5 text-[10px] uppercase tracking-[0.2em] font-bold px-5 py-2.5 transition-all duration-200"
+        <!-- Título de MÁXIMO impacto — BLACK weight -->
+        <h2
+          class="text-white leading-[0.91] uppercase mb-5 lg:mb-9"
+          :class="isMobilePreview ? 'text-[30px]' : 'text-[36px] md:text-[54px] lg:text-[72px] xl:text-[82px]'"
           :style="{
-            backgroundColor: palette.primary,
-            color: '#ffffff',
-            fontFamily: fonts.body + ', sans-serif'
+            fontFamily: fonts.heading + ', Arial Black, Impact, sans-serif',
+            fontWeight: 900,
+            letterSpacing: '-0.02em',
+            textShadow: '0 2px 40px rgba(0,0,0,0.5)'
           }"
-        >
-          {{ ctaText || 'EXPLORAR' }}
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-          </svg>
-        </button>
+        >{{ headline }}</h2>
+
+        <!-- Fila: subtítulo izquierda + CTA derecha -->
+        <div class="flex items-center justify-between gap-4 lg:gap-8">
+          <p
+            v-if="subheadline"
+            class="text-white/65 text-[11px] lg:text-[14px] uppercase tracking-[0.12em] leading-relaxed max-w-[200px] lg:max-w-[380px] font-medium"
+            :style="{ fontFamily: fonts.body + ', sans-serif' }"
+          >{{ subheadline }}</p>
+          <div v-else class="flex-1"></div>
+
+          <!-- CTA rectangular sólido BOLD -->
+          <button
+            @click="$emit('cta')"
+            class="flex-shrink-0 flex items-center gap-3 lg:gap-4 text-[11px] lg:text-[13px] uppercase tracking-[0.18em] font-black px-6 lg:px-10 py-3.5 lg:py-5 transition-all duration-200"
+            :style="{
+              backgroundColor: palette.primary,
+              color: '#ffffff',
+              fontFamily: fonts.body + ', sans-serif'
+            }"
+          >
+            {{ ctaText || 'EXPLORAR' }}
+            <svg class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -92,6 +95,6 @@ defineEmits(['cta'])
 const heightClass = computed(() =>
   props.isMobilePreview
     ? 'h-[65vh] min-h-[380px]'
-    : 'h-[65vh] min-h-[420px] md:h-[80vh] md:min-h-[540px]'
+    : 'h-[65vh] min-h-[420px] md:h-[80vh] md:min-h-[540px] lg:h-[88vh] lg:max-h-[900px]'
 )
 </script>

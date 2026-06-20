@@ -1,61 +1,64 @@
 <template>
   <Teleport to="body">
     <Transition
-      enter-active-class="transition-opacity duration-300 ease-out"
+      enter-active-class="transition-opacity duration-200 ease-out"
       enter-from-class="opacity-0"
       enter-to-class="opacity-100"
-      leave-active-class="transition-opacity duration-200 ease-in"
+      leave-active-class="transition-opacity duration-150 ease-in"
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
       <div 
         v-if="isOpen"
         @click="closeModal"
-        class="fixed inset-0 bg-black/70 dark:bg-black/80  z-[100] flex items-center justify-center p-4"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
       >
         <Transition
-          enter-active-class="transition-all duration-300 ease-out"
-          enter-from-class="opacity-0 scale-95"
-          enter-to-class="opacity-100 scale-100"
-          leave-active-class="transition-all duration-200 ease-in"
-          leave-from-class="opacity-100 scale-100"
-          leave-to-class="opacity-0 scale-95"
+          enter-active-class="transition-all duration-200 ease-out"
+          enter-from-class="opacity-0 translate-y-4 scale-95"
+          enter-to-class="opacity-100 translate-y-0 scale-100"
+          leave-active-class="transition-all duration-150 ease-in"
+          leave-from-class="opacity-100 translate-y-0 scale-100"
+          leave-to-class="opacity-0 translate-y-2 scale-95"
         >
           <div 
             v-if="isOpen"
             @click.stop
-            class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-gray-200 dark:border-zinc-700"
+            class="bg-white dark:bg-[#09090b] rounded-xl shadow-2xl max-w-sm w-full overflow-hidden border border-gray-200 dark:border-zinc-800"
           >
             <!-- Header -->
-            <div class="px-6 py-5 border-b border-gray-200 dark:border-zinc-800">
-              <div class="flex items-center justify-between">
-                <div>
-                  <h3 class="text-xl font-bold text-gray-900 dark:text-white">Cargar Pedido Web</h3>
-                  <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Busca el pedido del cliente por código</p>
-                </div>
-                <button 
-                  @click="closeModal"
-                  class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 transition-all"
-                >
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+            <div class="px-5 py-4 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-700 dark:text-zinc-300">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                   </svg>
-                </button>
+                </div>
+                <div>
+                  <h3 class="text-[15px] font-bold text-gray-900 dark:text-white leading-tight">Cargar Pedido Web</h3>
+                  <p class="text-[11px] text-gray-500 dark:text-zinc-400">Sincroniza la tienda en línea</p>
+                </div>
               </div>
+              <button 
+                @click="closeModal"
+                class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
             </div>
 
             <!-- Content -->
-            <div class="p-6">
+            <div class="p-5">
               <div v-if="!orderLoaded">
-                <!-- Input de código -->
-                <div class="space-y-5">
+                <!-- Input State -->
+                <div class="space-y-4">
                   <div>
-                    <label class="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-2">
-                      Código de Pedido
+                    <label class="block text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-1.5">
+                      Código de Referencia
                     </label>
-                    <div class="relative">
-                      <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
-                        <svg class="w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="relative group">
+                      <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-zinc-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                       </div>
@@ -64,166 +67,111 @@
                         v-model="orderCode"
                         @keyup.enter="searchOrder"
                         type="text"
-                        placeholder="Ejemplo: PED-123 o 123"
-                        class="w-full pl-12 pr-4 py-3 bg-white dark:bg-zinc-800 border-2 border-gray-200 dark:border-zinc-700 rounded-xl text-base font-semibold text-gray-900 dark:text-white focus:ring-2 focus:ring-slate-500 dark:focus:ring-slate-400 focus:border-slate-500 dark:focus:border-slate-400 outline-none transition-all placeholder-gray-400 dark:placeholder-zinc-500"
+                        placeholder="Ej: PED-12345"
+                        class="w-full pl-9 pr-3 py-2.5 bg-gray-50 dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-lg text-sm font-semibold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-zinc-900 focus:ring-1 focus:ring-gray-900 dark:focus:ring-white focus:border-gray-900 dark:focus:border-white outline-none transition-all placeholder-gray-400 dark:placeholder-zinc-600 uppercase"
                         :disabled="isLoading"
                       >
-                      <div v-if="isLoading" class="absolute right-4 top-1/2 transform -translate-y-1/2">
-                        <div class="animate-spin rounded-full h-6 w-6 border-3 border-slate-600 dark:border-slate-400 border-t-transparent"></div>
+                      <div v-if="isLoading" class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <div class="animate-spin rounded-full h-3.5 w-3.5 border border-gray-900 dark:border-white border-t-transparent"></div>
                       </div>
                     </div>
-                    <div v-if="error" class="mt-3 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-xl flex items-center gap-2">
-                      <svg class="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                      <p class="text-red-700 dark:text-red-300 text-sm font-semibold">{{ error }}</p>
-                    </div>
+                    <Transition enter-active-class="transition-all duration-200" enter-from-class="opacity-0 -translate-y-1" enter-to-class="opacity-100 translate-y-0" leave-active-class="transition-all duration-150" leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 -translate-y-1">
+                      <div v-if="error" class="mt-2 flex items-center gap-1.5 text-red-600 dark:text-red-400">
+                        <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <p class="text-[11px] font-semibold">{{ error }}</p>
+                      </div>
+                    </Transition>
                   </div>
 
                   <button 
                     @click="searchOrder"
                     :disabled="!orderCode.trim() || isLoading"
-                    class="w-full py-3 bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 dark:hover:bg-slate-600 disabled:bg-gray-300 dark:disabled:bg-zinc-700 text-white font-bold rounded-xl transition-all duration-200 disabled:cursor-not-allowed shadow-lg flex items-center justify-center gap-2"
+                    class="w-full py-2.5 bg-gray-900 hover:bg-black dark:bg-white dark:hover:bg-gray-100 disabled:opacity-50 text-white dark:text-gray-900 text-[13px] font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
                   >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                    {{ isLoading ? 'Buscando pedido...' : 'Buscar Pedido' }}
+                    <span v-if="!isLoading">Buscar pedido</span>
+                    <span v-else>Buscando...</span>
                   </button>
-                </div>
-
-                <!-- Info card - Professional Style -->
-                <div class="mt-6 p-4 bg-gray-50 dark:bg-zinc-800/50 rounded-xl border border-gray-200/60 dark:border-zinc-700/40">
-                  <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <svg class="w-5 h-5 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                    </div>
-                    <div class="flex-1">
-                      <p class="text-sm font-bold text-gray-700 dark:text-zinc-300 mb-1.5">Instrucciones</p>
-                      <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed">
-                        Los clientes realizan pedidos desde tu <span class="font-semibold">catálogo web</span> y reciben un código único. 
-                        Ingresa ese código para cargar automáticamente todos los productos al carrito del POS.
-                      </p>
-                    </div>
-                  </div>
                 </div>
               </div>
 
-                <!-- Orden encontrada -->
-              <div v-else class="space-y-5">
-                <!-- Success Banner -->
-                <div class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-2 border-green-300 dark:border-green-800 rounded-2xl p-5">
-                  <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg">
-                      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                    </div>
-                    <div>
-                      <span class="font-bold text-lg text-green-800 dark:text-green-300">¡Pedido Encontrado!</span>
-                      <p class="text-xs text-green-700 dark:text-green-400">Información verificada correctamente</p>
-                    </div>
+              <div v-else class="space-y-4">
+                <!-- Success State -->
+                <div class="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 p-3 rounded-lg">
+                  <div class="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-md flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                   </div>
-                  <div class="space-y-3 text-sm">
-                    <div class="flex justify-between items-center bg-white dark:bg-zinc-800 p-3 rounded-xl">
-                      <span class="text-gray-600 dark:text-zinc-400 font-semibold">Código:</span>
-                      <span class="font-bold text-gray-900 dark:text-white bg-green-100 dark:bg-green-900/40 px-3 py-1.5 rounded-lg border border-green-300 dark:border-green-700">{{ foundOrder.order_number }}</span>
-                    </div>
-                    <div class="flex justify-between items-center bg-white dark:bg-zinc-800 p-3 rounded-xl">
-                      <span class="text-gray-600 dark:text-zinc-400 font-semibold flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                        Cliente:
-                      </span>
-                      <span class="font-bold text-gray-900 dark:text-white">{{ foundOrder.customer_name }}</span>
-                    </div>
-                    <div class="flex justify-between items-center bg-white dark:bg-zinc-800 p-3 rounded-xl">
-                      <span class="text-gray-600 dark:text-zinc-400 font-semibold flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                        </svg>
-                        Teléfono:
-                      </span>
-                      <span class="font-bold text-gray-900 dark:text-white">{{ foundOrder.customer_phone }}</span>
-                    </div>
-                    <div class="flex justify-between items-center bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 p-4 rounded-xl border-2 border-green-300 dark:border-green-700 mt-3">
-                      <span class="text-green-800 dark:text-green-300 font-bold text-base">Total del Pedido:</span>
-                      <span class="font-bold text-green-700 dark:text-green-400 text-2xl">${{ formatPrice(foundOrder.total) }}</span>
-                    </div>
-                  </div>
-                </div>                <!-- Productos -->
-                <div class="bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 rounded-xl overflow-hidden">
-                  <div class="bg-gray-50 dark:bg-zinc-800 px-4 py-3 border-b border-gray-200 dark:border-zinc-700">
-                    <div class="flex items-center justify-between">
-                      <h4 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                        </svg>
-                        Productos del Pedido
-                      </h4>
-                      <span class="bg-slate-100 dark:bg-slate-700 px-3 py-1 rounded-full text-xs font-bold text-slate-700 dark:text-slate-200">{{ foundOrder.items.length }} items</span>
-                    </div>
-                  </div>
-                  <div class="p-4 max-h-48 overflow-y-auto">
-                    <div class="space-y-3">
-                      <div 
-                        v-for="item in foundOrder.items" 
-                        :key="item.product_id"
-                        class="flex justify-between items-center text-sm py-3 px-4 bg-gray-50 dark:bg-zinc-800 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all border border-gray-200 dark:border-zinc-700"
-                      >
-                        <div class="flex items-center gap-3">
-                          <span class="font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 px-2.5 py-1 rounded-lg text-xs">{{ item.quantity }}x</span>
-                          <span class="text-gray-900 dark:text-white font-semibold">{{ item.product_name }}</span>
-                        </div>
-                        <span class="font-bold text-gray-900 dark:text-white text-base">${{ formatPrice(item.subtotal) }}</span>
-                      </div>
-                    </div>
+                  <div>
+                    <h4 class="text-[13px] font-bold text-gray-900 dark:text-white leading-tight">Pedido Encontrado</h4>
+                    <p class="text-[11px] text-gray-600 dark:text-zinc-400 font-medium">Cod: {{ foundOrder.order_number }}</p>
                   </div>
                 </div>
 
-                <!-- Alertas de stock -->
-                <div v-if="stockIssues.length > 0" class="bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30 border-2 border-amber-300 dark:border-amber-800 rounded-2xl p-5">
-                  <div class="flex items-start gap-4">
-                    <div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-yellow-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                      </svg>
-                    </div>
-                    <div class="flex-1">
-                      <p class="text-base font-bold text-amber-900 dark:text-amber-300 mb-3">Advertencia de Stock</p>
-                      <div class="space-y-2">
-                        <div v-for="issue in stockIssues" :key="issue.product" class="text-sm text-amber-800 dark:text-amber-400 bg-white dark:bg-zinc-800 px-3 py-2.5 rounded-xl font-semibold border border-amber-200 dark:border-amber-700">
-                          <span class="font-bold">{{ issue.product }}:</span> 
-                          Solo <span class="font-bold text-amber-700 dark:text-amber-400">{{ issue.available }}</span> disponibles 
-                          (pedido: <span class="font-bold text-amber-900 dark:text-amber-300">{{ issue.requested }}</span>)
-                        </div>
-                      </div>
-                    </div>
+                <!-- Customer Summary -->
+                <div class="bg-gray-50 dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-lg p-3 flex items-center justify-between">
+                  <div>
+                    <p class="text-[9px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-0.5">Cliente</p>
+                    <p class="text-[12px] font-semibold text-gray-900 dark:text-white">{{ foundOrder.customer_name }}</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-[9px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-0.5">Contacto</p>
+                    <p class="text-[12px] font-semibold text-gray-700 dark:text-zinc-300">{{ foundOrder.customer_phone || 'N/A' }}</p>
                   </div>
                 </div>
 
-                <!-- Botones de acción -->
-                <div class="flex gap-3 pt-2">
+                <!-- Items List -->
+                <div>
+                  <p class="text-[11px] font-bold text-gray-900 dark:text-white mb-2">Resumen ({{ foundOrder.items.length }} prod.)</p>
+                  <div class="space-y-1.5 max-h-[140px] overflow-y-auto pr-1 custom-scrollbar">
+                    <div 
+                      v-for="item in foundOrder.items" 
+                      :key="item.product_id"
+                      class="flex justify-between items-start py-2 px-2.5 bg-white dark:bg-[#09090b] border border-gray-200 dark:border-zinc-800 rounded-md"
+                    >
+                      <div class="flex items-start gap-2">
+                        <span class="font-bold text-[10px] bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 px-1.5 py-0.5 rounded mt-0.5">
+                          {{ item.quantity }}x
+                        </span>
+                        <div>
+                          <p class="text-[12px] font-semibold text-gray-900 dark:text-white leading-tight">{{ item.product_name }}</p>
+                          <p v-if="item.options_summary" class="text-[10px] text-gray-500 dark:text-zinc-400 mt-0.5">{{ formatOptionsSummary(item.options_summary) }}</p>
+                        </div>
+                      </div>
+                      <span class="font-bold text-[12px] text-gray-900 dark:text-white ml-2 whitespace-nowrap">${{ formatPrice(item.subtotal) }}</span>
+                    </div>
+                  </div>
+                  
+                  <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-200 dark:border-zinc-800">
+                    <span class="text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Total</span>
+                    <span class="text-[16px] font-black text-gray-900 dark:text-white">${{ formatPrice(foundOrder.total) }}</span>
+                  </div>
+                </div>
+
+                <!-- Stock Warnings -->
+                <div v-if="stockIssues.length > 0" class="bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-900/40 rounded-lg p-3">
+                  <div class="flex items-center gap-1.5 mb-1.5">
+                    <svg class="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <p class="text-[10px] font-bold text-orange-800 dark:text-orange-400 uppercase tracking-wide">Falta de Inventario</p>
+                  </div>
+                  <ul class="space-y-0.5">
+                    <li v-for="issue in stockIssues" :key="issue.product" class="text-[10px] text-orange-700 dark:text-orange-300 font-medium">
+                      {{ issue.product }} (Req: {{ issue.requested }}, Hay: {{ issue.available }})
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-2.5 pt-1">
                   <button 
                     @click="resetSearch"
-                    class="flex-1 px-5 py-3 bg-white dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-slate-600 dark:text-zinc-300 text-sm font-bold rounded-xl border-2 border-slate-300 dark:border-zinc-600 shadow-md transition-all duration-200 hover:shadow-lg hover:border-slate-400 dark:hover:border-zinc-500 flex items-center justify-center gap-2"
+                    class="px-4 py-2 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-[12px] font-semibold rounded-lg border border-gray-300 dark:border-zinc-700 transition-colors"
                   >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                    <span>Cancelar</span>
+                    Atrás
                   </button>
                   <button 
                     @click="loadOrder"
-                    class="flex-1 px-5 py-3 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white text-sm font-bold rounded-xl shadow-lg shadow-emerald-400/40 dark:shadow-emerald-900/50 transition-all duration-200 flex items-center justify-center gap-2"
+                    class="flex-1 py-2 bg-gray-900 hover:bg-black dark:bg-white dark:hover:bg-gray-100 text-white dark:text-gray-900 text-[12px] font-semibold rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2"
                   >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                    <span>Cargar al Carrito</span>
+                    Cargar y Pagar
                   </button>
                 </div>
               </div>
@@ -260,6 +208,19 @@ const formatPrice = (price) => {
   }).format(price)
 }
 
+const formatOptionsSummary = (summary) => {
+  if (!summary) return ''
+  try {
+    let parsed = typeof summary === 'string' ? JSON.parse(summary) : summary
+    if (Array.isArray(parsed)) {
+      return parsed.map(opt => `${opt.name}: ${opt.value}`).join(' / ')
+    }
+    return ''
+  } catch (e) {
+    return summary
+  }
+}
+
 const searchOrder = async () => {
   if (!orderCode.value.trim()) return
 
@@ -278,7 +239,7 @@ const searchOrder = async () => {
     }
   } catch (err) {
     if (err.response?.status === 404) {
-      error.value = 'Pedido no encontrado. Verifica el código.'
+      error.value = 'No se encontró el pedido. Verifica el código.'
     } else {
       error.value = 'Error al buscar el pedido. Intenta nuevamente.'
     }
@@ -316,19 +277,23 @@ watch(() => props.isOpen, async (newVal) => {
 </script>
 
 <style scoped>
-/* Scrollbar personalizado */
-.overflow-y-auto::-webkit-scrollbar {
+.custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
-.overflow-y-auto::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 10px;
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
 }
-.overflow-y-auto::-webkit-scrollbar-thumb {
+.custom-scrollbar::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 10px;
 }
-.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+}
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
 }
 </style>

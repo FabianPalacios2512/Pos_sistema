@@ -289,9 +289,12 @@ export function useLiveCall(options = {}) {
         
         // Si ya está en caché, saltar
         if (voiceCache.has(cacheKey)) continue
+        // Obtener la URL base del backend, igual que las imágenes
+        const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+        const cleanUrl = backendUrl.replace(/\/+$/, '')
         
         // Pre-cargar archivo estático (sin await, sin bloquear)
-        fetch(`/storage/voice-previews/${voiceId}_preview.wav`)
+        fetch(`${cleanUrl}/storage/voice-previews/${voiceId}_preview.wav`)
           .then(async (response) => {
             if (response.ok) {
               const blob = await response.blob()
@@ -309,10 +312,14 @@ export function useLiveCall(options = {}) {
     const voice = AVAILABLE_VOICES[voiceIndex]
     const voiceId = voice.id.toLowerCase()
     
+    // Obtener la URL base del backend
+    const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+    const cleanUrl = backendUrl.replace(/\/+$/, '')
+    
     // Determinar archivo a cargar
     const audioType = isWelcome ? 'welcome' : 'preview'
     const cacheKey = `${audioType}_${voice.id}`
-    const audioPath = `/storage/voice-previews/${voiceId}_${audioType}.wav`
+    const audioPath = `${cleanUrl}/storage/voice-previews/${voiceId}_${audioType}.wav`
     
     isPlayingPreview.value = true
     
@@ -377,9 +384,13 @@ export function useLiveCall(options = {}) {
         previewAudio.value = null
       }
       
+      // Obtener la URL base del backend
+      const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+      const cleanUrl = backendUrl.replace(/\/+$/, '')
+      
       // Determinar archivo según género
       const confirmType = voice.gender === 'female' ? 'confirm_female' : 'confirm_male'
-      const audioPath = `/storage/voice-previews/${voiceId}_${confirmType}.wav`
+      const audioPath = `${cleanUrl}/storage/voice-previews/${voiceId}_${confirmType}.wav`
       
       const response = await fetch(audioPath)
       if (!response.ok) {
@@ -640,8 +651,8 @@ ${sinCategorias ? 'Esta tienda NO tiene categorías creadas aún.' : ''}
 Tu objetivo es AYUDAR al usuario a configurar su negocio de forma amigable.
 
 SALUDO ESPECIAL PARA TIENDA NUEVA:
-Al saludar, sé cálido y ofrece ayuda proactivamente:
-- "¡Hola ${userName}! Soy ciento cinco i a. Veo que estás comenzando con tu ${tipoTiendaDescripcion}. ¿Te ayudo a registrar tus primeros productos?"
+Al saludar, sé cálido y ofrece apoyo proactivamente:
+- "¡Hola ${userName}! Soy ciento cinco i a. Veo que estás comenzando con tu ${tipoTiendaDescripcion}. ¿Te apoyo a registrar tus primeros productos?"
 - Si acepta, pregúntale qué tipo de productos vende para guiarlo mejor
 - Ofrécele crear su primera categoría y luego sus primeros productos
 - Sé paciente y guíalo paso a paso
@@ -651,15 +662,49 @@ FLUJO RECOMENDADO PARA TIENDA NUEVA:
 2. Pregunta: "¿Qué tipo de productos vendes?" para entender mejor su negocio
 3. ${sinCategorias ? 'Ayúdalo a crear su primera categoría según lo que venda' : 'Ya tiene categorías, puedes crear productos'}
 4. Luego guíalo para crear su primer producto
-5. Hazlo sentir acompañado, que no está solo configurando esto
+6. También puedes sugerirle: "En 105 POS ahora puedes crear tu propia tienda web, ¿te gustaría que te asista para crear tu página web ya mismo?"
+7. Si el usuario acepta crear la tienda web, usa la herramienta asistenteTiendaWeb con accion='activar_tienda_inicial' y guíalo paso a paso.
 ` : `
 SALUDO NORMAL (tienda con productos):
 Responde de forma breve y amigable, como un asistente de trabajo.
-- "¡Hola ${userName}! ¿En qué te puedo ayudar?"
+- "¡Hola ${userName}! ¿En qué te puedo colaborar?"
 - NO menciones la fecha/hora
 - NO hagas resúmenes de ventas sin que te pregunten
-- Puedes mencionar si ves algo relevante como alertas de stock bajo
+- Ocasionalmente puedes sugerir: "¿Te gustaría que te apoye a crear tu página web para vender por internet?" Si acepta, usa asistenteTiendaWeb.
 `}
+
+FLUJO ESTRICTO DE CREACIÓN DE TIENDA WEB (asistenteTiendaWeb):
+Si el usuario quiere crear su tienda web, ESTÁS OBLIGADO a seguir los pasos uno por uno sin adelantarte:
+
+PASO 1: Inicio
+- Usa SIEMPRE asistenteTiendaWeb({accion: 'activar_tienda_inicial'}) PRIMERO. ¡Esto es obligatorio para abrir la interfaz!
+- UNA VEZ EJECUTADO, pregúntale: "Cuéntame un poco de tu tienda, ¿qué vendes y para qué público va dirigido?"
+- ESPERA SU RESPUESTA. ¡NO TE ADELANTES AL PASO 2!
+
+PASO 2: Descripción y Generación
+- Cuando te dé la descripción, usa asistenteTiendaWeb({accion: 'describir_negocio', descripcion: <lo que dijo>}).
+- Dile: "Perfecto, he escrito tu descripción y estoy generando unos diseños."
+- ESPERA. ¡NO HABLES DE FOTOS NI NADA MÁS!
+
+PASO 3: Carrusel de Diseños (VISTA ACTUAL)
+- Al ver los diseños, dile: "Aquí tienes algunas opciones. Dime 'siguiente' o 'anterior' para ver los demás, y cuando te guste uno dime 'elige este'."
+- Si te dice "siguiente", "pásalo", "otro" → SOLO usa asistenteTiendaWeb({accion: 'siguiente_diseno'}). NO hables de fotos. NO escojas nada.
+- Si te dice "anterior", "vuelve" → SOLO usa asistenteTiendaWeb({accion: 'anterior_diseno'}). NO hables de fotos.
+- ESPERA SU DECISIÓN.
+
+PASO 4: Elección FINAL y Fotos
+- Si el usuario dice "sí", "este", "este me gusta", "elegir", "dejemos este" u otra confirmación → Usa asistenteTiendaWeb({accion: 'elegir_diseno'}).
+- SOLO HASTA ESE MOMENTO (que el diseño ya se eligió) avanza a decirle: "Excelente elección. Ahora sube 3 imágenes. Si no tienes, dime 'saltar'."
+- Usa {accion: 'resaltar_fotos'} para mostrarle dónde, o {accion: 'saltar_fotos'} si quiere omitir.
+
+PASO 5: Saltar Fotos o Finalizar
+- Si el usuario dice "saltar", "saltar fotos", "luego", "no tengo" → Usa asistenteTiendaWeb({accion: 'saltar_fotos'}).
+- MENSAJE DE CIERRE: Dile con MUCHO entusiasmo: "¡Perfecto! Tu tienda web ya está creada y configurada. ¡Felicidades por dar este gran paso en tu emprendimiento! Cuenta conmigo para lo que necesites seguir impulsando tu negocio." (¡NUNCA digas "en qué más te puedo ayudar"!).
+
+REGLA DE ORO DEL CATÁLOGO: PROHIBIDO MENCIONAR "FOTOS" MIENTRAS EL USUARIO SOLO ESTÉ NAVEGANDO (Paso 3).
+¡REGLA ABSOLUTA PROHIBIDA!: NUNCA USES LA PALABRA "AYUDAR", "AYUDA", "AYUDARTE". SUSTITÚYELAS SIEMPRE POR "APOYAR", "COLABORAR", "ASISTIR", "ACOMPAÑAR".
+
+REGLA DE ORO DEL CATÁLOGO: PROHIBIDO MENCIONAR "FOTOS" O EL "PASO 3 DE FOTOS" MIENTRAS EL USUARIO SOLO ESTÉ NAVEGANDO O MIRANDO DISEÑOS (con 'siguiente' o 'anterior').
 
 REGLA UX CRÍTICA - EXPERIENCIA VISUAL DEL USUARIO SIEMPRE recuerda: Estás asistiendo a un usuario que VE una pantalla. 
 TODO lo que hagas debe ser VISIBLE para él. NO hagas cosas "en el fondo".
@@ -1594,6 +1639,22 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
                   }
                 },
                 {
+                  name: 'asistenteTiendaWeb',
+                  description: 'Herramienta para guiar la creación de la tienda web paso a paso.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      accion: { 
+                        type: 'STRING', 
+                        description: 'Acción a ejecutar en el catálogo web.',
+                        enum: ['abrir_modulo', 'describir_negocio', 'siguiente_diseno', 'anterior_diseno', 'elegir_diseno', 'saltar_fotos', 'resaltar_fotos']
+                      },
+                      descripcion: { type: 'STRING', description: 'La descripción del negocio dada por el usuario (solo requerida para describir_negocio)' }
+                    },
+                    required: ['accion']
+                  }
+                },
+                {
                   name: 'mostrarFactura',
                   description: 'Navega a facturas y abre una factura específica. Opciones: mas_cara (la de mayor total), mas_barata (la de menor total), ultima (la más reciente por fecha/hora), primera (la primera del día), por_numero (buscar por número de factura). Período: hoy, ayer, semana, mes.',
                   parameters: {
@@ -1874,6 +1935,26 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
                       nombre: { 
                         type: 'STRING', 
                         description: 'Nombre de la categoría (solo para crearCategoriaYAbrirProducto)'
+                      }
+                    },
+                    required: ['accion']
+                  }
+                },
+                // ASISTENTE TIENDA WEB (CATÁLOGO WEB)
+                {
+                  name: 'asistenteTiendaWeb',
+                  description: 'Asistente para guiar al usuario a crear su tienda web/catálogo en línea paso a paso. Usar cuando el usuario quiera crear su página web o catálogo.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      accion: { 
+                        type: 'STRING', 
+                        description: 'Acción a ejecutar: abrir_modulo, describir_negocio, siguiente_diseno, anterior_diseno, elegir_diseno, resaltar_fotos, saltar_fotos',
+                        enum: ['abrir_modulo', 'describir_negocio', 'siguiente_diseno', 'anterior_diseno', 'elegir_diseno', 'resaltar_fotos', 'saltar_fotos']
+                      },
+                      descripcion: { 
+                        type: 'STRING', 
+                        description: 'Descripción del negocio dictada por el usuario (solo requerida para accion: describir_negocio)'
                       }
                     },
                     required: ['accion']
@@ -4014,6 +4095,27 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
             }
             break
             
+          case 'asistenteTiendaWeb':
+            try {
+              const accion = fc.args?.accion
+              const descripcion = fc.args?.descripcion || ''
+              
+              if (accion === 'abrir_modulo') {
+                navigateToModule('web-catalog-config')
+                result = { success: true, message: 'He abierto el módulo de creación de tienda web. Pregúntale sobre su negocio.' }
+              } else {
+                // Ejecutar acción registrada por WebCatalogConfig.vue
+                const uiContext = useUIContextStore()
+                const respuesta = await uiContext.executeAction('catalogWebAction', { accion, descripcion })
+                
+                result = respuesta || { success: true, message: `Acción ${accion} ejecutada en tienda web.` }
+              }
+            } catch (err) {
+              console.error('[asistenteTiendaWeb] Error:', err)
+              result = { success: false, message: 'No pude ejecutar la acción de la tienda web' }
+            }
+            break
+            
           case 'obtenerEstadisticas':
             try {
               // Obtener datos directamente
@@ -4214,6 +4316,39 @@ CAJA: ${datosGlobales.caja.estado === 'abierta' ? 'Abierta' : 'Cerrada'} - ${for
             }
             break
           
+          case 'asistenteTiendaWeb':
+            try {
+              const accion = fc.args?.accion
+              const descripcion = fc.args?.descripcion
+              
+              if (!accion) {
+                result = { success: false, message: 'Falta la acción a ejecutar.' }
+                break
+              }
+              
+              const uiContext = useUIContextStore()
+              
+              if (accion === 'abrir_modulo') {
+                if (uiContext.currentModule !== 'web-catalog-config') {
+                  navigateToModule('web-catalog-config')
+                  await new Promise(resolve => setTimeout(resolve, 800))
+                }
+                const actionResult = await uiContext.executeAction('catalogWebAction', { accion: 'activar_tienda_inicial' })
+                result = { success: true, message: 'Módulo abierto.' }
+              } else {
+                if (uiContext.currentModule !== 'web-catalog-config') {
+                  result = { success: false, message: 'El usuario no está en el catálogo web.' }
+                  break
+                }
+                const actionResult = await uiContext.executeAction('catalogWebAction', { accion, descripcion })
+                result = actionResult || { success: true, message: 'Acción ejecutada.' }
+              }
+            } catch (err) {
+              console.error('Error en asistenteTiendaWeb:', err)
+              result = { success: false, message: 'Error al ejecutar acción del catálogo.' }
+            }
+            break
+            
           case 'buscarProductoEnVivo':
             try {
               const texto = fc.args?.texto

@@ -19,7 +19,7 @@ $VPS          = "root@72.61.73.245"
 $REMOTE_PATH  = "/var/www/105pos"
 $SSH_OPTS     = @("-i", $SSH_KEY, "-o", "StrictHostKeyChecking=no", "-o", "BatchMode=yes")
 $ROOT         = $PSScriptRoot
-$TEMP_DIR     = "$ROOT\.deploy-tmp"
+$TEMP_DIR     = "$ROOT\.deploy-tmp2"
 
 Set-Location $ROOT
 
@@ -135,6 +135,7 @@ try {
             --exclude="storage/framework/cache/*" `
             --exclude="storage/framework/views/*" `
             --exclude="storage/framework/sessions/*" `
+            --exclude="public/storage" `
             --exclude=".env" `
             -C backend .
         Pop-Location
@@ -155,12 +156,11 @@ cd $REMOTE_PATH/backend && tar -xzf /tmp/backend.tar.gz --exclude='.env' && rm /
         Write-Ok "Backend subido"
     }
 
-    # ── 5. LIMPIAR CACHE EN VPS ────────────────────────────
-    Write-Step "Limpiando cache en VPS..."
+    Write-Step "Limpiando cache en VPS y enlazando Storage..."
     Invoke-RemoteCmd @"
-cd $REMOTE_PATH/backend && php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear && php artisan config:cache && php artisan route:cache && sudo systemctl restart php8.3-fpm && echo 'CACHE OK'
+cd $REMOTE_PATH/backend && php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear && php artisan config:cache && php artisan route:cache && php artisan storage:link && sudo systemctl restart php8.3-fpm && echo 'CACHE Y STORAGE OK'
 "@
-    Write-Ok "Cache limpiado y PHP reiniciado"
+    Write-Ok "Cache limpiado, Storage enlazado y PHP reiniciado"
 
 } finally {
     # ── LIMPIAR ARCHIVOS TEMPORALES ────────────────────────

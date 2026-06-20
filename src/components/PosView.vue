@@ -4075,7 +4075,8 @@ const getFullImageUrl = (imageUrl) => {
   }
   // Si es una ruta relativa, agregar el base URL del backend
   const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
-  return `${baseUrl}/storage/${imageUrl.replace(/^\/storage\//, '')}`
+  const cleanUrl = imageUrl.replace(/^(?:\/?storage\/?)+/, '')
+  return `${baseUrl}/storage/${cleanUrl}`
 }
 
 // Función para obtener la imagen del item del carrito (con fallback a avatar)
@@ -8841,6 +8842,9 @@ const handleWebOrderLoaded = async (order) => {
       
       showSuccess(`Pedido #${order.order_number} cargado. Cliente: ${customer.name}`)
       
+      // Mostrar modal de pago automáticamente
+      showPaymentModal.value = true
+      
     } else {
       // 4. Si el cliente NO existe, pedir confirmación antes de crear
       pendingCustomerData.value = {
@@ -8865,11 +8869,67 @@ const handleWebOrderLoaded = async (order) => {
 const loadOrderProductsToCart = async (order) => {
   // Agregar los productos al carrito
   for (const item of order.items) {
-    const product = filteredProducts.value.find(p => p.id === item.product_id)
+    const product = products.value.find(p => p.id === item.product_id)
     
     if (product) {
-      await addToCart(product, item.quantity)
+      // Manejar productos con variantes (Fashion)
+      if (item.variant_id && product.variants && product.variants.length > 0) {
+        const variant = product.variants.find(v => v.id === item.variant_id)
+        if (variant) {
+          // Construir resumen de opciones (ej: Talla: M / Color: Rojo)
+          let optionsSummaryText = ''
+          try {
+            let summary = variant.options_summary
+            if (typeof summary === 'string') summary = JSON.parse(summary)
+            if (Array.isArray(summary)) {
+              optionsSummaryText = summary.map(opt => {
+                const val = opt.name.toLowerCase() === 'color' && String(opt.value).startsWith('#') 
+                  ? hexToColorName(opt.value) 
+                  : opt.value
+                return `${opt.name}: ${val}`
+              }).join(' / ')
+            }
+          } catch (e) {
+            console.error('Error parsing variant options', e)
+          }
+
+          const existingItem = cart.items.find(i => i.variant_id === variant.id)
+          if (existingItem) {
+            existingItem.quantity += item.quantity
+            if (existingItem.quantity > variant.stock) existingItem.quantity = variant.stock
+          } else {
+            cart.items.push({
+              id: product.id,
+              variant_id: variant.id,
+              name: `${product.name} ${optionsSummaryText ? '(' + optionsSummaryText + ')' : ''}`,
+              price: variant.price || product.price,
+              quantity: Math.min(item.quantity, variant.stock || 999),
+              image_url: getProductImage(product),
+              barcode: variant.sku || product.barcode,
+              category: product.category,
+              max_stock: variant.stock,
+              measurement_unit: product.measurement_unit || 'unit',
+              variant_options: optionsSummaryText
+            })
+          }
+          // Emitir cambio de carrito para actualizar UI
+          emit('cart-status-changed', cart.items.length > 0)
+        } else {
+          // Fallback si no se encuentra la variante
+          await addToCart(product)
+          const addedItem = cart.items[cart.items.length - 1]
+          if (addedItem && addedItem.id === product.id) addedItem.quantity = item.quantity
+        }
+      } else {
+        // Producto simple
+        await addToCart(product)
+        const addedItem = cart.items.find(i => i.id === product.id && !i.variant_id)
+        if (addedItem) {
+          addedItem.quantity = item.quantity
+        }
+      }
     } else {
+      console.warn(`Producto ${item.product_id} no encontrado en el POS`)
     }
   }
   
@@ -8917,6 +8977,9 @@ const handleConfirmNewCustomer = async () => {
     
     showSuccess(`Pedido #${pendingWebOrder.value.order_number} cargado. Cliente: ${newCustomer.name}`)
     
+    // Mostrar modal de pago automáticamente
+    showPaymentModal.value = true
+    
     // Limpiar datos pendientes
     pendingCustomerData.value = null
     pendingWebOrder.value = null
@@ -8930,8 +8993,18 @@ const handleConfirmNewCustomer = async () => {
 /**
  * Cancelar creación de cliente
  */
-const handleCancelNewCustomer = () => {
-  showInfo('Pedido web cancelado. No se creó el cliente.')
+const handleCancelNewCustomer = async () => {
+  if (pendingWebOrder.value) {
+    showInfo('Continuando venta sin registrar al cliente...')
+    // Cargar productos al carrito de todas formas
+    await loadOrderProductsToCart(pendingWebOrder.value)
+    showSuccess(`Pedido #${pendingWebOrder.value.order_number} cargado.`)
+    // Mostrar modal de pago automáticamente
+    showPaymentModal.value = true
+  } else {
+    showInfo('Pedido web cancelado.')
+  }
+  
   pendingCustomerData.value = null
   pendingWebOrder.value = null
 }

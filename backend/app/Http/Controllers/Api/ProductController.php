@@ -611,9 +611,26 @@ class ProductController extends Controller
             }
 
             // 4. Lógica Híbrida
-            // Obtener el warehouse real del tenant (nunca hardcodear 1)
+            // Obtener el warehouse real del tenant (nunca hardcodear 1 si no existe)
             $defaultWarehouse = \App\Models\Warehouse::orderBy('id')->first();
-            $warehouseId = $request->warehouse_id ?? ($defaultWarehouse ? $defaultWarehouse->id : null);
+            
+            // Si el tenant no tiene bodegas (bd recién creada o con errores), crear una por defecto
+            if (!$defaultWarehouse) {
+                $defaultWarehouse = \App\Models\Warehouse::create([
+                    'name' => 'Sede Principal',
+                    'is_default' => true,
+                    'active' => true
+                ]);
+            }
+            
+            $warehouseId = $request->warehouse_id;
+            
+            // Validar que el warehouse_id enviado realmente exista en la bd del tenant
+            if ($warehouseId && !\App\Models\Warehouse::find($warehouseId)) {
+                $warehouseId = $defaultWarehouse->id; // Fallback seguro
+            } elseif (!$warehouseId) {
+                $warehouseId = $defaultWarehouse->id;
+            }
 
             if ($request->product_type === 'simple') {
                 // --- LÓGICA SIMPLE ---
@@ -967,7 +984,17 @@ class ProductController extends Controller
                         ->where('product_id', $product->id)
                         ->delete();
 
-                    $warehouseId = $request->warehouse_id ?? Warehouse::first()->id ?? 1;
+                    $defaultWarehouse = Warehouse::first();
+                    if (!$defaultWarehouse) {
+                        $defaultWarehouse = Warehouse::create(['name' => 'Sede Principal', 'is_default' => true, 'active' => true]);
+                    }
+                    $warehouseId = $request->warehouse_id;
+                    if ($warehouseId && !Warehouse::find($warehouseId)) {
+                        $warehouseId = $defaultWarehouse->id;
+                    } elseif (!$warehouseId) {
+                        $warehouseId = $defaultWarehouse->id;
+                    }
+
                     $product->warehouses()->attach($warehouseId, [
                         'stock' => $variantData['stock'] ?? 0,
                         'product_variant_id' => $variant->id
@@ -1068,7 +1095,16 @@ class ProductController extends Controller
                     // Eliminar variantes anteriores
                     $product->variants()->delete();
 
-                    $warehouseId = $request->warehouse_id ?? Warehouse::first()->id ?? 1;
+                    $defaultWarehouse = Warehouse::first();
+                    if (!$defaultWarehouse) {
+                        $defaultWarehouse = Warehouse::create(['name' => 'Sede Principal', 'is_default' => true, 'active' => true]);
+                    }
+                    $warehouseId = $request->warehouse_id;
+                    if ($warehouseId && !Warehouse::find($warehouseId)) {
+                        $warehouseId = $defaultWarehouse->id;
+                    } elseif (!$warehouseId) {
+                        $warehouseId = $defaultWarehouse->id;
+                    }
 
                     foreach ($variants as $variantData) {
                         $costPrice = $variantData['cost'] ?? $variantData['cost_price'] ?? 0;

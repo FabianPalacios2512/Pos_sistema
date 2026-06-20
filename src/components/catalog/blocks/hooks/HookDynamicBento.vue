@@ -1,13 +1,14 @@
 <template>
   <!-- HOOK: DYNAMIC BENTO — Deportivo / Tecnología / Consumo -->
-  <!-- Bento Grid: cuadro grande con foto lifestyle + dos celdas 50/50 (claim + detalle). -->
-  <!-- rounded-lg máximo. Estética técnica, fuente sans-serif gruesa. -->
-  <section class="w-full px-4 py-5" :style="{ backgroundColor: palette.background || '#f9fafb' }">
+  <!-- Mobile: stack vertical. Desktop: bento horizontal (imagen izquierda | columna derecha). -->
+  <section class="w-full px-4 py-5 lg:py-8" :style="{ backgroundColor: palette.background || '#f9fafb' }">
 
-    <div class="flex flex-col gap-2">
+    <!-- Bento: flex-col en mobile, flex-row en desktop -->
+    <div class="flex flex-col lg:flex-row gap-2 lg:gap-3">
 
-      <!-- CELDA GRANDE: Imagen lifestyle full-width -->
-      <div class="relative overflow-hidden rounded-lg" style="aspect-ratio: 16/8; min-height: 180px;">
+      <!-- CELDA PRINCIPAL: Imagen lifestyle -->
+      <!-- Mobile: aspect 16/8 (landscape). Desktop: portrait, toma el lado izquierdo -->
+      <div class="relative overflow-hidden rounded-lg min-h-[180px] aspect-[16/8] lg:aspect-auto lg:w-[57%] lg:min-h-[480px]">
         <img
           v-if="image"
           :src="image"
@@ -20,83 +21,66 @@
           :style="{ backgroundColor: palette.primary + '22' }"
         ></div>
 
-        <!-- Overlay + título encima -->
-        <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent flex items-end p-4 lg:p-6">
+        <!-- Overlay + título -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent flex items-end p-4 lg:p-8">
           <div>
-            <p
-              class="text-[8px] uppercase tracking-[0.4em] font-bold text-white/50 mb-1"
-            >{{ label }}</p>
+            <p class="text-[8px] uppercase tracking-[0.4em] font-bold text-white/50 mb-1">{{ label }}</p>
             <h2
-              class="text-2xl sm:text-3xl lg:text-4xl font-black uppercase tracking-tighter text-white leading-[0.95] whitespace-pre-line"
+              class="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black uppercase tracking-tighter text-white leading-[0.95] whitespace-pre-line"
               :style="{ fontFamily: fonts.heading + ', Impact, sans-serif' }"
             >{{ headline }}</h2>
           </div>
         </div>
       </div>
 
-      <!-- FILA INFERIOR: 2 celdas 50/50 -->
-      <div class="grid grid-cols-2 gap-2">
+      <!-- COLUMNA DERECHA: celdas + CTA (apiladas en desktop) -->
+      <div class="flex flex-col gap-2 lg:gap-3 lg:flex-1">
 
-        <!-- CELDA A: Color sólido + claim de beneficio principal -->
-        <div
-          class="rounded-lg flex flex-col items-start justify-end px-4 py-4 sm:py-5"
-          style="min-height: 130px;"
-          :style="{ backgroundColor: palette.primary }"
-        >
-          <p
-            class="text-[8px] uppercase tracking-[0.3em] font-bold mb-1.5"
-            :style="{ color: primaryContrastMuted }"
-          >Tecnología</p>
-          <p
-            class="text-[16px] sm:text-[18px] font-black uppercase leading-tight whitespace-pre-line"
-            :style="{ color: primaryContrastText, fontFamily: fonts.heading + ', sans-serif' }"
-          >{{ benefit }}</p>
+        <!-- Celdas: 50/50 en mobile → stack vertical en desktop -->
+        <div class="grid grid-cols-2 lg:grid-cols-1 gap-2 lg:gap-3 lg:flex-1">
+
+          <!-- CELDA A: Color sólido + claim -->
+          <div
+            class="rounded-lg flex flex-col items-start justify-end px-4 py-4 sm:py-5 lg:py-7"
+            style="min-height: 130px;"
+            :style="{ backgroundColor: palette.primary }"
+          >
+            <p class="text-[8px] uppercase tracking-[0.3em] font-bold mb-1.5" :style="{ color: primaryContrastMuted }">Tecnología</p>
+            <p
+              class="text-[16px] sm:text-[18px] lg:text-[22px] font-black uppercase leading-tight whitespace-pre-line"
+              :style="{ color: primaryContrastText, fontFamily: fonts.heading + ', sans-serif' }"
+            >{{ benefit }}</p>
+          </div>
+
+          <!-- CELDA B: Foto de detalle -->
+          <div class="relative overflow-hidden rounded-lg" style="min-height: 130px;">
+            <img
+              v-if="detailImage"
+              :src="detailImage"
+              :alt="benefit"
+              class="absolute inset-0 w-full h-full object-cover object-center"
+            />
+            <div v-else class="absolute inset-0" :style="{ backgroundColor: palette.secondary + '50' }"></div>
+            <div
+              class="absolute top-2 left-2 px-2 py-[3px] rounded text-[7.5px] font-bold uppercase tracking-wider"
+              :style="{ backgroundColor: badgeBgColor, color: badgeTextColor }"
+            >Detalle</div>
+          </div>
+
         </div>
 
-        <!-- CELDA B: Foto de detalle del producto -->
-        <div
-          class="relative overflow-hidden rounded-lg"
-          style="min-height: 130px;"
-        >
-          <img
-            v-if="detailImage"
-            :src="detailImage"
-            :alt="benefit"
-            class="absolute inset-0 w-full h-full object-cover object-center"
-          />
-          <div
-            v-else
-            class="absolute inset-0"
-            :style="{ backgroundColor: palette.secondary + '50' }"
-          ></div>
-
-          <!-- Mini badge de detalle -->
-          <div
-            class="absolute top-2 left-2 px-2 py-[3px] rounded text-[7.5px] font-bold uppercase tracking-wider"
-            :style="{ backgroundColor: badgeBgColor, color: badgeTextColor }"
-          >Detalle</div>
+        <!-- CTA Row (ahora dentro de la columna derecha) -->
+        <div class="flex items-center justify-between gap-3 lg:mt-1">
+          <p class="text-[12px] font-medium" style="color: #9ca3af;">{{ subheadline }}</p>
+          <button
+            @click="$emit('cta')"
+            class="flex-shrink-0 px-5 py-2.5 rounded-md text-[10px] font-black uppercase tracking-widest transition-opacity duration-150 hover:opacity-80 active:scale-95"
+            :style="{ backgroundColor: ctaBgColor, color: ctaTextColor, fontFamily: fonts.body + ', sans-serif' }"
+          >{{ ctaText }}</button>
         </div>
 
       </div>
 
-    </div>
-
-    <!-- CTA Row debajo del bento -->
-    <div class="mt-3.5 flex items-center justify-between gap-3">
-      <p
-        class="text-[12px] font-medium"
-        style="color: #9ca3af;"
-      >{{ subheadline }}</p>
-
-      <button
-        @click="$emit('cta')"
-        class="flex-shrink-0 px-5 py-2.5 rounded-md text-[10px] font-black uppercase tracking-widest transition-opacity duration-150 hover:opacity-80 active:scale-95"
-        :style="{
-          backgroundColor: ctaBgColor,
-          color: ctaTextColor,
-          fontFamily: fonts.body + ', sans-serif',
-        }"
-      >{{ ctaText }}</button>
     </div>
 
   </section>

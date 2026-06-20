@@ -297,9 +297,18 @@ const loadGlobalBusinessDataForAI = async () => {
  */
 export function normalizeImageUrl(url) {
   if (!url) return null
-  if (url.startsWith('http') || url.startsWith('/')) return url
+  if (url.startsWith('http')) return url
+  
+  // Limpiar posibles duplicados de storage
+  let cleanUrl = url.replace(/^(?:\/?storage\/?)+/, '')
+  
+  // Si la url original tenía slashes (era una ruta, ej: tenants/test/products/...), se respeta su estructura
+  if (cleanUrl.includes('/')) {
+    return `/storage/${cleanUrl}`
+  }
+  
   // Bare filename: asumir que está en storage/products/
-  return `/storage/products/${url}`
+  return `/storage/products/${cleanUrl}`
 }
 
 // Store global de la aplicación para datos precargados

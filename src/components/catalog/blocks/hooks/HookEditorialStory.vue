@@ -2,10 +2,10 @@
   <!-- HOOK: EDITORIAL STORY — Boutique / Lencería / Alta Costura -->
   <!-- Mobile: texto arriba, imagen abajo. Desktop: texto izquierda, imagen derecha full-height. -->
   <section class="w-full" :style="{ backgroundColor: palette.background || '#ffffff' }">
-    <div class="flex flex-col lg:flex-row lg:min-h-[480px]">
+    <div class="flex flex-col lg:flex-row-reverse lg:min-h-[560px]">
 
       <!-- TEXTO: Arriba en móvil, izquierda en desktop -->
-      <div class="flex flex-col justify-center px-6 py-10 lg:w-[45%] lg:px-16 lg:py-20 order-1">
+      <div class="flex flex-col justify-center px-6 py-10 lg:w-[44%] lg:px-16 xl:px-20 lg:py-24 order-1">
 
         <!-- Etiqueta superior — micro label -->
         <p
@@ -15,13 +15,13 @@
 
         <!-- Título serif grande, saltos de línea respetados -->
         <h2
-          class="text-[30px] lg:text-[40px] xl:text-[48px] leading-[1.08] font-semibold mb-5 whitespace-pre-line"
+          class="text-[30px] lg:text-[42px] xl:text-[56px] leading-[1.06] font-semibold mb-5 whitespace-pre-line"
           :style="{ fontFamily: fonts.heading + ', Georgia, \'Times New Roman\', serif', color: adaptiveTextColor }"
         >{{ headline }}</h2>
 
         <!-- Párrafo — color adaptativo al fondo -->
         <p
-          class="text-[13.5px] leading-relaxed max-w-[320px] mb-9"
+          class="text-[13.5px] lg:text-[15px] leading-relaxed max-w-[320px] lg:max-w-[360px] mb-9"
           :style="{ color: adaptiveBodyColor }"
         >{{ body }}</p>
 

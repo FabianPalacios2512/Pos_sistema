@@ -3810,18 +3810,10 @@ const processImageUrl = (url) => {
   // Usar el origen actual (mismo puerto que el frontend/proxy)
   const backendUrl = window.location.origin
   
-  // Si es ruta relativa de Laravel Storage, convertir a URL absoluta
-  if (trimmedUrl.startsWith('/storage')) {
-    return `${backendUrl}${trimmedUrl}`
-  }
+  // Limpiar cualquier prefijo de storage duplicado o mal formado
+  const cleanUrl = trimmedUrl.replace(/^(?:\/?storage\/?)+/, '')
   
-  // Si no empieza con /, agregar /storage/
-  if (!trimmedUrl.startsWith('/')) {
-    return `${backendUrl}/storage/${trimmedUrl}`
-  }
-  
-  // Ruta relativa genérica
-  return `${backendUrl}${trimmedUrl}`
+  return `${backendUrl}/storage/${cleanUrl}`
 }
 
 // �x� Computed: Lista de imágenes del producto seleccionado

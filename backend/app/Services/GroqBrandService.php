@@ -40,6 +40,8 @@ class GroqBrandService
         'floating-pill'    => 'Header flotante tipo píldora, urbano y moderno — streetwear, tech, marcas juveniles y atrevidas',
         'centered-serif'   => 'Logo centrado serif estilo distribuidor/boutique — distribuidoras, ropa premium, marcas clásicas',
         'dark-premium'     => 'Fondo negro sólido con efecto glass oscuro al hacer scroll, íconos y texto siempre en blanco — USAR cuando la paleta tenga background oscuro/negro, alta costura noir, marcas de lujo oscuras, tecnología premium',
+        'split-action'     => 'Logo a la izquierda, barra de búsqueda centrada, iconos a la derecha — ideal para e-commerce grande, ferreterías, marketplaces o tiendas multimarca estilo Amazon/MercadoLibre',
+        'minimal-float'    => 'Pill flotante minimalista que aparece solo al scroll-up — estilo Apple premium, moderno, limpio, boutique de gama alta',
     ];
 
     /**
@@ -50,6 +52,9 @@ class GroqBrandService
         'urban-lookbook'  => 'Lookbook urbano asimétrico — streetwear, sneakers, drops, marcas juveniles y bold',
         'dynamic-bento'   => 'Cuadrícula bento dinámica — deportivo, tech, consumo rápido, marcas con muchos productos',
         'dark-noir'       => 'Brand story noir: fondo negro puro, imagen asimétrica 60/40, texto blanco + gris plata, CTA outline sutil — USAR únicamente con diseños oscuros (background negro/muy oscuro), alta costura noir, lujo minimalista dark, tech premium oscuro',
+        'testimonials'     => 'Carrusel de testimonios y opiniones de clientes con avatar, estrellas y texto — ideal para construir confianza social en cualquier vertical de tienda',
+        'collection-grid'  => 'Mosaico visual de categorías o colecciones asimétricas — ideal para tiendas de ropa, calzado, accesorios que quieren guiar la compra',
+        'brand-manifesto'  => 'Manifiesto de marca tipográfico full-width — declaración fuerte serif con firma, perfecto para marcas de diseño de autor o artesanales',
     ];
 
     /**
@@ -61,6 +66,8 @@ class GroqBrandService
         'divided'        => 'Gris sutil con divisores verticales — cosmética, corporativo, marcas ordenadas y limpias',
         'marquee'        => 'Texto en loop infinito animado — streetwear urbano, marcas energéticas, drops exclusivos',
         'soft-pills'     => 'Pastillas blancas flotantes sobre fondo claro — tech, digital, marcas modernas y frescas',
+        'icon-grid'      => 'Cuadrícula con iconos circulares premium y títulos de valor — ideal para moda, calzado y marcas de diseño independiente',
+        'countdown'      => 'Barra de ofertas flash con temporizador de urgencia animado — perfecto para tiendas de descuento, temporadas especiales (Black Friday) y drops rápidos',
     ];
 
     /**
@@ -69,43 +76,71 @@ class GroqBrandService
     private array $designDirections = [
         [
             'mood' => 'luxury-editorial',
-            'hint' => 'Paleta oscura o crema/beige/dorada. Serif elegante. Header: editorial-center o centered-serif. Hero: split-portrait o portrait. Hook: editorial-story. Trust: minimal-border o dark-contrast. CTA single-outline. Ticker muted-light.',
+            'hint' => 'Paleta oscura o crema/beige/dorada. Serif elegante. Header: editorial-center o centered-serif. Hero: split-portrait o portrait. Hook: editorial-story. Trust: minimal-border o dark-contrast. CTA single-outline. Ticker muted-light. retail_intensity: minimal.',
         ],
         [
             'mood' => 'bold-energetic',
-            'hint' => 'Colores saturados y contrastantes. Tipografía display o grotesca grande. Header: floating-pill o retail-left. Hero: full-bleed. Hook: dynamic-bento. Trust: marquee o soft-pills. CTA bold-filled. Ticker soft-primary o contrast-dark.',
+            'hint' => 'Colores saturados y contrastantes. Tipografía display o grotesca grande. Header: floating-pill o retail-left. Hero: full-bleed. Hook: dynamic-bento. Trust: marquee o soft-pills. CTA bold-filled. Ticker soft-primary o contrast-dark. retail_intensity: moderate.',
         ],
         [
             'mood' => 'fresh-modern',
-            'hint' => 'Colores pastel o neones suaves. Sans moderna (DM Sans, Outfit, Manrope). Header: editorial-center o retail-left. Hero: full-bleed o centered-minimal. Hook: editorial-story o dynamic-bento. Trust: soft-pills o divided. CTA double-solid.',
+            'hint' => 'Colores pastel o neones suaves. Sans moderna (DM Sans, Outfit, Manrope). Header: editorial-center o retail-left. Hero: full-bleed o centered-minimal. Hook: editorial-story o dynamic-bento. Trust: soft-pills o divided. CTA double-solid. retail_intensity: moderate.',
         ],
         [
             'mood' => 'warm-artisan',
-            'hint' => 'Tonos tierra, ocre, terracota, verde salvia. Header: centered-serif o editorial-center. Hero: split-portrait. Hook: editorial-story. Trust: minimal-border o divided. CTA single-outline. Ticker muted-light.',
+            'hint' => 'Tonos tierra, ocre, terracota, verde salvia. Header: centered-serif o editorial-center. Hero: split-portrait. Hook: editorial-story. Trust: minimal-border o divided. CTA single-outline. Ticker muted-light. retail_intensity: minimal.',
         ],
         [
             'mood' => 'urban-street',
-            'hint' => 'Negro, blanco y un acento neón o vibrante. Display (Oswald, Bebas Neue, Anton). Header: floating-pill. Hero: streetwear. Hook: urban-lookbook. Trust: dark-contrast o marquee. CTA bold-filled o double-solid. Ticker contrast-dark.',
+            'hint' => 'Negro, blanco y un acento neón o vibrante. Display (Oswald, Bebas Neue, Anton). Header: floating-pill. Hero: streetwear. Hook: urban-lookbook. Trust: dark-contrast o marquee. CTA bold-filled o double-solid. Ticker contrast-dark. retail_intensity: moderate.',
         ],
         [
             'mood' => 'clean-minimal',
-            'hint' => 'Paleta casi monocromática con un acento suave. Ultra-limpia (Inter, Work Sans). Header: editorial-center o transparent-glass. Hero: centered-minimal. Hook: editorial-story. Trust: minimal-border. CTA single-outline.',
+            'hint' => 'Paleta casi monocromática con un acento suave. Ultra-limpia (Inter, Work Sans). Header: editorial-center o transparent-glass. Hero: centered-minimal. Hook: editorial-story. Trust: minimal-border. CTA single-outline. retail_intensity: minimal.',
         ],
         [
             'mood' => 'vibrant-tropical',
-            'hint' => 'Colores vivos tropicales (coral, turquesa, amarillo, verde). Rounded (Nunito Sans, Poppins). Header: retail-left o floating-pill. Hero: full-bleed. Hook: dynamic-bento. Trust: soft-pills o marquee. CTA double-solid. Ticker soft-primary.',
+            'hint' => 'Colores vivos tropicales (coral, turquesa, amarillo, verde). Rounded (Nunito Sans, Poppins). Header: retail-left o floating-pill. Hero: full-bleed. Hook: dynamic-bento. Trust: soft-pills o marquee. CTA double-solid. Ticker soft-primary. retail_intensity: high.',
         ],
         [
             'mood' => 'portrait-beauty',
-            'hint' => 'Hero portrait para rostros/productos close-up. Colores suaves, rosados, nude. Header: transparent-glass. Hero: portrait. Hook: editorial-story. Trust: divided o soft-pills. Tipografía (Cormorant Garamond, Lora). CTA double-solid.',
+            'hint' => 'Hero portrait para rostros/productos close-up. Colores suaves, rosados, nude. Header: transparent-glass. Hero: portrait. Hook: editorial-story. Trust: divided o soft-pills. Tipografía (Cormorant Garamond, Lora). CTA double-solid. retail_intensity: moderate.',
         ],
         [
             'mood' => 'glass-premium',
-            'hint' => 'Transparencia y efecto glass sobre imagen de fondo. Header: transparent-glass. Hero: full-bleed o portrait. Hook: urban-lookbook o editorial-story. Trust: minimal-border. Colores neutros con acento metálico. CTA single-outline.',
+            'hint' => 'Transparencia y efecto glass sobre imagen de fondo. Header: transparent-glass. Hero: full-bleed o portrait. Hook: urban-lookbook o editorial-story. Trust: minimal-border. Colores neutros con acento metálico. CTA single-outline. retail_intensity: minimal.',
         ],
         [
             'mood' => 'dark-luxury',
-            'hint' => 'Fondo negro o gris abismal (#0a0a0a, #111111). Acento dorado, plata o color vibrante único sobre negro. Header: dark-premium. Hero: dark-cinematic. Hook: dark-noir. Trust: dark-contrast o marquee. Tipografía serif liviana (Playfair Display, Cormorant Garamond) o display bold (Bebas Neue, Oswald). CTA: single-outline con borde blanco o bg-white text-black. Ticker contrast-dark. PALETA: background=#0a0a0a o #111111, text_dark=#000000, text_light=#ffffff, primary=color acento vivo (dorado, esmeralda, rojo, blanco). IMPORTANTE: NO uses bg-white en tarjetas; usa grises profundos y transparencias.',
+            'hint' => 'Fondo negro o gris abismal (#0a0a0a, #111111). Acento dorado, plata o color vibrante único sobre negro. Header: dark-premium. Hero: dark-cinematic. Hook: dark-noir. Trust: dark-contrast o marquee. Tipografía serif liviana (Playfair Display, Cormorant Garamond) o display bold (Bebas Neue, Oswald). CTA: single-outline con borde blanco o bg-white text-black. Ticker contrast-dark. PALETA: background=#0a0a0a o #111111, text_dark=#000000, text_light=#ffffff, primary=color acento vivo (dorado, esmeralda, rojo, blanco). IMPORTANTE: NO uses bg-white en tarjetas; usa grises profundos y transparencias. retail_intensity: minimal.',
+        ],
+        [
+            'mood' => 'industrial-raw',
+            'hint' => 'Paleta de grises metálicos, carbón y naranja de advertencia o amarillo industrial. Header: split-action o retail-left. Hero: overlay o video-loop. Hook: dynamic-bento. Trust: dark-contrast o divided. CTA bold-filled. Ticker contrast-dark. retail_intensity: moderate.',
+        ],
+        [
+            'mood' => 'botanical-wellness',
+            'hint' => 'Paleta verde orgánica, salvia, menta y eucalipto con fondos color crema. Serif natural (Spectral, Lora). Header: transparent-glass o centered-serif. Hero: parallax o gradient-wave. Hook: brand-manifesto o testimonials. Trust: minimal-border. CTA single-outline. retail_intensity: minimal.',
+        ],
+        [
+            'mood' => 'candy-pop',
+            'hint' => 'Colores divertidos tipo pastel dulce, rosa chicle, amarillo limón, lila y fondos blancos. Tipografía redondeada o sans. Header: minimal-float o floating-pill. Hero: carousel. Hook: collection-grid o testimonials. Trust: soft-pills o marquee. CTA double-solid. retail_intensity: high.',
+        ],
+        [
+            'mood' => 'scandinavian-neutral',
+            'hint' => 'Ultra minimalista nórdico con beiges suaves, avena, tiza y negros finos. Sans moderna limpia (Inter, DM Sans). Header: minimal-float o transparent-glass. Hero: minimal o centered. Hook: brand-manifesto. Trust: minimal-border. CTA single-outline. retail_intensity: minimal.',
+        ],
+        [
+            'mood' => 'retro-vintage',
+            'hint' => 'Paleta retro tierra quemada, mostaza, terracota, verde oliva. Tipografía display vintage o serif. Header: centered-serif o editorial-center. Hero: split-portrait o image-grid. Hook: collection-grid o editorial-story. Trust: minimal-border. retail_intensity: moderate.',
+        ],
+        [
+            'mood' => 'retail-conversion',
+            'hint' => 'Máximo retail e-commerce: badges de descuento visibles, countdown timer, banners promocionales, bottom nav app. Header: split-action o retail-left. Hero: carousel o full-bleed. Hook: testimonials. Trust: countdown o soft-pills. Colores: fondo blanco, primary vibrante para CTAs y badges (rojo, naranja, verde esmeralda). CTA bold-filled. Ticker soft-primary. retail_intensity: high. ecommerce_features: todo activado.',
+        ],
+        [
+            'mood' => 'app-native',
+            'hint' => 'Parece app nativa de celular: bottom navigation obligatorio, cards con sombras suaves, carruseles horizontales, estilo MercadoLibre o Rappi. Header: retail-left o split-action. Hero: carousel o full-bleed. Hook: collection-grid o testimonials. Trust: soft-pills o icon-grid. Sans moderna (Inter, DM Sans, Poppins). Fondo blanco o gris muy claro. CTA double-solid. retail_intensity: high. ecommerce_features: todo activado.',
         ],
     ];
 
@@ -119,6 +154,14 @@ class GroqBrandService
         'streetwear'       => 'Asymmetric bold layout, huge typography overlapping image (best for urban brands, youth, bold/edgy aesthetics)',
         'portrait'         => 'Full-bleed close-up portrait photo, mixed sans+serif typography headline, two solid rectangular CTAs, integrated trust strip below (best for beauty, hair, cosmetics distributors, brands where face/product close-up photography is the hero)',
         'dark-cinematic'   => 'Full-screen noir: overlay dramático de abajo hacia arriba (rgba(0,0,0,0.92)→transparente), título serif masivo en blanco, CTA blanco sólido con texto negro — USAR únicamente cuando background sea negro/muy oscuro; ideal para alta costura noir, lujo oscuro, tech premium, marcas de moda masculina de alto impacto',
+        'carousel'         => 'Carrusel automático rotativo de diapositivas con barra de progreso — excelente para marcas que quieren mostrar múltiples campañas o categorías principales en el banner inicial',
+        'centered'         => 'Diseño centrado con tipografía elegante y color de fondo puro sin imagen — ideal para minimalistas puros, lanzamientos especiales o marcas conceptuales sin fotos',
+        'image-grid'       => 'Mosaico bento con 1 imagen grande y 2 chicas superpuestas con texto editorial — perfecto para marcas de diseño, arte o moda curada',
+        'minimal'          => 'Diseño ultra limpio, fondo blanco o crema con CTAs minimalistas y mucho espacio en blanco — estilo Apple premium, alta gama',
+        'overlay'          => 'Imagen de campaña completa con overlay degradado denso del color primario y textos centrados de alto contraste',
+        'video-loop'       => 'Video de fondo en loop sin sonido con texto superpuesto de gran impacto — excelente para marcas jóvenes, streetwear, ropa deportiva o tecnología',
+        'parallax'         => 'Fondo con efecto parallax suave al hacer scroll y textos fijos encima — aporta profundidad tridimensional a marcas premium',
+        'gradient-wave'    => 'Fondo con ondas de gradiente de color animado interactivo sin imágenes — ideal para marcas modernas de bienestar, cosmética natural o tecnológicas',
     ];
 
     /**
@@ -284,6 +327,12 @@ REGLAS ESTRICTAS:
 - Los anuncios del ticker deben ser breves y atractivos (max 50 caracteres c/u)
 - En layout_config, prioriza experiencia mobile-first ecommerce
 
+DIRECTRIZ CRÍTICA — COLORES PROFESIONALES (OBLIGATORIA):
+- NUNCA uses azul genérico como color primario (#0000ff, #1e90ff, #4169e1, #2196f3, #1976d2, #3b82f6, #60a5fa). Estos colores se ven baratos y de plantilla gratuita.
+- Si el negocio NECESITA azul (ej: tecnología, salud), usa tonos sofisticados: navy (#1e3a5f), petróleo (#0c4a6e), índigo (#312e81), azul acero (#475569).
+- NUNCA uses el color primary como color de texto para headings/títulos. Los headings SIEMPRE deben usar text_dark (sobre fondos claros) o text_light (sobre fondos oscuros). El primary es SOLO para botones, badges, bordes, iconos y acentos decorativos.
+- Los secondary NUNCA deben ser un color completamente diferente al primary. Deben ser una versión más suave, desaturada o complementaria del primary.
+
 DIRECTRIZ CRÍTICA — INTELIGENCIA DEMOGRÁFICA:
 Antes de elegir cualquier color o componente, identifica el público objetivo real del negocio:
 
@@ -302,7 +351,7 @@ Antes de elegir cualquier color o componente, identifica el público objetivo re
   → Fondo claro por defecto. Solo usar Dark si la descripción lo pide explícitamente (marca de tecnología, lujo masculino noir, alta costura oscura).
 
 - NEGOCIOS DE SALUD, FARMACIA, ALIMENTOS, MASCOTAS:
-  → SIEMPRE fondos claros, paletas limpias y confiables (blancos, verdes suaves, azules).
+  → SIEMPRE fondos claros, paletas limpias y confiables (blancos, verdes suaves, azules sofisticados).
 
 DIRECTRIZ DE CONTRASTE Y LEGIBILIDAD (OBLIGATORIA):
 - Si el background es oscuro (#0a0a0a, #111111, #1a1a1a, #2a2a2a o cualquier hex con luminancia < 50%):
@@ -322,12 +371,25 @@ DIRECTRICES DE DISEÑO AVANZADAS:
    - Deportivo / Tech / Consumo masivo → Header: retail-left. Hero: full-bleed. Hook: dynamic-bento. Trust: soft-pills.
    - Cosmética / Beauty / Hair → Header: transparent-glass. Hero: portrait. Hook: editorial-story. Trust: divided.
    - Lujo Noir (SOLO si negocio lo exige explícitamente) → Header: dark-premium. Hero: dark-cinematic. Hook: dark-noir. Trust: dark-contrast.
+   - E-commerce retail / Tienda general / Marketplace → Header: split-action o retail-left. Hero: carousel. Hook: testimonials o collection-grid. Trust: countdown o soft-pills.
 
 2. TEORÍA DEL COLOR MADURA (nivel agencia):
    - background: SIEMPRE neutro — blanco puro, crema sutil, o negro profundo. NUNCA fondo de color saturado.
-   - primary: el color de acento principal para botones CTA y elementos destacados.
+   - primary: el color de acento principal para botones CTA y elementos destacados. NUNCA azul genérico.
    - secondary: derivado o complementario del primary, más apagado. NUNCA un color completamente diferente y gritón.
    - accent: detalle de contraste. En paletas claras: tono oscuro del primario. En paletas oscuras: dorado o el primario brillante.
+
+DIRECTRIZ DE RETAIL E-COMMERCE (NUEVA):
+Cada tienda debe tener una "intensidad retail" (retail_intensity) que determina cuántos elementos de conversión y psicología de venta se activan:
+- "minimal": Tiendas serias, lujo, boutique exclusiva. Sin badges, sin promos, elegancia pura.
+- "moderate": Balance elegante. Badges de descuento discretos, 1 promo sutil, reseñas opcionales.
+- "high": Full retail e-commerce. Badges grandes de descuento, countdown, bottom nav app, reseñas con fotos, banners promocionales, máximo impacto visual de venta.
+
+Elije la retail_intensity según el tipo de negocio:
+- Tiendas de ropa, accesorios, tecnología, mascotas, cosméticos → moderate o high
+- Marketplace, tienda general, consumo masivo → high
+- Alta costura, joyería de autor, arte → minimal
+- Farmacia, salud, alimentos → moderate
 
 PIEZAS DISPONIBLES (elige la combinación más coherente con la marca):
 
@@ -343,7 +405,7 @@ DENSIDAD COPY HERO (hero_content_density): {$heroDensityJson}
 FORMATO DE RESPUESTA JSON:
 {
   "color_palette": {
-    "primary": "#hex — color de acento para botones y elementos destacados",
+    "primary": "#hex — color de acento para botones y elementos destacados (NUNCA azul genérico)",
     "secondary": "#hex — tono derivado del primary, más apagado",
     "accent": "#hex — detalle de contraste para bordes y detalles",
     "background": "#hex — SIEMPRE neutro: blanco, crema o negro profundo",
@@ -362,17 +424,31 @@ FORMATO DE RESPUESTA JSON:
     "cta_secondary": "Texto del segundo botón (solo para hero_cta_style double-solid)"
   },
   "layout_config": {
-    "header_style": "editorial-center|retail-left|transparent-glass|floating-pill|centered-serif|dark-premium",
-    "hero_style": "full-bleed|split-portrait|centered-minimal|streetwear|portrait|dark-cinematic",
+    "header_style": "editorial-center|retail-left|transparent-glass|floating-pill|centered-serif|dark-premium|split-action|minimal-float",
+    "hero_style": "full-bleed|split-portrait|centered-minimal|streetwear|portrait|dark-cinematic|carousel|centered|image-grid|minimal|overlay|video-loop|parallax|gradient-wave",
     "hero_cta_style": "double-solid|single-outline|bold-filled",
     "hero_text_position": "bottom-left|center|bottom-center",
     "hero_content_density": "compact|balanced|rich",
     "ticker_style": "muted-light|soft-primary|contrast-dark",
     "category_style": "horizontal-pills|image-cards",
     "editorial_mood": "luxury|fresh|bold|minimal",
-    "hook_style": "editorial-story|urban-lookbook|dynamic-bento|dark-noir",
-    "trust_strip_style": "dark-contrast|minimal-border|divided|marquee|soft-pills"
+    "hook_style": "editorial-story|urban-lookbook|dynamic-bento|dark-noir|testimonials|collection-grid|brand-manifesto",
+    "trust_strip_style": "dark-contrast|minimal-border|divided|marquee|soft-pills|icon-grid|countdown"
   },
+  "ecommerce_features": {
+    "show_discount_badge": true,
+    "discount_percentage": 7,
+    "show_promo_banner": true,
+    "promo_banner_text": "7% OFF en tu primera compra",
+    "show_reviews": true,
+    "show_bottom_nav": true,
+    "retail_intensity": "minimal|moderate|high"
+  },
+  "fake_reviews": [
+    {"name": "Nombre del cliente", "rating": 5, "text": "Reseña positiva realista y específica al negocio", "date": "Hace X días"},
+    {"name": "Nombre del cliente", "rating": 5, "text": "Otra reseña positiva", "date": "Hace X semana"},
+    {"name": "Nombre del cliente", "rating": 4, "text": "Reseña buena con detalle", "date": "Hace X días"}
+  ],
   "about_us": "Texto completo de Nuestra Historia (2-3 párrafos, profesional y emotivo)",
   "value_messages": [
     "Mensaje de valor 1",
@@ -391,6 +467,14 @@ FORMATO DE RESPUESTA JSON:
     "Mensaje venta cruzada 3"
   ]
 }
+
+REGLAS PARA ecommerce_features:
+- retail_intensity="minimal" → show_discount_badge=false, show_promo_banner=false, show_reviews=false, show_bottom_nav=false
+- retail_intensity="moderate" → show_discount_badge=true (5-10%), show_promo_banner=true, show_reviews=true, show_bottom_nav=false
+- retail_intensity="high" → TODO activado: badges grandes, promos, reviews, bottom nav, discount_percentage entre 5 y 15
+- El promo_banner_text debe ser específico al negocio (ej: "Envío gratis en perfumes" o "10% en tu primer pedido")
+- Las fake_reviews deben ser realistas y específicas al tipo de negocio. GENERA SIEMPRE 3 reseñas.
+- Los nombres deben ser latinoamericanos comunes (María, Carlos, Laura, Andrés, Valentina, etc.)
 PROMPT;
     }
 
@@ -469,16 +553,60 @@ PROMPT;
             }
         }
 
+        // Default ecommerce_features if AI didn't include them
+        if (!isset($data['ecommerce_features']) || !is_array($data['ecommerce_features'])) {
+            $data['ecommerce_features'] = [
+                'show_discount_badge' => true,
+                'discount_percentage' => 7,
+                'show_promo_banner'   => true,
+                'promo_banner_text'   => 'Descuento especial en tu primera compra',
+                'show_reviews'        => true,
+                'show_bottom_nav'     => true,
+                'retail_intensity'    => 'moderate',
+            ];
+        } else {
+            // Validate and set defaults for missing sub-fields
+            $ecf = &$data['ecommerce_features'];
+            $ecf['show_discount_badge'] = $ecf['show_discount_badge'] ?? true;
+            $ecf['discount_percentage'] = max(0, min(30, (int)($ecf['discount_percentage'] ?? 7)));
+            $ecf['show_promo_banner']   = $ecf['show_promo_banner'] ?? true;
+            $ecf['promo_banner_text']   = $ecf['promo_banner_text'] ?? 'Descuento especial en tu primera compra';
+            $ecf['show_reviews']        = $ecf['show_reviews'] ?? true;
+            $ecf['show_bottom_nav']     = $ecf['show_bottom_nav'] ?? false;
+            $validRetail = ['minimal', 'moderate', 'high'];
+            if (!in_array($ecf['retail_intensity'] ?? '', $validRetail)) {
+                $ecf['retail_intensity'] = 'moderate';
+            }
+        }
+
+        // Default fake_reviews if not provided
+        if (!isset($data['fake_reviews']) || !is_array($data['fake_reviews']) || count($data['fake_reviews']) < 1) {
+            $data['fake_reviews'] = [
+                ['name' => 'María G.', 'rating' => 5, 'text' => 'Excelente calidad y el envío fue muy rápido. Totalmente recomendado.', 'date' => 'Hace 2 días'],
+                ['name' => 'Carlos P.', 'rating' => 5, 'text' => 'Me encantó el producto, superó mis expectativas. Volveré a comprar.', 'date' => 'Hace 1 semana'],
+                ['name' => 'Laura M.', 'rating' => 4, 'text' => 'Muy buena experiencia de compra. El producto llegó tal como se describe.', 'date' => 'Hace 3 días'],
+            ];
+        } else {
+            // Validate each review has required fields
+            foreach ($data['fake_reviews'] as &$review) {
+                $review['name']   = $review['name'] ?? 'Cliente';
+                $review['rating'] = max(1, min(5, (int)($review['rating'] ?? 5)));
+                $review['text']   = $review['text'] ?? 'Excelente experiencia.';
+                $review['date']   = $review['date'] ?? 'Hace unos días';
+            }
+            unset($review);
+        }
+
         // Default layout_config if AI didn't include it
-        $validHeroStyles     = ['full-bleed', 'split-portrait', 'centered-minimal', 'streetwear', 'portrait', 'dark-cinematic'];
+        $validHeroStyles     = ['full-bleed', 'split-portrait', 'centered-minimal', 'streetwear', 'portrait', 'dark-cinematic', 'carousel', 'centered', 'image-grid', 'minimal', 'overlay', 'video-loop', 'parallax', 'gradient-wave'];
         $validCtaStyles      = ['double-solid', 'single-outline', 'bold-filled'];
         $validCategoryStyles = ['horizontal-pills', 'image-cards'];
         $validTextPositions  = ['bottom-left', 'center', 'bottom-center'];
         $validTickerStyles   = ['muted-light', 'soft-primary', 'contrast-dark'];
         $validHeroDensity    = ['compact', 'balanced', 'rich'];
-        $validHeaderStyles   = ['editorial-center', 'retail-left', 'transparent-glass', 'floating-pill', 'centered-serif', 'dark-premium'];
-        $validHookStyles     = ['editorial-story', 'urban-lookbook', 'dynamic-bento', 'dark-noir'];
-        $validTrustStyles    = ['dark-contrast', 'minimal-border', 'divided', 'marquee', 'soft-pills'];
+        $validHeaderStyles   = ['editorial-center', 'retail-left', 'transparent-glass', 'floating-pill', 'centered-serif', 'dark-premium', 'split-action', 'minimal-float'];
+        $validHookStyles     = ['editorial-story', 'urban-lookbook', 'dynamic-bento', 'dark-noir', 'testimonials', 'collection-grid', 'brand-manifesto'];
+        $validTrustStyles    = ['dark-contrast', 'minimal-border', 'divided', 'marquee', 'soft-pills', 'icon-grid', 'countdown'];
 
         if (!isset($data['layout_config'])) {
             $data['layout_config'] = [
@@ -571,6 +699,8 @@ PROMPT;
                 'ai_announcements' => json_encode($brandData['announcements']),
                 'ai_cross_sell_messages' => json_encode($brandData['cross_sell_messages']),
                 'ai_layout_config' => json_encode($brandData['layout_config'] ?? []),
+                'ai_ecommerce_features' => json_encode($brandData['ecommerce_features'] ?? []),
+                'ai_fake_reviews' => json_encode($brandData['fake_reviews'] ?? []),
                 'ai_generated_at' => now(),
                 'updated_at' => now(),
             ];

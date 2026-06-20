@@ -172,6 +172,8 @@ class AiBrandController extends Controller
                     'announcements' => json_decode($config->ai_announcements, true),
                     'cross_sell_messages' => json_decode($config->ai_cross_sell_messages, true),
                     'layout_config' => json_decode($config->ai_layout_config ?? 'null', true),
+                    'ecommerce_features' => json_decode($config->ai_ecommerce_features ?? 'null', true),
+                    'fake_reviews' => json_decode($config->ai_fake_reviews ?? 'null', true),
                     'generated_at' => $config->ai_generated_at,
                 ]
             ]);

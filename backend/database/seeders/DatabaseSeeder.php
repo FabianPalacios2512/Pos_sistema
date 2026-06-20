@@ -196,7 +196,22 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => now(),
             ]));
         }
-            \Log::info('✅ DatabaseSeeder: Categorías de gastos creadas');
+        }
+
+        // ✅ Verificar si ya existe una bodega por defecto
+        $existingWarehouse = DB::table('warehouses')->count();
+
+        if ($existingWarehouse == 0) {
+            // Crear bodega por defecto
+            DB::table('warehouses')->insert([
+                'name' => 'Sede Principal',
+                'address' => 'Dirección principal',
+                'is_default' => true,
+                'active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            \Log::info('✅ DatabaseSeeder: Bodega principal creada');
         }
 
         // ✅ Verificar si ya existe el cliente "Consumidor Final" (normativa DIAN Colombia)

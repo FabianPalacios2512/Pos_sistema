@@ -154,10 +154,11 @@ const getProductImage = (product) => {
   
   const trimmedUrl = url.trim()
   
-  // Si es una ruta relativa de Laravel Storage
-  if (trimmedUrl.startsWith('/storage/')) {
+  // Si es una ruta relativa de Laravel Storage (empiece por storage/ o /storage/)
+  if (trimmedUrl.includes('storage/')) {
     const backendUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin
-    return `${backendUrl}${trimmedUrl}`
+    const cleanUrl = trimmedUrl.replace(/^(?:\/?storage\/?)+/, '')
+    return `${backendUrl}/storage/${cleanUrl}`
   }
   
   // Si ya es una URL HTTP completa

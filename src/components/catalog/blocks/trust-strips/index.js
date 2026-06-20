@@ -16,9 +16,17 @@ export { default as TrustStripMarquee }       from './TrustStripMarquee.vue'
 export { default as TrustStripSoftPills }     from './TrustStripSoftPills.vue'
 // Tech / Consumo rápido — pastillas horizontales blancas sobre fondo gris claro
 
+export { default as TrustStripIconGrid }      from './TrustStripIconGrid.vue'
+// Moda / Retail — grid 2x2 o 4 columnas con íconos circulares grandes + descripción
+
+export { default as TrustStripCountdown }     from './TrustStripCountdown.vue'
+// Urgencia / Ofertas — countdown timer + texto promo + CTA, línea animada inferior
+
 // ─── Mapeo para selección por IA ──────────────────────────────────────────────
 // 'dark-contrast'   → TrustStripDarkContrast  (moda premium, Kharis, distribuidoras)
 // 'minimal-border'  → TrustStripMinimalBorder  (boutique, zara-style, lujo moderno)
 // 'divided'         → TrustStripDivided        (cosmética, catálogos, corporativo)
 // 'marquee'         → TrustStripMarquee        (streetwear, urbano, jóvenes)
 // 'soft-pills'      → TrustStripSoftPills      (tech, electrónica, consumo rápido)
+// 'icon-grid'       → TrustStripIconGrid       (moda retail, fashion brands)
+// 'countdown'       → TrustStripCountdown      (ofertas flash, urgencia, promociones)
