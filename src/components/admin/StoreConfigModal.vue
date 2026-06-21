@@ -349,6 +349,17 @@
         </div>
       </div>
     </div>
+    <!-- Modal de Confirmación Genérico -->
+    <ConfirmModal 
+      v-if="showConfirmModal" 
+      :title="confirmModalConfig.title"
+      :message="confirmModalConfig.message"
+      :confirmText="confirmModalConfig.confirmText"
+      :cancelText="confirmModalConfig.cancelText"
+      :type="confirmModalConfig.type"
+      @cancel="showConfirmModal = false"
+      @confirm="executeConfirmAction"
+    />
   </div>
 </template>
 
@@ -356,8 +367,32 @@
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { useToast } from '../../composables/useToast.js'
+import ConfirmModal from './ConfirmModal.vue'
 
 const { showSuccess, showError, showWarning } = useToast()
+
+// Estado para ConfirmModal Genérico
+const showConfirmModal = ref(false)
+const confirmModalConfig = ref({
+  title: '',
+  message: '',
+  confirmText: 'Aceptar',
+  cancelText: 'Cancelar',
+  type: 'danger',
+  action: null
+})
+
+const openConfirmModal = (config) => {
+  confirmModalConfig.value = config
+  showConfirmModal.value = true
+}
+
+const executeConfirmAction = async () => {
+  if (confirmModalConfig.value.action) {
+    await confirmModalConfig.value.action()
+  }
+  showConfirmModal.value = false
+}
 
 const props = defineProps({
   tenant: {
@@ -445,29 +480,36 @@ const updateSubscriptionDates = async () => {
 // Pausar/Activar tienda
 const toggleTenantStatus = async () => {
   const newStatus = props.tenant.status === 'active' ? 'paused' : 'active'
-  const confirmMsg = props.tenant.status === 'active' 
-    ? '¿Seguro que deseas PAUSAR esta tienda? Los usuarios no podrán acceder.'
-    : '¿Seguro que deseas ACTIVAR esta tienda?'
+  const isPausing = props.tenant.status === 'active'
   
-  if (!confirm(confirmMsg)) return
-  
-  togglingStatus.value = true
-  try {
-    const res = await axios.put(`/api/admin/tenants/${props.tenant.id}/status`, {
-      status: newStatus
-    })
-    
-    if (res.data.success) {
-      showSuccess(`Tienda ${newStatus === 'active' ? 'activada' : 'pausada'} correctamente`)
-      emit('refresh')
-      emit('close')
-    } else {
-      showError('Error: ' + (res.data.message || 'No se pudo cambiar el estado'))
+  openConfirmModal({
+    title: isPausing ? '¿Pausar tienda?' : '¿Activar tienda?',
+    message: isPausing 
+      ? 'Los usuarios de esta tienda no podrán acceder temporalmente. Los datos se conservarán.'
+      : 'La tienda volverá a estar activa y los usuarios podrán acceder normalmente.',
+    confirmText: isPausing ? 'Sí, pausar' : 'Sí, activar',
+    cancelText: 'Cancelar',
+    type: isPausing ? 'danger' : 'info',
+    action: async () => {
+      togglingStatus.value = true
+      try {
+        const res = await axios.put(`/api/admin/tenants/${props.tenant.id}/status`, {
+          status: newStatus
+        })
+        
+        if (res.data.success) {
+          showSuccess(`Tienda ${newStatus === 'active' ? 'activada' : 'pausada'} correctamente`)
+          emit('refresh')
+          emit('close')
+        } else {
+          showError('Error: ' + (res.data.message || 'No se pudo cambiar el estado'))
+        }
+      } catch (error) {
+        showError('Error: ' + (error.response?.data?.message || error.message))
+      }
+      togglingStatus.value = false
     }
-  } catch (error) {
-    showError('Error: ' + (error.response?.data?.message || error.message))
-  }
-  togglingStatus.value = false
+  })
 }
 
 // Cargar usuarios

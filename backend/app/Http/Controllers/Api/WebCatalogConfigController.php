@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use App\Traits\UploadsBase64ToS3;
 
 class WebCatalogConfigController extends Controller
 {
+    use UploadsBase64ToS3;
     /**
      * Obtener la configuración del catálogo web del tenant actual
      */
@@ -63,6 +66,13 @@ class WebCatalogConfigController extends Controller
             $logoUrl = $request->input('brandIdentity.logo');
             $bannerUrl = $request->input('brandIdentity.banner');
 
+            // Procesar imágenes si vienen en Base64
+            if (!empty($logoUrl)) {
+                $logoUrl = $this->uploadBase64ToS3($logoUrl, "tenants/{$tenantId}/webcatalog", 'web_logo_');
+            }
+            if (!empty($bannerUrl)) {
+                $bannerUrl = $this->uploadBase64ToS3($bannerUrl, "tenants/{$tenantId}/webcatalog", 'web_banner_');
+            }
 
             // BACKWARD COMPATIBILITY: Aceptar datos en formato NUEVO (products) o VIEJO (inventoryVisibility)
             $visibleCategories = $request->input('products.visibleCategories')

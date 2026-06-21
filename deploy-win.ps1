@@ -156,11 +156,11 @@ cd $REMOTE_PATH/backend && tar -xzf /tmp/backend.tar.gz --exclude='.env' && rm /
         Write-Ok "Backend subido"
     }
 
-    Write-Step "Limpiando cache en VPS y enlazando Storage..."
+    Write-Step "Actualizando dependencias, limpiando cache, migrando DB en VPS..."
     Invoke-RemoteCmd @"
-cd $REMOTE_PATH/backend && php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear && php artisan config:cache && php artisan route:cache && php artisan storage:link && sudo systemctl restart php8.3-fpm && echo 'CACHE Y STORAGE OK'
+cd $REMOTE_PATH/backend && composer update --no-dev --optimize-autoloader && php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear && php artisan config:cache && php artisan route:cache && php artisan migrate --force && php artisan storage:link && sudo systemctl restart php8.3-fpm && echo 'DEPENDENCIAS, CACHE Y MIGRATE OK'
 "@
-    Write-Ok "Cache limpiado, Storage enlazado y PHP reiniciado"
+    Write-Ok "Dependencias actualizadas, cache limpiado, DB migrada y PHP reiniciado"
 
 } finally {
     # ── LIMPIAR ARCHIVOS TEMPORALES ────────────────────────

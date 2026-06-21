@@ -12,9 +12,11 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use App\Traits\UploadsBase64ToS3;
 
 class BiometricController extends Controller
 {
+    use UploadsBase64ToS3;
     /**
      * Enrolar perfil biométrico: guarda imagen base + descriptor facial
      */
@@ -70,15 +72,11 @@ class BiometricController extends Controller
             // Desactivar perfiles anteriores del mismo usuario
             BiometricProfile::where('user_id', $userId)->update(['active' => false]);
 
-            // Guardar imagen base en storage privado
+            // Guardar imagen base en Cloudflare R2
             $imagePath = null;
-            if ($request->image) {
-                $imageData = $this->decodeBase64Image($request->image);
-                if ($imageData) {
-                    $filename = 'biometric/' . $userId . '_' . time() . '.' . $imageData['extension'];
-                    Storage::disk('local')->put($filename, $imageData['data']);
-                    $imagePath = $filename;
-                }
+            if (!empty($request->image)) {
+                $tenantId = tenant('id') ?? 'default';
+                $imagePath = $this->uploadBase64ToS3($request->image, "tenants/{$tenantId}/biometric", $userId . '_');
             }
 
             $profile = BiometricProfile::create([

@@ -192,18 +192,17 @@
             </Transition>
           </div>
           
-          <!-- Video Tutoriales - Tutorial con texto -->
+          <!-- Ayuda -->
           <button
             id="tour-video-button"
-            @click="showVideoTutorial"
+            @click="$emit('show-help')"
             class="hidden md:flex items-center gap-1.5 h-10 px-3 text-gray-600 dark:text-zinc-400 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-lg transition-all duration-200"
-            title="Ver tutorial"
+            title="Soporte y Ayuda"
           >
             <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.91 11.672a.375.375 0 010 .656l-5.603 3.113a.375.375 0 01-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
-            <span class="text-sm font-semibold">Tutorial</span>
+            <span class="text-sm font-semibold">Ayuda</span>
           </button>
           
           <!-- Radio - Con texto -->

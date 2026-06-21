@@ -156,6 +156,21 @@
             </button>
           </li>
           
+          <li>
+            <button @click="activeSection = 'help'"
+                    :class="[
+                      'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200',
+                      activeSection === 'help'
+                        ? 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-l-4 border-blue-600 dark:border-blue-500'
+                        : 'text-gray-600 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-800/50 hover:text-gray-900 dark:hover:text-zinc-200'
+                    ]">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span>Ayuda y Soporte</span>
+            </button>
+          </li>
+          
           <!-- Facturación Electrónica DIAN (TEMPORALMENTE DESHABILITADO) -->
           <!-- TODO: Reactivar cuando esté listo el módulo de facturación electrónica
           <li>
@@ -1032,6 +1047,237 @@
 
       </div>
 
+      <!-- Sección: Ayuda y Soporte -->
+      <div v-if="activeSection === 'help'" class="space-y-6 py-4">
+        <!-- Header -->
+        <div class="mb-8">
+          <h2 class="text-2xl font-semibold text-slate-800 dark:text-white tracking-tight">Centro de Ayuda</h2>
+          <p class="text-sm text-slate-500 dark:text-zinc-400 mt-1">¿En qué podemos ayudarte el día de hoy?</p>
+        </div>
+
+        <div v-if="!showUserTicketsListModal" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <!-- Crear Caso -->
+          <div @click="showSupportTicketModal = true" class="bg-white dark:bg-zinc-900 rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm p-5 flex flex-col md:flex-row items-center gap-4 cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-md transition-all group z-10 relative">
+            <div class="w-12 h-12 flex-shrink-0 rounded-lg flex items-center justify-center text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+              <svg class="w-6 h-6 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 4v12l-4-2-4 2V4M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div class="text-left">
+              <h3 class="text-base font-bold text-slate-900 dark:text-white mb-0.5">Crear caso</h3>
+              <p class="text-sm text-slate-600 dark:text-zinc-400 leading-relaxed">Abre un ticket de soporte para nuestro equipo técnico.</p>
+            </div>
+          </div>
+
+          <!-- Mis Casos -->
+          <div @click="showUserTicketsListModal = true" class="bg-white dark:bg-zinc-900 rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm p-5 flex flex-col md:flex-row items-center gap-4 cursor-pointer hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md transition-all group z-10 relative">
+            <div class="w-12 h-12 flex-shrink-0 rounded-lg flex items-center justify-center text-slate-700 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+              <svg class="w-6 h-6 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+            </div>
+            <div class="text-left">
+              <h3 class="text-base font-bold text-slate-900 dark:text-white mb-0.5">Mis Casos</h3>
+              <p class="text-sm text-slate-600 dark:text-zinc-400 leading-relaxed">Revisa el historial y estado de tus tickets.</p>
+            </div>
+          </div>
+
+          <!-- ARIS (IA) -->
+          <div @click="openARIS" class="bg-white dark:bg-zinc-900 rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm p-5 flex flex-col md:flex-row items-center gap-4 cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-md transition-all group z-10 relative">
+            <div class="w-12 h-12 flex-shrink-0 rounded-lg flex items-center justify-center text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+              <svg class="w-6 h-6 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </div>
+            <div class="text-left">
+              <h3 class="text-base font-bold text-slate-900 dark:text-white mb-0.5">Hablar con ARIS</h3>
+              <p class="text-sm text-slate-600 dark:text-zinc-400 leading-relaxed">Tu asistente IA especializado en la plataforma.</p>
+            </div>
+          </div>
+
+          <!-- WhatsApp -->
+          <a href="https://wa.me/573127388130?text=Hola,%20necesito%20ayuda%20con%20105%20POS" target="_blank" class="bg-white dark:bg-zinc-900 rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm p-5 flex flex-col md:flex-row items-center gap-4 cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-md transition-all group z-10 relative">
+            <div class="w-12 h-12 flex-shrink-0 rounded-lg flex items-center justify-center text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+              <svg class="w-6 h-6 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            </div>
+            <div class="text-left">
+              <h3 class="text-base font-bold text-slate-900 dark:text-white mb-0.5">WhatsApp</h3>
+              <p class="text-sm text-slate-600 dark:text-zinc-400 leading-relaxed">Chat directo con un asesor vía WhatsApp.</p>
+            </div>
+          </a>
+
+        </div>
+
+        <!-- Banner de Soporte (Mueve un poco hacia arriba para acortar el espacio) -->
+        <!-- Banner de Soporte -->
+        <div v-if="!showUserTicketsListModal" class="-mt-8 relative z-0 flex justify-center w-full pointer-events-none">
+          <img src="/soporte.png" alt="Soporte Técnico" class="w-full max-w-5xl h-auto object-contain opacity-95" />
+        </div>
+      </div>
+
+      <!-- MIS CASOS INLINE -->
+      <div v-if="showUserTicketsListModal" class="mt-2">
+        <!-- Header Inline -->
+        <div class="mb-6 flex items-center justify-between">
+          <div>
+            <h3 class="text-xl font-bold text-slate-800 dark:text-white">Mis Casos de Soporte</h3>
+            <p class="text-sm text-slate-500 dark:text-zinc-400">Historial y seguimiento de tickets</p>
+          </div>
+          <button @click="showUserTicketsListModal = false" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-700 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            Volver
+          </button>
+        </div>
+        
+        <!-- Body Inline -->
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-sm overflow-hidden p-6">
+          <div v-if="loadingUserTickets" class="py-12 flex justify-center items-center">
+            <div class="flex flex-col items-center gap-3">
+              <svg class="animate-spin h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <p class="text-sm font-medium text-slate-600 dark:text-zinc-400">Cargando tus casos...</p>
+            </div>
+          </div>
+          
+          <div v-else-if="userTickets.length === 0" class="py-20 flex flex-col items-center justify-center text-center px-4">
+            <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center mb-4 border border-blue-100 dark:border-blue-900/30">
+              <svg class="w-8 h-8 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </div>
+            <h4 class="text-lg font-bold text-slate-800 dark:text-white mb-1">Aún no tienes casos</h4>
+            <p class="text-slate-500 dark:text-zinc-400 max-w-sm">Crea un nuevo caso de soporte desde el Centro de Ayuda para obtener asistencia.</p>
+          </div>
+          
+          <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div v-for="ticket in userTickets" :key="ticket.id" @click="openUserTicketModal(ticket)" class="bg-slate-50 dark:bg-zinc-950/50 rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm p-6 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/10 cursor-pointer flex flex-col h-full group relative overflow-hidden">
+              <div class="flex justify-between items-start mb-4">
+                <span class="text-xs font-bold text-slate-400 dark:text-zinc-500">{{ ticket.ticket_number }}</span>
+                <span :class="[
+                  'inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider',
+                  ticket.status === 'open' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' :
+                  ticket.status === 'in_progress' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
+                  ticket.status === 'resolved' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                  'bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
+                ]">
+                  {{ ticket.status === 'open' ? 'Abierto' : ticket.status === 'in_progress' ? 'En Progreso' : ticket.status === 'resolved' ? 'Resuelto' : 'Cerrado' }}
+                </span>
+              </div>
+              <h4 class="text-base font-bold text-slate-900 dark:text-white leading-snug mb-3 line-clamp-2" :title="ticket.subject">{{ ticket.subject }}</h4>
+              <p class="text-sm text-slate-500 dark:text-zinc-400 mt-auto flex items-center gap-2 pt-4 border-t border-slate-200 dark:border-zinc-800/50">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                {{ new Date(ticket.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DRAWER DETALLES DEL CASO (CLIENTE) -->
+      <div v-if="showUserTicketModal" class="fixed inset-0 z-[100] flex justify-end">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-slate-900/10 transition-opacity" @click="showUserTicketModal = false"></div>
+        
+        <!-- Drawer Panel -->
+        <div class="relative bg-white dark:bg-zinc-900 shadow-2xl h-full w-full md:w-[600px] lg:w-[800px] flex flex-col border-l border-slate-200 dark:border-zinc-800 z-[101]">
+          
+          <!-- Header Corporativo -->
+          <div class="px-8 py-6 border-b border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex justify-between items-start shrink-0">
+            <div class="flex-1 pr-8">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="font-mono text-xs text-slate-500 dark:text-zinc-500 tracking-wide">{{ selectedUserTicket?.ticket_number }}</span>
+                <span :class="[
+                  'font-medium px-2.5 py-0.5 rounded-full text-xs',
+                  selectedUserTicket?.status === 'open' ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
+                  selectedUserTicket?.status === 'in_progress' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                  selectedUserTicket?.status === 'resolved' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                  'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                ]">{{ selectedUserTicket?.status === 'open' ? 'Abierto' : selectedUserTicket?.status === 'in_progress' ? 'En Progreso' : selectedUserTicket?.status === 'resolved' ? 'Resuelto' : 'Cerrado' }}</span>
+              </div>
+              <h3 class="text-xl font-semibold text-slate-800 dark:text-white leading-tight">
+                {{ selectedUserTicket?.subject }}
+              </h3>
+            </div>
+            <button @click="showUserTicketModal = false" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors shrink-0">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+
+          <!-- Body: Hilo de Comentarios (Timeline) -->
+          <div class="flex-1 overflow-y-auto p-8 bg-white dark:bg-[#0a0a0a]">
+            
+            <div class="relative pl-6 border-l-2 border-slate-200 dark:border-zinc-800 space-y-10 py-2">
+              
+              <!-- Original Message -->
+              <div class="relative">
+                <!-- Avatar Icon -->
+                <div class="absolute -left-[35px] bg-slate-100 dark:bg-zinc-800 rounded-full p-1.5 border-4 border-white dark:border-zinc-900">
+                  <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                </div>
+                
+                <div class="flex flex-col">
+                  <div class="mb-2">
+                    <span class="text-black dark:text-white font-bold text-base">{{ selectedUserTicket?.user_name || 'Tú' }}</span>
+                    <span class="text-slate-600 dark:text-zinc-400 text-sm ml-1">reportó un problema • {{ new Date(selectedUserTicket?.created_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) }}</span>
+                  </div>
+                  <div class="text-black dark:text-zinc-200 text-base font-medium leading-relaxed whitespace-pre-wrap mt-1">
+                    {{ selectedUserTicket?.description }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Messages -->
+              <template v-if="selectedUserTicket?.messages && selectedUserTicket.messages.length > 0">
+                <div v-for="msg in selectedUserTicket.messages" :key="msg.id" class="relative">
+                  <!-- Avatar Icon -->
+                  <div class="absolute -left-[35px] rounded-full p-1.5 border-4 border-white dark:border-zinc-900" :class="msg.sender_type === 'admin' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600' : 'bg-slate-100 dark:bg-zinc-800 text-slate-500'">
+                    <svg v-if="msg.sender_type === 'admin'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                  </div>
+                  
+                  <div class="flex flex-col">
+                    <div class="mb-2">
+                      <span class="text-black dark:text-white font-bold text-base">{{ msg.sender_type === 'admin' ? 'Soporte Técnico' : (selectedUserTicket?.user_name || 'Tú') }}</span>
+                      <span class="text-slate-600 dark:text-zinc-400 text-sm ml-1">{{ msg.sender_type === 'admin' ? 'añadió una nota' : 'añadió una actualización' }} • {{ new Date(msg.created_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) }}</span>
+                    </div>
+                    <div class="text-black dark:text-zinc-200 text-base font-medium leading-relaxed whitespace-pre-wrap mt-1">
+                      {{ msg.message }}
+                    </div>
+                  </div>
+                </div>
+              </template>
+              
+            </div>
+          </div>
+
+          <!-- Footer: Reply Box -->
+          <div v-if="selectedUserTicket?.status !== 'closed' && selectedUserTicket?.status !== 'resolved'" class="sticky bottom-0 bg-white dark:bg-zinc-900 border-t border-slate-200 dark:border-zinc-800 p-6 shrink-0">
+            <div class="border border-slate-300 dark:border-zinc-700 rounded-md overflow-hidden bg-white dark:bg-zinc-950 shadow-sm focus-within:ring-1 focus-within:ring-slate-500 focus-within:border-slate-500 transition-all">
+              <textarea 
+                v-model="userReplyMessage" 
+                placeholder="Añadir una nota interna o responder al cliente..." 
+                class="w-full min-h-[100px] p-4 text-[15px] bg-transparent text-slate-900 dark:text-white border-none focus:ring-0 resize-none outline-none"
+              ></textarea>
+              
+              <!-- Toolbar -->
+              <div class="flex items-center justify-between px-4 py-3 border-t border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50">
+                <button class="text-slate-400 hover:text-slate-600 dark:hover:text-zinc-300 p-1.5 rounded-sm transition-colors" title="Adjuntar archivo">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                </button>
+                
+                <button 
+                  @click="sendUserReply" 
+                  :disabled="sendingUserReply || !userReplyMessage.trim()"
+                  class="flex items-center gap-2 px-5 py-2 bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-900 hover:bg-slate-700 dark:hover:bg-slate-300 font-medium rounded-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                >
+                  <svg v-if="sendingUserReply" class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                  <span>{{ sendingUserReply ? 'Actualizando...' : 'Añadir Registro' }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div v-else class="p-6 bg-slate-50 dark:bg-zinc-900/50 border-t border-slate-200 dark:border-zinc-800 text-center text-[15px] text-slate-500 dark:text-zinc-400 font-medium">
+            Este caso está {{ selectedUserTicket?.status === 'resolved' ? 'resuelto' : 'cerrado' }}. Si el problema persiste o necesitas más ayuda, por favor abre un nuevo caso desde el menú superior.
+          </div>
+
+        </div>
+      </div>
+
       <!-- Sección: Papelera de Productos -->
       <div v-if="activeSection === 'trash'" class="space-y-6">
         
@@ -1438,12 +1684,97 @@
 
   <!-- Modal de Upgrade de Plan -->
   <UpgradePlanModal :isOpen="showUpgradeModal" @close="showUpgradeModal = false" @success="handleUpgradeSuccess" />
+
+  <!-- Modal Crear Caso de Soporte -->
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0 scale-95"
+      enter-to-class="opacity-100 scale-100"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="opacity-100 scale-100"
+      leave-to-class="opacity-0 scale-95"
+    >
+      <div v-if="showSupportTicketModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-0">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity" @click="closeSupportModal"></div>
+
+        <!-- Panel del Modal -->
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-2xl w-full max-w-4xl overflow-hidden transform transition-all relative">
+          <!-- Header -->
+          <div class="px-6 py-3 border-b border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between">
+            <div class="flex items-baseline gap-3">
+              <h3 class="text-xl font-semibold text-slate-800 dark:text-white tracking-tight">Generar Ticket de Soporte</h3>
+              <p class="text-sm text-slate-500 dark:text-zinc-400 m-0">Solicitante: <span class="font-medium text-slate-700 dark:text-zinc-300">{{ currentUser.name || 'Usuario Actual' }}</span></p>
+            </div>
+            <button @click="closeSupportModal" class="text-slate-400 hover:text-slate-600 dark:text-zinc-500 dark:hover:text-zinc-300 transition-colors">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+
+          <!-- Body -->
+          <form @submit.prevent="submitSupportTicket" class="p-6 space-y-4 bg-slate-50/50 dark:bg-zinc-900 flex flex-col">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1">Asunto</label>
+                <input type="text" v-model="supportForm.subject" required class="w-full px-3 py-2 bg-white dark:bg-zinc-800/50 border border-slate-300 dark:border-zinc-700 rounded-lg text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 focus:border-slate-900 dark:focus:ring-white dark:focus:border-white transition-colors" placeholder="Breve descripción del problema">
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1">Personas en copia (CC)</label>
+                <input type="text" v-model="supportForm.cc_emails" class="w-full px-3 py-2 bg-white dark:bg-zinc-800/50 border border-slate-300 dark:border-zinc-700 rounded-lg text-sm text-slate-900 dark:text-white focus:ring-1 focus:ring-slate-900 focus:border-slate-900 dark:focus:ring-white dark:focus:border-white transition-colors" placeholder="correo1@ejemplo.com, correo2@ejemplo.com">
+              </div>
+            </div>
+
+            <div class="flex-1 flex flex-col">
+              <label class="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1">Descripción detallada</label>
+              <textarea v-model="supportForm.description" required rows="10" class="w-full min-h-[250px] px-4 py-3 bg-white dark:bg-zinc-800/50 border border-slate-300 dark:border-zinc-700 rounded-lg text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-colors resize-y shadow-sm" placeholder="Describe detalladamente tu problema, pasos para reproducirlo o tu solicitud..."></textarea>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1">Adjuntos</label>
+              <div class="mt-1 flex justify-center px-6 py-4 border-2 border-slate-300 dark:border-zinc-700 border-dashed rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors cursor-pointer group">
+                <div class="space-y-1 text-center">
+                  <svg class="mx-auto h-8 w-8 text-slate-400 group-hover:text-slate-500 dark:text-zinc-500" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                  <div class="flex text-sm text-slate-600 dark:text-zinc-400 justify-center">
+                    <span class="relative cursor-pointer rounded-md font-medium text-slate-900 dark:text-white hover:underline focus-within:outline-none">
+                      <span>Arrastra tus archivos aquí</span>
+                    </span>
+                    <p class="pl-1">o haz clic para explorar</p>
+                  </div>
+                  <p class="text-xs text-slate-500 dark:text-zinc-500">PNG, JPG, PDF hasta 10MB</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer / Botones -->
+            <div class="pt-5 flex justify-end gap-3 border-t border-slate-200 dark:border-zinc-800">
+              <button type="button" @click="closeSupportModal" class="px-4 py-2 text-sm font-medium text-slate-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 rounded-lg transition-colors shadow-sm">
+                Cancelar
+              </button>
+              <button type="submit" :disabled="isSubmittingTicket" class="px-4 py-2 text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm">
+                <svg v-if="isSubmittingTicket" class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>{{ isSubmittingTicket ? 'Enviando...' : 'Generar Caso' }}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import axiosInstance from '../services/apiClient'
 import { appStore } from '../store/appStore.js'
+import { aiChatStore } from '../store/aiChatStore.js'
 import UpgradePlanModal from './UpgradePlanModal.vue'
 import PaymentHistoryPanel from './PaymentHistoryPanel.vue'
 import ElectronicInvoiceConfig from './settings/ElectronicInvoiceConfig.vue'
@@ -1458,6 +1789,82 @@ const props = defineProps({
 
 // Emits para eventos
 const emit = defineEmits(['navigate', 'changeModule', 'change-module', 'openQuotationInPos', 'openReturnInPos', 'refresh'])
+
+const currentUser = computed(() => {
+  try {
+    return JSON.parse(localStorage.getItem('user') || '{}')
+  } catch(e) {
+    return {}
+  }
+})
+
+// Estados de Soporte
+const showSupportTicketModal = ref(false)
+const isSubmittingTicket = ref(false)
+const supportForm = ref({
+  subject: '',
+  description: '',
+  cc_emails: ''
+})
+const userTickets = ref([])
+const loadingUserTickets = ref(false)
+
+// Lógica Modal Cliente
+const showUserTicketModal = ref(false)
+const showUserTicketsListModal = ref(false)
+const selectedUserTicket = ref(null)
+const userReplyMessage = ref('')
+const sendingUserReply = ref(false)
+
+const openUserTicketModal = (ticket) => {
+  selectedUserTicket.value = { ...ticket }
+  userReplyMessage.value = ''
+  showUserTicketModal.value = true
+}
+
+const sendUserReply = async () => {
+  if (!userReplyMessage.value.trim() || !selectedUserTicket.value) return
+  
+  sendingUserReply.value = true
+  try {
+    const response = await axiosInstance.post(`/support-tickets/${selectedUserTicket.value.id}/reply`, {
+      message: userReplyMessage.value
+    })
+    
+    if (response.data.success) {
+      // Actualizar el ticket en la lista
+      const idx = userTickets.value.findIndex(t => t.id === selectedUserTicket.value.id)
+      if (idx !== -1) {
+        userTickets.value[idx] = response.data.ticket
+      }
+      selectedUserTicket.value = response.data.ticket
+      userReplyMessage.value = ''
+    }
+  } catch (error) {
+    console.error('Error enviando respuesta:', error)
+    alert(error.response?.data?.message || 'Ocurrió un error al enviar la respuesta')
+  } finally {
+    sendingUserReply.value = false
+  }
+}
+
+const loadUserTickets = async () => {
+  try {
+    loadingUserTickets.value = true
+    const response = await axiosInstance.get('/support-tickets', {
+      params: {
+        tenant_id: currentUser.value?.tenant_id || props.companyInfo?.id
+      }
+    })
+    if (response.data.success) {
+      userTickets.value = response.data.tickets || []
+    }
+  } catch (error) {
+    console.error('Error loading tickets:', error)
+  } finally {
+    loadingUserTickets.value = false
+  }
+}
 
 // Estado del modal de upgrade de plan
 const showUpgradeModal = ref(false)
@@ -1506,8 +1913,18 @@ const showNotification = (message, type = 'success') => {
 }
 
 // Estado reactivo
-const activeSection = ref('general')
+const activeSection = ref(
+  props.queryParams?.tab === 'help' || props.queryParams?.section === 'help' 
+    ? 'help' 
+    : (props.queryParams?.section === 'plans' ? 'plan' : 'general')
+)
 const loading = ref(false)
+
+watch(activeSection, (newSection) => {
+  if (newSection === 'help') {
+    loadUserTickets()
+  }
+}, { immediate: true })
 
 // Modales
 const showAddDiscountModal = ref(false)
@@ -2222,6 +2639,11 @@ onMounted(async () => {
       showUpgradeModal.value = true
     }, 300)
   }
+
+  // Si viene con tab=help o section=help, ir a ayuda
+  if (props.queryParams?.tab === 'help' || props.queryParams?.section === 'help') {
+    activeSection.value = 'help'
+  }
 })
 
 // Watch para cuando cambian los queryParams (navegación desde otros módulos)
@@ -2232,7 +2654,48 @@ watch(() => props.queryParams, (newParams) => {
       showUpgradeModal.value = true
     }, 300)
   }
+  if (newParams?.tab === 'help' || newParams?.section === 'help') {
+    activeSection.value = 'help'
+  }
 }, { deep: true })
+
+// Soporte y Ayuda
+const closeSupportModal = () => {
+  showSupportTicketModal.value = false
+  supportForm.value = { subject: '', description: '', cc_emails: '' }
+}
+
+const submitSupportTicket = async () => {
+  try {
+    isSubmittingTicket.value = true
+    const payload = {
+      ...supportForm.value,
+      user_name: currentUser.value.name || 'Usuario 105 POS',
+      user_email: currentUser.value.email || 'correo@noespecificado.com'
+    }
+    const response = await axiosInstance.post('/support-tickets', payload)
+    if (response.data.success) {
+      showNotification('Ticket generado exitosamente. Nos pondremos en contacto pronto.', 'success')
+      closeSupportModal()
+      loadUserTickets() // Recargar la lista de tickets
+    }
+  } catch (error) {
+    showNotification(error.response?.data?.message || 'Error al generar el ticket', 'error')
+  } finally {
+    isSubmittingTicket.value = false
+  }
+}
+
+const openARIS = () => {
+  if (aiChatStore && typeof aiChatStore.toggle === 'function') {
+    aiChatStore.toggle('centered')
+  } else if (appStore && typeof appStore.toggleAIChat === 'function') {
+    appStore.toggleAIChat()
+  } else {
+    // Fallback en caso de no existir toggleAIChat
+    window.dispatchEvent(new CustomEvent('open-aris-ai'))
+  }
+}
 </script>
 
 <style scoped>

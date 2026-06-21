@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="space-y-5">
     <!-- Header: Estado + Uptime + Auto-refresh -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -37,7 +37,7 @@
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
         </svg>
-        <p class="text-xs text-zinc-400">Cargando mÃ©tricas del sistema...</p>
+        <p class="text-xs text-zinc-400">Cargando métricas del sistema...</p>
       </div>
     </div>
 
@@ -299,8 +299,8 @@
             <div v-for="iface in h.network" :key="iface.name" class="flex items-center justify-between text-[10px] py-1">
               <span class="font-mono text-zinc-400">{{ iface.name }}</span>
               <span class="text-zinc-300">
-                <span class="text-emerald-500">â†“{{ fmtBytes(iface.rx_bytes) }}</span>
-                <span class="text-blue-500 ml-2">â†‘{{ fmtBytes(iface.tx_bytes) }}</span>
+                <span class="text-emerald-500">↓{{ fmtBytes(iface.rx_bytes) }}</span>
+                <span class="text-blue-500 ml-2">↑{{ fmtBytes(iface.tx_bytes) }}</span>
               </span>
             </div>
           </div>
@@ -350,7 +350,7 @@
             :class="loaded 
               ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800' 
               : 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-800'">
-            {{ ext }} {{ loaded ? 'âœ“' : 'âœ—' }}
+            {{ ext }} {{ loaded ? '✓' : '✗' }}
           </span>
         </div>
       </div>
@@ -359,7 +359,7 @@
       <div v-if="h.database?.tenants?.length" class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden">
         <div class="px-5 py-3 border-b border-gray-200 dark:border-zinc-800">
           <h3 class="text-sm font-bold text-gray-900 dark:text-white">Bases de Datos Tenants</h3>
-          <p class="text-[10px] text-zinc-400 mt-0.5">{{ h.database?.tenant_count }} DBs Â· {{ h.database?.total_tenant_size_mb }} MB total</p>
+          <p class="text-[10px] text-zinc-400 mt-0.5">{{ h.database?.tenant_count }} DBs · {{ h.database?.total_tenant_size_mb }} MB total</p>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full">
@@ -368,7 +368,7 @@
                 <th class="px-4 py-2.5 text-left text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Negocio</th>
                 <th class="px-4 py-2.5 text-left text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Database</th>
                 <th class="px-4 py-2.5 text-right text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Tablas</th>
-                <th class="px-4 py-2.5 text-right text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">TamaÃ±o</th>
+                <th class="px-4 py-2.5 text-right text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Tamaño</th>
                 <th class="px-4 py-2.5 text-center text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Estado</th>
               </tr>
             </thead>
@@ -406,7 +406,7 @@
             <p class="text-lg font-bold text-gray-900 dark:text-white">{{ h.php_memory?.peak_mb }} MB</p>
           </div>
           <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-3 text-center">
-            <p class="text-[10px] text-zinc-400 uppercase tracking-wide">LÃ­mite</p>
+            <p class="text-[10px] text-zinc-400 uppercase tracking-wide">Límite</p>
             <p class="text-lg font-bold text-gray-900 dark:text-white">{{ h.php_memory?.limit }}</p>
           </div>
         </div>
@@ -488,7 +488,7 @@ const loadColor = (val) => {
 }
 
 const fmtMb = (mb) => {
-  if (!mb && mb !== 0) return 'â€”'
+  if (!mb && mb !== 0) return '—'
   if (mb >= 1024) return (mb / 1024).toFixed(1) + ' GB'
   return Math.round(mb) + ' MB'
 }
@@ -509,7 +509,7 @@ const fmtNum = (n) => {
 }
 
 const formatDbUptime = (secs) => {
-  if (!secs) return 'â€”'
+  if (!secs) return '—'
   const d = Math.floor(secs / 86400)
   const hrs = Math.floor((secs % 86400) / 3600)
   const m = Math.floor((secs % 3600) / 60)
@@ -530,7 +530,7 @@ const fetchHealth = async () => {
       error.value = res.data.message || 'Error al cargar datos'
     }
   } catch (e) {
-    error.value = e.response?.data?.message || e.message || 'Error de conexiÃ³n'
+    error.value = e.response?.data?.message || e.message || 'Error de conexión'
   }
   loading.value = false
 }

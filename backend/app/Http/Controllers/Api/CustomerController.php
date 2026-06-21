@@ -9,9 +9,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use App\Traits\UploadsBase64ToS3;
 
 class CustomerController extends Controller
 {
+    use UploadsBase64ToS3;
     /**
      * Display a listing of the resource.
      */
@@ -111,6 +115,12 @@ class CustomerController extends Controller
                 $customerData['credit_access_token'] = CreditPortalController::generateAccessToken();
             }
 
+            // Procesar foto de crédito si viene
+            if (!empty($customerData['credit_photo'])) {
+                $tenantId = tenant('id') ?? 'default';
+                $customerData['credit_photo'] = $this->uploadBase64ToS3($customerData['credit_photo'], "tenants/{$tenantId}/customers", 'credit_');
+            }
+
             $customer = Customer::create($customerData);
 
             return response()->json([
@@ -192,6 +202,12 @@ class CustomerController extends Controller
                 $updateData['credit_active'] = true;
                 $updateData['credit_id'] = CreditPortalController::generateCreditId();
                 $updateData['credit_access_token'] = CreditPortalController::generateAccessToken();
+            }
+
+            // Procesar foto de crédito si viene en la actualización
+            if (isset($updateData['credit_photo']) && !empty($updateData['credit_photo'])) {
+                $tenantId = tenant('id') ?? 'default';
+                $updateData['credit_photo'] = $this->uploadBase64ToS3($updateData['credit_photo'], "tenants/{$tenantId}/customers", 'credit_');
             }
 
             $customer->update($updateData);
@@ -369,8 +385,20 @@ class CustomerController extends Controller
 
             // Eliminar foto si existe
             if ($customer->credit_photo) {
-                $photoPath = str_replace('/storage/', '', $customer->credit_photo);
-                \Storage::disk('public')->delete($photoPath);
+                if (Str::contains($customer->credit_photo, 'r2.cloudflarestorage.com') || Str::contains($customer->credit_photo, '.r2.dev')) {
+                    // Extraer path relativo del bucket para eliminar
+                    $photoPath = parse_url($customer->credit_photo, PHP_URL_PATH);
+                    $photoPath = ltrim($photoPath, '/'); // puede incluir el nombre del bucket si no usa dominio dev
+                    // Si usa subdominio, el path directo funciona. Removemos prefijos si es necesario.
+                    $parts = explode('tenants/', $photoPath);
+                    if (count($parts) > 1) {
+                        $s3Path = 'tenants/' . $parts[1];
+                        Storage::disk('s3')->delete($s3Path);
+                    }
+                } else {
+                    $photoPath = str_replace('/storage/', '', $customer->credit_photo);
+                    Storage::disk('public')->delete($photoPath);
+                }
             }
 
             // 🔧 FIX: Limpiar datos de crédito del cliente (credit_active, NO has_credit)

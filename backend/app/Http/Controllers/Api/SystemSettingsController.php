@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\SystemSetting;
 use Illuminate\Http\Request;
+use App\Traits\UploadsBase64ToS3;
 
 class SystemSettingsController extends Controller
 {
+    use UploadsBase64ToS3;
     /**
      * Obtener configuración del sistema
      */
@@ -185,6 +187,11 @@ class SystemSettingsController extends Controller
                 $validated['enable_loyalty_system'] = false;
             }
 
+            // Procesar logo si viene en Base64
+            if (isset($validated['company_logo']) && !empty($validated['company_logo'])) {
+                $tenantId = tenant('id') ?? 'default';
+                $validated['company_logo'] = $this->uploadBase64ToS3($validated['company_logo'], "tenants/{$tenantId}/settings", 'logo_');
+            }
 
             // ⚠️ DEBUG: Intentar UPDATE directo con DB
             if (isset($validated['store_type'])) {
@@ -297,6 +304,12 @@ class SystemSettingsController extends Controller
                 'whatsapp_number' => 'nullable|string|max:20',
                 'onboarding_completed' => 'boolean'
             ]);
+
+            // Procesar logo de onboarding si viene en Base64
+            if (isset($validated['company_logo']) && !empty($validated['company_logo'])) {
+                $tenantId = tenant('id') ?? 'default';
+                $validated['company_logo'] = $this->uploadBase64ToS3($validated['company_logo'], "tenants/{$tenantId}/settings", 'logo_');
+            }
 
             // Actualizar configuración
             $settings->update([

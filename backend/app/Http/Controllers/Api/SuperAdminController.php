@@ -115,7 +115,7 @@ class SuperAdminController extends Controller
                 // Table may not exist yet
             }
 
-            $tenants = Tenant::with('domains')->get()->map(function($tenant) use ($errorCounts) {
+            $tenants = Tenant::withTrashed()->with('domains')->get()->map(function($tenant) use ($errorCounts) {
                 // stancl/tenancy permite acceder a valores de JSON como propiedades directas
                 $subscriptionStart = $tenant->subscription_start ?? ($tenant->created_at ? $tenant->created_at->format('Y-m-d') : null);
                 $subscriptionEnd = $tenant->subscription_end ?? $tenant->subscription_ends_at;
@@ -152,6 +152,7 @@ class SuperAdminController extends Controller
                     'created_at' => $tenant->created_at->format('Y-m-d H:i:s'),
                     'subscription_start' => $subscriptionStart,
                     'subscription_end' => $subscriptionEnd ? (is_string($subscriptionEnd) ? $subscriptionEnd : $subscriptionEnd->format('Y-m-d')) : null,
+                    'deleted_at' => $tenant->deleted_at ? $tenant->deleted_at->format('Y-m-d H:i:s') : null,
                     'error_count' => (int)($errorCounts[$tenant->id] ?? 0),
                     'owner_name' => $adminUser->owner_name ?? $tenant->owner_name ?? null,
                     'cedula' => $adminUser->cedula ?? $tenant->cedula ?? $tenant->nit ?? null,
@@ -181,7 +182,7 @@ class SuperAdminController extends Controller
     public function getTenantDetails($tenantId)
     {
         try {
-            $tenant = Tenant::with('domains')->find($tenantId);
+            $tenant = Tenant::withTrashed()->with('domains')->find($tenantId);
 
             if (!$tenant) {
                 return response()->json([
@@ -235,6 +236,7 @@ class SuperAdminController extends Controller
                     'created_at' => $tenant->created_at->format('Y-m-d H:i:s'),
                     'subscription_start' => $subscriptionStart,
                     'subscription_end' => $subscriptionEnd,
+                    'deleted_at' => $tenant->deleted_at ? $tenant->deleted_at->format('Y-m-d H:i:s') : null,
                     'owner_name' => $adminUser->owner_name ?? $tenant->owner_name ?? null,
                     'cedula' => $adminUser->cedula ?? $tenant->cedula ?? null,
                     'admin_email' => $adminUser->admin_email ?? $tenant->admin_email ?? null,
@@ -734,7 +736,7 @@ class SuperAdminController extends Controller
     public function deleteTenant($id)
     {
         try {
-            $tenant = Tenant::find($id);
+            $tenant = Tenant::withTrashed()->find($id);
             if (!$tenant) {
                 return response()->json([
                     'success' => false,
@@ -763,6 +765,79 @@ class SuperAdminController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al eliminar tenant: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * ♻️ Restaurar un tenant eliminado de la papelera
+     */
+    public function restoreTenant($id)
+    {
+        try {
+            $tenant = Tenant::withTrashed()->find($id);
+            if (!$tenant) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tenant no encontrado'
+                ], 404);
+            }
+
+            if (!$tenant->trashed()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El tenant no está en la papelera'
+                ], 400);
+            }
+
+            $tenant->restore();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Tenant restaurado correctamente de la papelera'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('❌ Error restaurando tenant:', [
+                'tenant_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al restaurar tenant: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * 🗑️ Eliminar un tenant permanentemente (destrucción de base de datos)
+     */
+    public function forceDeleteTenant($id)
+    {
+        try {
+            $tenant = Tenant::withTrashed()->find($id);
+            if (!$tenant) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tenant no encontrado'
+                ], 404);
+            }
+
+            // forceDelete() eliminará la DB si está configurado en stancl/tenancy, 
+            // de lo contrario solo hará el hard delete en la tabla principal.
+            $tenant->forceDelete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Tenant eliminado permanentemente y su base de datos destruida'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('❌ Error forzando eliminación de tenant:', [
+                'tenant_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar permanentemente: ' . $e->getMessage()
             ], 500);
         }
     }

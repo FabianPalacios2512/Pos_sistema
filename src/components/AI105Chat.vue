@@ -1,11 +1,21 @@
 <template>
   <!-- Panel Lateral de Chat IA - Diseño GEMINI Style -->
   <div>
-    <transition name="slide-right">
+    <!-- Backdrop for centered mode -->
+    <transition name="fade" appear>
+      <div v-if="localChatOpen && localChatMode === 'centered'" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-[44]" @click="closeChat"></div>
+    </transition>
+
+    <transition :name="localChatMode === 'centered' ? 'zoom-in' : 'slide-right'" appear>
       <div 
         v-if="localChatOpen"
-        class="fixed right-0 w-full sm:w-[400px] bg-white dark:bg-[#131314] flex flex-col z-[45] shadow-[-8px_0_30px_-5px_rgba(0,0,0,0.15)] dark:shadow-[-8px_0_30px_-5px_rgba(0,0,0,0.5)] border-l border-gray-200/80 dark:border-zinc-800"
-        :style="{ top: dynamicHeaderHeight + 'px', height: `calc(100% - ${dynamicHeaderHeight}px)` }"
+        :class="[
+          'fixed bg-white dark:bg-[#131314] flex flex-col z-[45] shadow-[-8px_0_30px_-5px_rgba(0,0,0,0.15)] dark:shadow-[-8px_0_30px_-5px_rgba(0,0,0,0.5)] overflow-hidden transition-all duration-300',
+          localChatMode === 'centered' 
+            ? 'top-[10%] left-1/2 -translate-x-1/2 w-[95%] max-w-5xl h-[80%] rounded-2xl border border-gray-200/80 dark:border-zinc-800' 
+            : 'right-0 w-full sm:w-[400px] border-l border-gray-200/80 dark:border-zinc-800'
+        ]"
+        :style="localChatMode === 'centered' ? {} : { top: dynamicHeaderHeight + 'px', height: `calc(100% - ${dynamicHeaderHeight}px)` }"
       >
         <!-- ═══════════════════════════════════════════════════════════════
              LIVE CALL OVERLAY - Vista de llamada en vivo estilo Futurista Light Mode
@@ -972,6 +982,7 @@ export default {
     // Computed
     const isControlledExternally = computed(() => props.isOpen !== undefined)
     const localChatOpen = computed(() => isControlledExternally.value ? props.isOpen : aiChatStore.isOpen.value)
+    const localChatMode = computed(() => isControlledExternally.value ? 'sidebar' : (aiChatStore.mode?.value || 'sidebar'))
     
     // Nombre del usuario para saludo personalizado
     const userName = computed(() => {
@@ -1618,6 +1629,7 @@ export default {
 
     return {
       localChatOpen,
+      localChatMode,
       isControlledExternally,
       dynamicHeaderHeight,
       messages,

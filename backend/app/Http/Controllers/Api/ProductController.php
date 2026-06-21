@@ -583,19 +583,19 @@ class ProductController extends Controller
 
             // 3. Manejo de Imágenes (Galería)
             if ($request->hasFile('images')) {
-                // ✅ Asegurar que el symlink existe antes de guardar imágenes
-                $this->ensureTenantStorageLink();
-
                 foreach ($request->file('images') as $index => $file) {
-                    $path = $file->store('products', 'public');
-
-                    // Para multi-tenancy: construir URL con tenant
-                    $tenantId = tenant('id');
-                    if ($tenantId) {
-                        $url = "/storage/tenants/{$tenantId}/{$path}";
-                    } else {
-                        $url = Storage::url($path);
-                    }
+                    $tenantId = tenant('id') ?? 'central';
+                    $originalName = time() . '_' . $file->getClientOriginalName();
+                    
+                    // Subir a S3 (Cloudflare R2) sin enviar ACL explícito ('public') 
+                    // porque R2 no soporta ACLs por defecto
+                    $path = \Illuminate\Support\Facades\Storage::disk('s3')->putFileAs(
+                        "tenants/{$tenantId}/products", 
+                        $file, 
+                        $originalName
+                    );
+                    
+                    $url = \Illuminate\Support\Facades\Storage::disk('s3')->url($path);
 
                     $product->images()->create([
                         'image_url' => $url,
@@ -915,24 +915,20 @@ class ProductController extends Controller
 
             // 3. Manejo de Imágenes
             if ($request->hasFile('images')) {
-                $this->ensureTenantStorageLink();
-
                 $currentMaxOrder = $product->images()->max('order') ?? 0;
                 foreach ($request->file('images') as $index => $file) {
                     try {
-                        $path = $file->store('products', 'public');
+                        $tenantId = tenant('id') ?? 'central';
+                        $originalName = time() . '_' . $file->getClientOriginalName();
+                        
+                        // Subir a S3 (Cloudflare R2)
+                        $path = \Illuminate\Support\Facades\Storage::disk('s3')->putFileAs(
+                            "tenants/{$tenantId}/products", 
+                            $file, 
+                            $originalName
+                        );
 
-                        if (!$path) {
-                            continue;
-                        }
-
-                        // Para multi-tenancy: construir URL con tenant
-                        $tenantId = tenant('id');
-                        if ($tenantId) {
-                            $url = "/storage/tenants/{$tenantId}/{$path}";
-                        } else {
-                            $url = Storage::url($path);
-                        }
+                        $url = \Illuminate\Support\Facades\Storage::disk('s3')->url($path);
 
                         $product->images()->create([
                             'image_url' => $url,

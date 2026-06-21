@@ -41,6 +41,7 @@
           @navigate-to-profile="handleNavigateProfile"
           @toggle-radio="handleToggleRadio"
           @logout="handleLogout"
+          @show-help="handleShowHelp"
           @notifications-opened="aiChatStore.close()"
           @profile-dropdown-opened="aiChatStore.close()"
         />
@@ -495,6 +496,13 @@ const shouldShowModule = (module) => {
 // Funciones que cierran el chat antes de ejecutar la acción
 const handleNavigateSettings = () => {
   aiChatStore.close()
+  setCurrentModule('settings')
+}
+
+const handleShowHelp = () => {
+  aiChatStore.close()
+  moduleQueryParams.value = { tab: 'help' }
+  router.push({ query: { tab: 'help' } })
   setCurrentModule('settings')
 }
 

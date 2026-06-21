@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
@@ -27,12 +30,12 @@ class CategoryController extends Controller
 
             // Calculate revenue for each category from paid invoices
             foreach ($categories as $category) {
-                $revenue = \DB::table('invoice_items')
+                $revenue = DB::table('invoice_items')
                     ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
                     ->join('products', 'invoice_items.product_id', '=', 'products.id')
                     ->where('products.category_id', $category->id)
                     ->where('invoices.status', 'paid')
-                    ->sum(\DB::raw('invoice_items.quantity * invoice_items.unit_price'));
+                    ->sum(DB::raw('invoice_items.quantity * invoice_items.unit_price'));
                 
                 $category->revenue = round($revenue, 2);
             }
@@ -58,7 +61,7 @@ class CategoryController extends Controller
     public function forPos()
     {
         try {
-            $categories = Category::select(['id', 'name', 'color', 'icon'])
+            $categories = Category::select(['id', 'name', 'color', 'icon', 'image_url'])
                 ->where('active', true)
                 ->orderBy('name')
                 ->get();
@@ -104,14 +107,11 @@ class CategoryController extends Controller
             $data = $request->except('image');
 
             if ($request->hasFile('image')) {
-                $tenantId = tenant('id');
-                $path = $request->file('image')->store('categories', 'public');
-                
-                if ($tenantId) {
-                    $data['image_url'] = "/storage/tenants/{$tenantId}/{$path}";
-                } else {
-                    $data['image_url'] = \Storage::url($path);
-                }
+                $tenantId = tenant('id') ?? 'default';
+                $file = $request->file('image');
+                $filename = 'cat_' . time() . '_' . Str::random(5) . '.' . $file->getClientOriginalExtension();
+                $path = Storage::disk('s3')->putFileAs("tenants/{$tenantId}/categories", $file, $filename, 'public');
+                $data['image_url'] = Storage::disk('s3')->url($path);
             }
 
             $category = Category::create($data);
@@ -185,46 +185,41 @@ class CategoryController extends Controller
                 ], 422);
             }
 
-            // Si se está desactivando la categoría
             if ($request->has('active') && $request->active === false && $category->active === true) {
-                // Marcar y desactivar solo productos que están actualmente activos
                 $category->products()->where('active', true)->update([
                     'active' => false,
                     'deactivated_by_category' => true
                 ]);
             }
             
-            // Si se está reactivando la categoría
             if ($request->has('active') && $request->active === true && $category->active === false) {
-                // Reactivar solo productos que fueron desactivados por la categoría
                 $category->products()->where('deactivated_by_category', true)->update([
                     'active' => true,
                     'deactivated_by_category' => false
                 ]);
             }
 
-            $data = $request->except('image');
+            $updateData = $request->except('image');
 
             if ($request->hasFile('image')) {
-                // Eliminar imagen anterior si existe
                 if ($category->image_url) {
-                    $oldPath = str_replace("/storage/tenants/" . tenant('id') . "/", "", $category->image_url);
-                    if (\Storage::disk('public')->exists($oldPath)) {
-                        \Storage::disk('public')->delete($oldPath);
+                    $parsedUrl = parse_url($category->image_url, PHP_URL_PATH);
+                    $pathParts = explode('/storage/', $parsedUrl);
+                    $storagePath = count($pathParts) > 1 ? $pathParts[1] : ltrim($parsedUrl, '/');
+                    
+                    if (Storage::disk('s3')->exists($storagePath)) {
+                        Storage::disk('s3')->delete($storagePath);
                     }
                 }
 
-                $tenantId = tenant('id');
-                $path = $request->file('image')->store('categories', 'public');
-                
-                if ($tenantId) {
-                    $data['image_url'] = "/storage/tenants/{$tenantId}/{$path}";
-                } else {
-                    $data['image_url'] = \Storage::url($path);
-                }
+                $tenantId = tenant('id') ?? 'default';
+                $file = $request->file('image');
+                $filename = 'cat_' . time() . '_' . Str::random(5) . '.' . $file->getClientOriginalExtension();
+                $path = Storage::disk('s3')->putFileAs("tenants/{$tenantId}/categories", $file, $filename, 'public');
+                $updateData['image_url'] = Storage::disk('s3')->url($path);
             }
 
-            $category->update($data);
+            $category->update($updateData);
 
             return response()->json([
                 'success' => true,

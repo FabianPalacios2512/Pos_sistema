@@ -14,6 +14,7 @@ use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\RadioProxyController;
 use App\Http\Controllers\PublicRadioController;
+use App\Http\Controllers\Api\Central\SupportTicketController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -43,6 +44,9 @@ Route::post('/admin/login', [AuthController::class, 'adminLogin'])
     ->name('api.admin.login'); // Login específico para super admin
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/register-tenant', [TenantRegisterController::class, 'register']);
+Route::post('/support-tickets', [SupportTicketController::class, 'store']);
+Route::get('/support-tickets', [SupportTicketController::class, 'indexUser']);
+Route::post('/support-tickets/{id}/reply', [SupportTicketController::class, 'replyUser']);
 Route::post('/update-tenant-plan', [\App\Http\Controllers\Api\TenantPlanController::class, 'updatePlan']);
 Route::post('/process-upgrade', [PlanUpgradeController::class, 'processUpgrade']);  // 🔥 Upgrade post-pago (público)
 Route::get('/process-upgrade', [PlanUpgradeController::class, 'processUpgrade']);   // 🔥 TAMBIÉN ACCEPT GET (Wompi podría usar GET)
@@ -95,6 +99,8 @@ Route::middleware(\App\Http\Middleware\PreventTenancyInit::class)->group(functio
     Route::put('/admin/tenants/{id}/subscription', [SuperAdminController::class, 'updateTenantSubscription']);
     Route::put('/admin/tenants/{id}/status', [SuperAdminController::class, 'updateTenantStatus']);
     Route::delete('/admin/tenants/{id}', [SuperAdminController::class, 'deleteTenant']);
+    Route::post('/admin/tenants/{id}/restore', [SuperAdminController::class, 'restoreTenant']);
+    Route::delete('/admin/tenants/{id}/force', [SuperAdminController::class, 'forceDeleteTenant']);
     Route::get('/check-domain/{domain}', [SuperAdminController::class, 'checkDomainAvailability']);
     Route::get('/check-cedula/{cedula}', [SuperAdminController::class, 'checkCedulaAvailability']);
     Route::get('/check-email/{email}', [SuperAdminController::class, 'checkEmailAvailability']);
@@ -109,7 +115,13 @@ Route::middleware(\App\Http\Middleware\PreventTenancyInit::class)->group(functio
     Route::delete('/admin/system/logs', [\App\Http\Controllers\Api\SystemToolsController::class, 'clearLogs']);
     Route::post('/admin/system/maintenance', [\App\Http\Controllers\Api\SystemToolsController::class, 'maintenance']);
     Route::get('/admin/system/environment', [\App\Http\Controllers\Api\SystemToolsController::class, 'environment']);
+    Route::post('/admin/system/terminal', [\App\Http\Controllers\Api\SystemToolsController::class, 'terminal']);
     Route::get('/admin/system/tenant-db/{tenantId}', [\App\Http\Controllers\Api\SystemToolsController::class, 'tenantDatabaseInfo']);
+
+    // R2 Storage Management
+    Route::get('/admin/storage/files', [\App\Http\Controllers\Api\R2StorageController::class, 'index']);
+    Route::post('/admin/storage/upload', [\App\Http\Controllers\Api\R2StorageController::class, 'upload']);
+    Route::delete('/admin/storage/delete', [\App\Http\Controllers\Api\R2StorageController::class, 'delete']);
 
     // Security Dashboard (GOD MODE)
     Route::get('/admin/security/dashboard', [SecurityController::class, 'dashboard']);
@@ -124,6 +136,11 @@ Route::middleware(\App\Http\Middleware\PreventTenancyInit::class)->group(functio
     Route::post('/admin/tenants/{id}/errors/{errorId}/resolve', [SuperAdminController::class, 'resolveError']);
     Route::post('/admin/tenants/{id}/errors/{errorId}/analyze', [SuperAdminController::class, 'analyzeError']);
     Route::post('/admin/tenants/{id}/errors/analyze-all', [SuperAdminController::class, 'analyzeAllErrors']);
+    
+    // Support Tickets (God Mode)
+    Route::get('/admin/support-tickets', [SupportTicketController::class, 'indexAdmin']);
+    Route::put('/admin/support-tickets/{id}/status', [SupportTicketController::class, 'updateStatusAdmin']);
+    Route::post('/admin/support-tickets/{id}/reply', [SupportTicketController::class, 'replyAdmin']);
 });
 
 // ==================== SUPER ADMIN (GOD MODE) - Prefijo /admin/api/* ====================

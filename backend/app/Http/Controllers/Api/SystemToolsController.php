@@ -12,6 +12,34 @@ use Illuminate\Support\Facades\Cache;
 class SystemToolsController extends Controller
 {
     /**
+     * VPS Terminal execution endpoint
+     */
+    public function terminal(Request $request)
+    {
+        $command = $request->input('command');
+        if (!$command) {
+            return response()->json(['success' => false, 'message' => 'No command provided']);
+        }
+        
+        $output = [];
+        $exitCode = 0;
+        $cwd = base_path();
+        
+        exec("cd {$cwd} && " . $command . " 2>&1", $output, $exitCode);
+        
+        $outputStr = implode("\n", $output);
+        if (!mb_check_encoding($outputStr, 'UTF-8')) {
+            $outputStr = mb_convert_encoding($outputStr, 'UTF-8', 'CP850');
+        }
+        
+        return response()->json([
+            'success' => true,
+            'output' => $outputStr,
+            'exit_code' => $exitCode
+        ]);
+    }
+
+    /**
      * System health check - real-time server metrics, services, CPU, RAM, disk, DB
      */
     public function health()
