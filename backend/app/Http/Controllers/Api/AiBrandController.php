@@ -26,14 +26,19 @@ class AiBrandController extends Controller
             $description = $request->input('business_description');
             $slot = (int) $request->input('slot', -1);
 
-            // Get current template and store_type
+            // Get current template and store_type from web_catalog_configs
             $currentConfig = DB::table('web_catalog_configs')
                 ->where('tenant_id', $tenantId)
                 ->first();
             $currentTemplate = $currentConfig->template ?? null;
 
+            // Get store_type from system_settings
+            $systemSettings = DB::table('system_settings')
+                ->first();
+            $storeType = $systemSettings->store_type ?? 'general';
+
             $service = new GroqBrandService();
-            $result = $service->generateBrandIdentity($description, $storeName, null, 'general', $slot);
+            $result = $service->generateBrandIdentity($description, $storeName, $currentTemplate, $storeType, $slot);
 
             if (!$result['success']) {
                 return response()->json([

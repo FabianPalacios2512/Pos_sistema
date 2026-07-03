@@ -32,6 +32,8 @@ export { default as HookCollectionGrid } from './HookCollectionGrid.vue'
 // → 2 tall + 2 short asymétrico, hover arrows, collection labels
 
 export { default as HookBrandManifesto } from './HookBrandManifesto.vue'
+export { default as HookGeneralBento } from './HookGeneralBento.vue'
+export { default as HookGeneralTrust } from './HookGeneralTrust.vue'
 // Editorial / Premium / Marcas con filosofía — statement tipográfico full-width
 // → Headline serif grande, texto manifiesto, firma de marca
 

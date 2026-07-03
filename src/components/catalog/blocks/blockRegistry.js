@@ -59,6 +59,13 @@ export const blocks = {
       moods: ['scandinavian-neutral', 'clean-minimal', 'candy-pop'],
       bgCompatibility: 'any',
       requiresDark: false
+    },
+    'general-header-search': {
+      name: 'General Search Header',
+      description: 'Header with large central search bar, typical for general retail/marketplaces.',
+      moods: ['retail-conversion', 'app-native'],
+      bgCompatibility: 'light',
+      requiresDark: false
     }
   },
 
@@ -147,6 +154,12 @@ export const blocks = {
       description: 'Smooth slow-changing animated colors without graphics.',
       moods: ['botanical-wellness', 'fresh-modern'],
       bgCompatibility: 'any'
+    },
+    'general-hero-promo': {
+      name: 'General Retail Promo Hero',
+      description: 'Banner dedicated to general mass-market promotions.',
+      moods: ['retail-conversion', 'app-native'],
+      bgCompatibility: 'light'
     }
   },
 
@@ -193,6 +206,18 @@ export const blocks = {
       description: 'Philosophy quote block with fine author signature.',
       moods: ['botanical-wellness', 'scandinavian-neutral', 'luxury-editorial'],
       bgCompatibility: 'any'
+    },
+    'general-bento-departments': {
+      name: 'General Departments Bento',
+      description: 'Grid layout for browsing multiple different retail departments.',
+      moods: ['retail-conversion', 'app-native'],
+      bgCompatibility: 'light'
+    },
+    'general-trust-benefits': {
+      name: 'General Trust & Benefits',
+      description: 'Functional large blocks highlighting free shipping, support, etc.',
+      moods: ['retail-conversion', 'app-native'],
+      bgCompatibility: 'light'
     }
   },
 

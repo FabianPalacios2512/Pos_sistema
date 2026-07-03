@@ -42,6 +42,7 @@ class GroqBrandService
         'dark-premium'     => 'Fondo negro sólido con efecto glass oscuro al hacer scroll, íconos y texto siempre en blanco — USAR cuando la paleta tenga background oscuro/negro, alta costura noir, marcas de lujo oscuras, tecnología premium',
         'split-action'     => 'Logo a la izquierda, barra de búsqueda centrada, iconos a la derecha — ideal para e-commerce grande, ferreterías, marketplaces o tiendas multimarca estilo Amazon/MercadoLibre',
         'minimal-float'    => 'Pill flotante minimalista que aparece solo al scroll-up — estilo Apple premium, moderno, limpio, boutique de gama alta',
+        'general-header-search' => 'Logo a la izq, buscador enorme central, full-width (Estilo Amazon/MercadoLibre) — OBLIGATORIO para store_type=general (Ferreterías, tecnología, misceláneas)',
     ];
 
     /**
@@ -55,6 +56,8 @@ class GroqBrandService
         'testimonials'     => 'Carrusel de testimonios y opiniones de clientes con avatar, estrellas y texto — ideal para construir confianza social en cualquier vertical de tienda',
         'collection-grid'  => 'Mosaico visual de categorías o colecciones asimétricas — ideal para tiendas de ropa, calzado, accesorios que quieren guiar la compra',
         'brand-manifesto'  => 'Manifiesto de marca tipográfico full-width — declaración fuerte serif con firma, perfecto para marcas de diseño de autor o artesanales',
+        'general-bento-departments' => 'Mosaico bento box ordenado para navegar por múltiples departamentos (Hogar, Herramientas, etc) — OBLIGATORIO para store_type=general',
+        'general-trust-benefits' => 'Píldoras funcionales gigantes de beneficios (Envío gratis, pago seguro, soporte 24/7) — OBLIGATORIO para store_type=general',
     ];
 
     /**
@@ -162,6 +165,7 @@ class GroqBrandService
         'video-loop'       => 'Video de fondo en loop sin sonido con texto superpuesto de gran impacto — excelente para marcas jóvenes, streetwear, ropa deportiva o tecnología',
         'parallax'         => 'Fondo con efecto parallax suave al hacer scroll y textos fijos encima — aporta profundidad tridimensional a marcas premium',
         'gradient-wave'    => 'Fondo con ondas de gradiente de color animado interactivo sin imágenes — ideal para marcas modernas de bienestar, cosmética natural o tecnológicas',
+        'general-hero-promo' => 'Banner comercial orientado a retail masivo y promociones de misceláneas, diseño estructurado y orientado a producto — OBLIGATORIO para store_type=general',
     ];
 
     /**
@@ -242,7 +246,7 @@ class GroqBrandService
             $direction = $this->designDirections[array_rand($this->designDirections)];
         }
 
-        $prompt = $this->buildBrandPrompt($businessDescription, $storeName, $direction);
+        $prompt = $this->buildBrandPrompt($businessDescription, $storeName, $direction, $storeType);
 
         $apiKeys = $this->getApiKeys();
         if (empty($apiKeys)) {
@@ -260,7 +264,7 @@ class GroqBrandService
                     'messages' => [
                         [
                             'role' => 'system',
-                            'content' => $this->getSystemPrompt()
+                            'content' => $this->getSystemPrompt($storeType)
                         ],
                         [
                             'role' => 'user',
@@ -294,7 +298,7 @@ class GroqBrandService
     /**
      * System prompt for the AI — Template A component-based architecture
      */
-    private function getSystemPrompt(): string
+    private function getSystemPrompt(string $storeType): string
     {
         $fontsJson         = json_encode($this->fontLibrary,      JSON_UNESCAPED_UNICODE);
         $heroStylesJson    = json_encode($this->heroStyles,        JSON_UNESCAPED_UNICODE);
@@ -424,15 +428,15 @@ FORMATO DE RESPUESTA JSON:
     "cta_secondary": "Texto del segundo botón (solo para hero_cta_style double-solid)"
   },
   "layout_config": {
-    "header_style": "editorial-center|retail-left|transparent-glass|floating-pill|centered-serif|dark-premium|split-action|minimal-float",
-    "hero_style": "full-bleed|split-portrait|centered-minimal|streetwear|portrait|dark-cinematic|carousel|centered|image-grid|minimal|overlay|video-loop|parallax|gradient-wave",
+    "header_style": "editorial-center|retail-left|transparent-glass|floating-pill|centered-serif|dark-premium|split-action|minimal-float|general-header-search",
+    "hero_style": "full-bleed|split-portrait|centered-minimal|streetwear|portrait|dark-cinematic|carousel|centered|image-grid|minimal|overlay|video-loop|parallax|gradient-wave|general-hero-promo",
     "hero_cta_style": "double-solid|single-outline|bold-filled",
     "hero_text_position": "bottom-left|center|bottom-center",
     "hero_content_density": "compact|balanced|rich",
     "ticker_style": "muted-light|soft-primary|contrast-dark",
     "category_style": "horizontal-pills|image-cards",
     "editorial_mood": "luxury|fresh|bold|minimal",
-    "hook_style": "editorial-story|urban-lookbook|dynamic-bento|dark-noir|testimonials|collection-grid|brand-manifesto",
+    "hook_style": "editorial-story|urban-lookbook|dynamic-bento|dark-noir|testimonials|collection-grid|brand-manifesto|general-bento-departments|general-trust-benefits",
     "trust_strip_style": "dark-contrast|minimal-border|divided|marquee|soft-pills|icon-grid|countdown"
   },
   "ecommerce_features": {
@@ -481,12 +485,14 @@ PROMPT;
     /**
      * Build the user prompt
      */
-    private function buildBrandPrompt(string $description, string $storeName, array $direction = []): string
+    private function buildBrandPrompt(string $description, string $storeName, array $direction, string $storeType): string
     {
         $moodName = $direction['mood'] ?? 'custom';
         $moodHint = $direction['hint'] ?? '';
 
         return <<<PROMPT
+TIPO DE TIENDA: {$storeType} (SI ES 'general' EXCLUYE LENGUAJE DE MODA. SI ES 'fashion' USA LENGUAJE BOUTIQUE).
+
 NOMBRE DE LA TIENDA: {$storeName}
 
 DESCRIPCIÓN DEL NEGOCIO (dada por el dueño):
@@ -513,8 +519,10 @@ INSTRUCCIONES:
 8. Genera anuncios cortos para la barra superior (ticker)
 9. Escribe mensajes de venta cruzada profesionales
 10. En layout_config elige la COMBINACIÓN DE PIEZAS más coherente con el público y la marca:
-    - Si public objetivo = mujeres adultas/maduras → editorial-center + portrait/split-portrait + editorial-story + minimal-border
-    - Si public objetivo = jóvenes urbanos → floating-pill + streetwear + urban-lookbook + marquee
+    - SI TIPO DE TIENDA ES 'general' → USA OBLIGATORIAMENTE: header_style="general-header-search", hero_style="general-hero-promo", hook_style="general-bento-departments" o "general-trust-benefits".
+    - SI TIPO DE TIENDA ES 'fashion' → USA LOS BLOQUES DE MODA:
+      - Si mujeres adultas/maduras → editorial-center + portrait/split-portrait + editorial-story + minimal-border
+      - Si jóvenes urbanos → floating-pill + streetwear + urban-lookbook + marquee
     - Si background es oscuro → dark-premium + dark-cinematic + dark-noir + dark-contrast (SIEMPRE como trio)
     - Si background es claro → NUNCA usar componentes dark-*
     - Los demás campos de layout_config según el mood asignado y el público
@@ -530,11 +538,16 @@ PROMPT;
      */
     private function parseResponse(string $content): ?array
     {
-        // Clean markdown formatting if present
-        $content = trim($content);
-        if (str_starts_with($content, '```')) {
-            $content = preg_replace('/^```(?:json)?\s*/i', '', $content);
-            $content = preg_replace('/\s*```$/', '', $content);
+        // Extract JSON using regex if it's wrapped in backticks anywhere
+        if (preg_match('/```(?:json)?\s*([\s\S]*?)\s*```/i', $content, $matches)) {
+            $content = trim($matches[1]);
+        } else {
+            // Fallback: try to find the first { and last }
+            $start = strpos($content, '{');
+            $end = strrpos($content, '}');
+            if ($start !== false && $end !== false && $end > $start) {
+                $content = substr($content, $start, $end - $start + 1);
+            }
         }
 
         $data = json_decode($content, true);
@@ -598,14 +611,14 @@ PROMPT;
         }
 
         // Default layout_config if AI didn't include it
-        $validHeroStyles     = ['full-bleed', 'split-portrait', 'centered-minimal', 'streetwear', 'portrait', 'dark-cinematic', 'carousel', 'centered', 'image-grid', 'minimal', 'overlay', 'video-loop', 'parallax', 'gradient-wave'];
+        $validHeroStyles     = ['full-bleed', 'split-portrait', 'centered-minimal', 'streetwear', 'portrait', 'dark-cinematic', 'carousel', 'centered', 'image-grid', 'minimal', 'overlay', 'video-loop', 'parallax', 'gradient-wave', 'general-hero-promo'];
         $validCtaStyles      = ['double-solid', 'single-outline', 'bold-filled'];
         $validCategoryStyles = ['horizontal-pills', 'image-cards'];
         $validTextPositions  = ['bottom-left', 'center', 'bottom-center'];
         $validTickerStyles   = ['muted-light', 'soft-primary', 'contrast-dark'];
         $validHeroDensity    = ['compact', 'balanced', 'rich'];
-        $validHeaderStyles   = ['editorial-center', 'retail-left', 'transparent-glass', 'floating-pill', 'centered-serif', 'dark-premium', 'split-action', 'minimal-float'];
-        $validHookStyles     = ['editorial-story', 'urban-lookbook', 'dynamic-bento', 'dark-noir', 'testimonials', 'collection-grid', 'brand-manifesto'];
+        $validHeaderStyles   = ['editorial-center', 'retail-left', 'transparent-glass', 'floating-pill', 'centered-serif', 'dark-premium', 'split-action', 'minimal-float', 'general-header-search'];
+        $validHookStyles     = ['editorial-story', 'urban-lookbook', 'dynamic-bento', 'dark-noir', 'testimonials', 'collection-grid', 'brand-manifesto', 'general-bento-departments', 'general-trust-benefits'];
         $validTrustStyles    = ['dark-contrast', 'minimal-border', 'divided', 'marquee', 'soft-pills', 'icon-grid', 'countdown'];
 
         if (!isset($data['layout_config'])) {

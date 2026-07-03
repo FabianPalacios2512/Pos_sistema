@@ -512,8 +512,8 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'product_type' => 'required|in:simple,variable',
-            'store_type' => 'nullable|in:general,fashion', // ✅ Tipo de tienda (general o moda)
-            'store_category' => 'nullable|in:general,fashion', // DEPRECATED: Mantener por compatibilidad
+            'store_type' => 'nullable|in:general,fashion,perfumery', // ✅ Tipo de tienda (general, moda o perfumería)
+            'store_category' => 'nullable|in:general,fashion,perfumery', // DEPRECATED: Mantener por compatibilidad
             'category_id' => 'required|exists:categories,id',
             // Validación condicional
             'sku' => 'required_if:product_type,simple|nullable|string|unique:products,sku',

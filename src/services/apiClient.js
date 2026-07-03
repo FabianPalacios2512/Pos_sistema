@@ -3,7 +3,7 @@ import axios from 'axios'
 // Configuración base del cliente API
 const apiClient = axios.create({
   baseURL: '/api',
-  timeout: 15000, // 15 segundos para operaciones normales (AI puede tardar)
+  timeout: 60000, // 60 segundos para dar tiempo a operaciones largas (AI, subidas de imágenes)
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -162,6 +162,14 @@ apiClient.interceptors.response.use(
             // Si es el health-check o recursos críticos, cerrar sesión
             if (error.config?.url?.includes('health-check') || 
                 error.config?.url?.includes('warehouses')) {
+              
+              // Evitar redirección si estamos en proceso de onboarding
+              const isPublicRoute = ['/register', '/login', '/select-plan'].some(r => window.location.pathname.startsWith(r))
+              if (isPublicRoute) {
+                console.error('Ignorando redirección de tenant en ruta pública para evitar interrupción.')
+                return Promise.reject(error)
+              }
+
               // Preservar configuraciones de UI antes de limpiar
               const tourCompleted = localStorage.getItem('pos_tour_completed')
               const tourSkipped = localStorage.getItem('pos_tour_skipped')
@@ -190,6 +198,13 @@ apiClient.interceptors.response.use(
             console.error('Error crítico: Base de datos o tenant no existe')
             console.error('Detalles:', data.message)
             
+            // Evitar redirección si estamos en proceso de onboarding
+            const isPublicRoute = ['/register', '/login', '/select-plan'].some(r => window.location.pathname.startsWith(r))
+            if (isPublicRoute) {
+              console.error('Ignorando redirección de base de datos en ruta pública para evitar interrupción.')
+              return Promise.reject(error)
+            }
+
             // Preservar configuraciones de UI antes de limpiar
             const tourCompleted = localStorage.getItem('pos_tour_completed')
             const tourSkipped = localStorage.getItem('pos_tour_skipped')

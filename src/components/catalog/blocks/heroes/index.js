@@ -13,4 +13,5 @@ export { default as HeroDarkCinematic }  from './HeroDarkCinematic.vue'
 export { default as HeroVideoLoop }      from './HeroVideoLoop.vue'
 export { default as HeroParallax }       from './HeroParallax.vue'
 export { default as HeroGradientWave }   from './HeroGradientWave.vue'
+export { default as HeroGeneralPromo }   from './HeroGeneralPromo.vue'
 

@@ -30,6 +30,10 @@ export { default as HeaderMinimalFloat }   from './HeaderMinimalFloat.vue'
 // Premium / Minimal — header flotante pill que solo aparece al scroll-up
 // → Apple-style, expandable search, glassmorphism pill
 
+export { default as HeaderGeneralSearch }  from './HeaderGeneralSearch.vue'
+// Retail general / Ferretería — logo izq, barra búsqueda central gigante
+// → Estilo MercadoLibre, OBLIGATORIO para store_type=general
+
 // ─── Mapeo para selección por IA ─────────────────────────────────────────────
 // 'editorial-center'   → HeaderEditorialCenter  (moda premium, boutique)
 // 'retail-left'        → HeaderRetailLeft        (masivo, funcional, minimarket)
@@ -40,3 +44,4 @@ export { default as HeaderMinimalFloat }   from './HeaderMinimalFloat.vue'
 // 'dark-premium'       → HeaderDarkPremium        (alta costura noir, tech premium)
 // 'split-action'       → HeaderSplitAction        (e-commerce grande, marketplace)
 // 'minimal-float'      → HeaderMinimalFloat       (premium minimal, aparece solo al scroll-up)
+// 'general-header-search' → HeaderGeneralSearch   (retail general, ferreterías, miscelánea)

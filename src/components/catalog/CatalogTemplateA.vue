@@ -148,6 +148,21 @@
       @cart="router.push('/catalog/bolsa')"
     />
 
+    <!-- ★ NUEVO: General Search Header — Amazon/MercadoLibre style para retail -->
+    <HeaderGeneralSearch
+      v-else-if="headerConfig.style === 'general-header-search'"
+      :storeName="storeName"
+      :logoUrl="storeConfig.logo_url"
+      :cartCount="cartCount"
+      v-model="searchQuery"
+      :palette="aiPalette"
+      :fonts="aiFonts"
+      class="fixed top-8 left-0 right-0 z-50"
+      @menu="showMobileMenu = true"
+      @cart="router.push('/catalog/bolsa')"
+      @home="clearFilters"
+    />
+
     <!-- DEFAULT (null): Header original del sistema — Retail Fashion / Kharis-inspired -->
     <header
       v-else
@@ -454,6 +469,20 @@
         @cta="scrollToProducts"
       />
 
+      <!-- ★ NUEVO: General Promo Hero -->
+      <HeroGeneralPromo
+        v-else-if="layoutConfig.hero_style === 'general-hero-promo'"
+        :headline="heroHeadlineDisplay"
+        :subheadline="heroSubheadlineDisplay"
+        :backgroundImage="currentHeroImage"
+        :storeName="storeName"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        :ctaText="bannerCtaText"
+        :ctaSecondary="bannerCtaSecondary"
+        @cta="scrollToProducts"
+      />
+
       <!-- FALLBACK: Editorial por defecto si hero_style no reconocido -->
       <HeroEditorial
         v-else
@@ -625,6 +654,22 @@
         :fonts="aiFonts"
         ctaText="Descubre Más"
         @cta="scrollToProducts"
+      />
+      <!-- ★ NUEVO: General Bento Departments -->
+      <HookGeneralBento
+        v-else-if="hookStyle === 'general-bento-departments'"
+        :aboutUs="hookBodyText"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        :categories="categories"
+        @select-category="(id) => { selectedCategory = id; scrollToProducts() }"
+      />
+      <!-- ★ NUEVO: General Trust Benefits -->
+      <HookGeneralTrust
+        v-else-if="hookStyle === 'general-trust-benefits'"
+        :palette="aiPalette"
+        :fonts="aiFonts"
+        :trustMessages="storeConfig.ai_value_messages || []"
       />
     </div>
 
@@ -1276,10 +1321,10 @@ import QuantityModal from './QuantityModal.vue'
 import ProductCard from './ProductCard.vue'
 import POSVariantSelector from '../POSVariantSelector.vue'
 import { useCatalogCart } from '../../stores/catalogCart.js'
-import { HeroEditorial, HeroSplit, HeroStreetwear, HeroFocus, HeroPortrait, HeroDarkCinematic, HeroCarousel, HeroCentered, HeroImageGrid, HeroMinimal, HeroOverlay, HeroVideoLoop, HeroParallax, HeroGradientWave } from './blocks/heroes/index.js'
-import { HeaderEditorialCenter, HeaderRetailLeft, HeaderTransparentGlass, HeaderRetailOverlay, HeaderUtilitySearch, HeaderCenteredSerif, HeaderDarkPremium, HeaderSplitAction, HeaderMinimalFloat } from './blocks/headers/index.js'
+import { HeroEditorial, HeroSplit, HeroStreetwear, HeroFocus, HeroPortrait, HeroDarkCinematic, HeroCarousel, HeroCentered, HeroImageGrid, HeroMinimal, HeroOverlay, HeroVideoLoop, HeroParallax, HeroGradientWave, HeroGeneralPromo } from './blocks/heroes/index.js'
+import { HeaderEditorialCenter, HeaderRetailLeft, HeaderTransparentGlass, HeaderRetailOverlay, HeaderUtilitySearch, HeaderCenteredSerif, HeaderDarkPremium, HeaderSplitAction, HeaderMinimalFloat, HeaderGeneralSearch } from './blocks/headers/index.js'
 import { TrustStripDarkContrast, TrustStripMinimalBorder, TrustStripDivided, TrustStripMarquee, TrustStripSoftPills, TrustStripIconGrid, TrustStripCountdown } from './blocks/trust-strips/index.js'
-import { HookEditorialStory, HookUrbanLookbook, HookDynamicBento, HookDarkNoir, HookTestimonials, HookCollectionGrid, HookBrandManifesto } from './blocks/hooks/index.js'
+import { HookEditorialStory, HookUrbanLookbook, HookDynamicBento, HookDarkNoir, HookTestimonials, HookCollectionGrid, HookBrandManifesto, HookGeneralBento, HookGeneralTrust } from './blocks/hooks/index.js'
 import BottomNavBar from './blocks/BottomNavBar.vue'
 import { productUrl } from '../../utils/slugify.js'
 
